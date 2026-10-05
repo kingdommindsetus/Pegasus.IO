@@ -4,8 +4,8 @@ import postgres from 'postgres';
 import dotenv from 'dotenv';
 
 const root=process.cwd();
-dotenv.config({path:path.join(root,'.env.local')});
-dotenv.config();
+dotenv.config({path:path.join(root,'.env.local'),quiet:true});
+dotenv.config({quiet:true});
 
 const databaseUrl=String(process.env.DATABASE_URL||'').trim();
 if(!databaseUrl)throw new Error('DATABASE_URL is required. Copy .env.example to .env.local and set DATABASE_URL.');
