@@ -1,0 +1,24 @@
+import React, { Suspense, useMemo } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { Environment, useGLTF } from '@react-three/drei';
+import * as THREE from 'three';
+import { AgentDefinition } from '../data/agents';
+import { estimateVisemeFromFrequency } from '../utils/visemes';
+
+interface AvatarFaceProps { agent:AgentDefinition; isSpeaking:boolean; frequencyData?:Uint8Array; size?:'sm'|'md'|'lg'|'xl'; showHud?:boolean; }
+type MorphMesh=THREE.Mesh&{morphTargetDictionary?:Record<string,number>;morphTargetInfluences?:number[]};
+const SIZE={sm:'w-16 h-16',md:'w-24 h-24',lg:'w-40 h-40',xl:'w-64 h-64'};
+const MODEL_SPAN=3.2;
+
+function FaceModel({agent,isSpeaking,frequencyData}:{agent:AgentDefinition;isSpeaking:boolean;frequencyData?:Uint8Array}){
+ const {scene:source}=useGLTF('/agents/'+agent.id+'.glb');
+ const {scene,center,scale,morphs}=useMemo(()=>{const s=source.clone(true);const ms:MorphMesh[]=[];s.traverse(o=>{const m=o as MorphMesh;if(!m.isMesh)return;m.geometry=m.geometry.clone();if(Array.isArray(m.material))m.material=m.material.map(x=>x.clone());else if(m.material)m.material=m.material.clone();if(m.morphTargetDictionary&&m.morphTargetInfluences)ms.push(m)});s.updateMatrixWorld(true);const b=new THREE.Box3().setFromObject(s),z=b.getSize(new THREE.Vector3()),largest=Math.max(z.x,z.y,z.z);return{scene:s,center:b.getCenter(new THREE.Vector3()),scale:largest?MODEL_SPAN/largest:1,morphs:ms}},[source]);
+ const v=useMemo(()=>isSpeaking&&frequencyData?.length?estimateVisemeFromFrequency(frequencyData):{jaw:0,width:0,round:0},[isSpeaking,frequencyData]);
+ useFrame((state,delta)=>{const k=1-Math.exp(-delta*22),energy=isSpeaking&&frequencyData?.length?frequencyData.reduce((a,b)=>a+b,0)/(frequencyData.length*255):0;for(const m of morphs){const d=m.morphTargetDictionary!,w=m.morphTargetInfluences!;const vals:Record<string,number>={jawOpen:v.jaw,viseme_aa:Math.max(0,v.jaw*(1-v.round)),viseme_oh:Math.max(0,v.round*.95),viseme_ee:Math.max(0,v.width*1.7),viseme_mbp:isSpeaking&&v.jaw<.14?.75:0,mouthSmile:isSpeaking?.035+energy*.05:.02};for(const [n,x] of Object.entries(vals)){const i=d[n];if(i!==undefined)w[i]=THREE.MathUtils.lerp(w[i]||0,x,k)}}scene.rotation.y=Math.sin(state.clock.elapsedTime*.42)*.012;scene.rotation.x=Math.sin(state.clock.elapsedTime*.31)*.006});
+ return <group scale={scale}><primitive object={scene} position={[-center.x,-center.y,-center.z]}/></group>
+}
+
+export const AvatarFace:React.FC<AvatarFaceProps>=({agent,isSpeaking,frequencyData,size='md',showHud=true})=><div className={'relative overflow-hidden rounded-2xl border border-cyan-400/30 bg-slate-950 '+SIZE[size]}>
+ <Canvas camera={{position:[0,0,4.3],fov:32}} dpr={[1,1.5]}><ambientLight intensity={1.8}/><directionalLight position={[3,4,4]} intensity={2.2}/><Suspense fallback={null}><FaceModel agent={agent} isSpeaking={isSpeaking} frequencyData={frequencyData}/><Environment preset="studio"/></Suspense></Canvas>
+ {showHud&&<div className={'pointer-events-none absolute bottom-1 left-1 rounded px-1.5 py-.5 text-[7px] font-mono '+(isSpeaking?'bg-emerald-950/80 text-emerald-300':'bg-slate-950/70 text-cyan-300')}>{isSpeaking?'LIVE':'GLB'}</div>}
+ </div>;

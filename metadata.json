@@ -1,0 +1,10 @@
+{
+  "name": "Pegasus.io · Autonomous Executive Operating System",
+  "description": "12-agent autonomous executive operating system with durable memory, governed Google AI Studio reasoning, ElevenLabs voice, and Browser Web Speech fallback.",
+  "requestFramePermissions": [
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GOOGLE_AI"
+  ]
+}
