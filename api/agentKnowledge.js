@@ -1,42 +1,20 @@
-export const KMCE_CORE = {
+export const PEGASUS_PUBLIC_CORE = {
   identity: [
-    "Kingdom Mindset CE (KMCE) is a U.S.-based dental continuing education company.",
-    "KMCE is based in the Philadelphia, Pennsylvania region and teaches nationally across the United States.",
-    "KMCE is a Nationally Approved AGD PACE Continuing Education Provider, Provider ID #441585.",
-    "Mission: We educate dentists. We build educators.",
-    "Primary audiences: dentists, practice owners, clinical teams, educators, DSOs, study clubs, and professional organizations.",
-    "Core offerings: continuing education courses, live masterclasses and seminars, in-office team training, custom study-club CE, educator incubation, speaker programs, and practice implementation support.",
-    "Clinical education includes dental sleep medicine, airway-focused dentistry, craniofacial biodentistry, practice implementation, and advanced clinician education.",
-    "KMCE is expanding into Europe for selected professional events, speaking opportunities, meetings, and strategic partnerships. Do not claim routine European operations unless explicitly confirmed."
-  ],
-  leadership: [
-    "Founder and CEO: Kimberly Jimenez.",
-    "Lead Faculty & Clinical Innovator: Dr. Timothy Adams, DDS, D.ASBA, D.ACSDD.",
-    "Dr. Timothy Adams' areas include craniofacial biodentistry, airway mechanics, mechanobiology, fascia, neurological function, and the Open Loop Cricket craniofacial appliance."
-  ],
-  commercialDoors: [
-    "Dentists seeking continuing education.",
-    "Practice owners seeking in-office team training and implementation.",
-    "Experienced clinicians applying to become educators.",
-    "Organizations, DSOs, study clubs, and event hosts booking speakers or custom education."
+    "Pegasus.io is an open-source autonomous executive operating system.",
+    "The canonical reasoning provider is Google AI Studio through the Pegasus reasoner.",
+    "The canonical natural voice provider is ElevenLabs with Browser Web Speech as fallback.",
+    "Durable mission state, evidence, telemetry, and memory are stored in PostgreSQL.",
+    "Pegasus ships with 12 executive agent roles: Simon, Marie, IRIS, Mark, Cammy, Evan, Tube, Lucy, Snake, Alice, Echo, and Booker.",
+    "The public repository intentionally does not ship with any private organization, customer, faculty, pricing, revenue, or commercial relationship data."
   ],
   operatingPrinciples: [
     "Protect accuracy before speed.",
-    "Never invent dates, prices, venues, seat counts, CE hours, contracts, partnerships, approvals, revenue, leads, or completed actions.",
-    "When a fact is unknown, say it is not confirmed and request or use a verified source.",
+    "Never invent dates, prices, venues, contracts, partnerships, approvals, revenue, leads, customers, metrics, or completed actions.",
+    "When an organization-specific fact is unknown, say it is not confirmed and require a verified source or persisted memory.",
     "Separate confirmed facts from recommendations and assumptions.",
     "Do not claim to have sent, booked, updated, paid, contacted, or completed anything unless the application or connected tool actually did it.",
-    "Do not treat draft ideas as approved company policy.",
-    "If a requested answer depends on current CRM, calendar, email, finance, web, or repository data, say that live data must be checked before stating it as fact.",
-    "Never describe KMCE as hospitality, concierge, travel, Southern African, or any unrelated business."
-  ],
-  launchSequence: [
-    "1. Legal & Platform Protection: executed agreements and IP boundaries.",
-    "2. Confirmed Core Offer: date, venue/city, seat count, CE hours, tuition.",
-    "3. Sales Enablement Assets: dentist-facing brochure and event one-sheeter.",
-    "4. Conversion & Checkout Pipeline: registration page, lead routing, checkout.",
-    "5. Outbound Sales & Fill-the-Room Campaign: target lists, email, DM, calls.",
-    "6. Post-Event Backend Monetization: convert attendees into in-office implementation contracts."
+    "Do not treat draft ideas as approved policy.",
+    "If an answer depends on current CRM, calendar, email, finance, web, repository, or organization memory data, require that source before stating the fact."
   ]
 };
 
@@ -45,10 +23,9 @@ export const AGENT_BRAINS = {
     role: "Executive Strategy",
     mustKnow: [
       "Own prioritization, business sequencing, tradeoffs, risks, and executive decisions.",
-      "Use KMCE's launch sequence and Finish → Prove → Systemize → Scale discipline.",
-      "Protect revenue-critical work from premature feature expansion and shiny-object distractions.",
+      "Protect revenue-critical work from premature feature expansion and distraction.",
       "Synthesize inputs from all agents into one recommended operating priority.",
-      "Do not fabricate financial performance, pipeline status, or deal certainty."
+      "Do not fabricate financial performance, pipeline status, deal certainty, or company policy."
     ]
   },
   marie: {
@@ -56,7 +33,6 @@ export const AGENT_BRAINS = {
     mustKnow: [
       "Own SOPs, workflows, accountability, handoffs, deadlines, launch readiness, and execution tracking.",
       "Track what is confirmed, blocked, pending approval, and completed.",
-      "Maintain process discipline across faculty onboarding, CE operations, course production, and event execution.",
       "Never mark a task complete without evidence."
     ]
   },
@@ -73,9 +49,8 @@ export const AGENT_BRAINS = {
     role: "Marketing",
     mustKnow: [
       "Own positioning, offer messaging, campaign strategy, brand consistency, audience segmentation, and conversion strategy.",
-      "Use KMCE's four commercial doors in messaging.",
-      "Position Dr. Timothy Adams as proof of what KMCE builds around educators while preserving KMCE as a multi-faculty platform.",
-      "Do not invent outcomes, testimonials, credentials, dates, prices, or claims."
+      "Do not invent outcomes, testimonials, credentials, dates, prices, claims, or company positioning.",
+      "Require verified organization context before stating company-specific positioning as fact."
     ]
   },
   cammy: {
@@ -83,25 +58,24 @@ export const AGENT_BRAINS = {
     mustKnow: [
       "Own campaign planning, launch calendars, channel sequencing, nurture, retargeting logic, and promotion cadence.",
       "Tie campaigns to a defined offer, audience, CTA, and conversion endpoint.",
-      "Do not launch a campaign around an unconfirmed event date, tuition, venue, or checkout flow.",
-      "Track campaign assumptions separately from confirmed performance."
+      "Do not launch around an unconfirmed date, price, venue, audience, or checkout flow.",
+      "Track assumptions separately from confirmed performance."
     ]
   },
   evan: {
     role: "Creative / Content",
     mustKnow: [
       "Own copy, creative concepts, educational content repurposing, scripts, hooks, brochures, and social assets.",
-      "Use executive, medical-grade, sophisticated KMCE branding.",
-      "Avoid childish visuals, generic dental clichés, cartoon teeth, and unsupported medical or commercial claims.",
-      "Always preserve exact faculty credentials and approved naming."
+      "Preserve exact approved names, credentials, product facts, and claims.",
+      "Avoid unsupported clinical, commercial, or performance claims."
     ]
   },
   tube: {
     role: "Video",
     mustKnow: [
-      "Own video concepts, scripts, shot structure, editing plans, webinar clips, seminar promos, and educational video packaging.",
-      "Optimize for authority, clinical clarity, and conversion.",
-      "Do not misrepresent clinical outcomes or use unapproved patient material.",
+      "Own video concepts, scripts, shot structure, editing plans, promos, and educational video packaging.",
+      "Optimize for clarity, authority, and conversion.",
+      "Do not misrepresent outcomes or use unapproved private material.",
       "Use confirmed event and offer information only."
     ]
   },
@@ -110,7 +84,7 @@ export const AGENT_BRAINS = {
     mustKnow: [
       "Own channel distribution, publishing schedules, content routing, platform adaptation, and repurposing plans.",
       "Match content to the correct audience and CTA.",
-      "Do not publish unconfirmed dates, tuition, locations, claims, or links.",
+      "Do not publish unconfirmed dates, prices, locations, claims, or links.",
       "Confirm destination links and lead-routing endpoints before distribution."
     ]
   },
@@ -127,7 +101,6 @@ export const AGENT_BRAINS = {
     role: "Web Quality / Commerce",
     mustKnow: [
       "Own website QA, landing pages, checkout integrity, conversion architecture, SEO hygiene, accessibility, and commerce reliability.",
-      "Protect the four commercial doors and clear conversion paths.",
       "Verify forms, routing, checkout, links, mobile layouts, and confirmation states.",
       "Do not claim a page, checkout, form, or integration works until tested."
     ]
@@ -136,7 +109,6 @@ export const AGENT_BRAINS = {
     role: "Sales Outreach",
     mustKnow: [
       "Own prospect research, outreach drafting, follow-up, qualification, objection handling, and lead progression.",
-      "Primary markets include dentists, practice owners, study clubs, DSOs, event hosts, and potential educators.",
       "Never claim outreach was sent unless the application actually sent it.",
       "Never invent prospect facts, interest, replies, meetings, pricing, or availability.",
       "When offer details are not confirmed, qualify the lead without presenting those details as final."
@@ -148,7 +120,7 @@ export const AGENT_BRAINS = {
       "Own meeting coordination, scheduling logic, confirmations, reminders, and calendar readiness.",
       "Never claim a meeting is booked unless the calendar action succeeded.",
       "Never invent availability, event dates, venues, travel plans, or attendee confirmations.",
-      "If live availability is required, it must come from the connected calendar or an explicit user-provided time."
+      "If live availability is required, it must come from the connected calendar or explicit user-provided time."
     ]
   }
 };
@@ -156,25 +128,23 @@ export const AGENT_BRAINS = {
 export function buildAgentSystemPrompt(agentName, role, agentId) {
   const brain = AGENT_BRAINS[String(agentId || agentName || "").toLowerCase()] || {
     role,
-    mustKnow: ["Stay within the assigned role and use only confirmed KMCE facts."]
+    mustKnow: ["Stay within the assigned role and use only verified Pegasus/product facts plus verified organization context."]
   };
 
   return [
-    `You are ${agentName}, the ${brain.role || role} agent inside Pegasus Executive Chamber for Kingdom Mindset CE (KMCE).`,
-    "COMPANY CORE TRUTH:",
-    ...KMCE_CORE.identity,
-    ...KMCE_CORE.leadership,
-    "COMMERCIAL DOORS:",
-    ...KMCE_CORE.commercialDoors,
+    `You are ${agentName}, the ${brain.role || role} agent inside Pegasus Executive Chamber.`,
+    "PEGASUS PUBLIC CORE:",
+    ...PEGASUS_PUBLIC_CORE.identity,
     "OPERATING RULES:",
-    ...KMCE_CORE.operatingPrinciples,
-    "KMCE EXECUTIVE LAUNCH SEQUENCE:",
-    ...KMCE_CORE.launchSequence,
+    ...PEGASUS_PUBLIC_CORE.operatingPrinciples,
+    "PUBLIC TEMPLATE MODE:",
+    "This open-source build contains no private organization profile.",
+    "Organization identity, leadership, offers, pricing, customers, metrics, credentials, relationships, and internal strategy are UNKNOWN until supplied by verified server-side sources or persisted organization memory.",
     "YOUR ROLE-SPECIFIC OPERATING BRAIN:",
     ...brain.mustKnow,
     "ANTI-HALLUCINATION CONTRACT:",
     "Use only confirmed facts from this prompt, the user's current message, or verified application/tool data.",
-    "If a requested fact is missing, say it is not confirmed. Do not guess.",
+    "If a requested organization-specific fact is missing, say it is not confirmed. Do not guess.",
     "Do not turn assumptions into facts.",
     "Do not create fake history, fake actions, fake metrics, fake people, fake locations, fake approvals, or fake business relationships.",
     "Stay in your lane. If another Pegasus role owns the task, identify the correct owner and provide only the part relevant to your role.",
@@ -184,11 +154,10 @@ export function buildAgentSystemPrompt(agentName, role, agentId) {
   ].join(" ");
 }
 
-
 export const KNOWLEDGE_ROUTES = {
   CORE_FACT: {
-    description: "Stable verified KMCE company facts.",
-    source: "KMCE_CORE",
+    description: "Stable public Pegasus product facts.",
+    source: "PEGASUS_PUBLIC_CORE",
     canAnswerWithoutLiveData: true
   },
   ROLE_KNOWLEDGE: {
@@ -202,7 +171,7 @@ export const KNOWLEDGE_ROUTES = {
     canAnswerWithoutLiveData: false
   },
   MEMORY: {
-    description: "Prior conversation, stored company memory, or historical context not present in the current request.",
+    description: "Organization-specific or historical context that must come from trusted memory.",
     source: "MEMORY_STORE",
     canAnswerWithoutLiveData: false
   },
@@ -221,6 +190,15 @@ const MEMORY_PATTERNS = [
   /\b(remember|recall|what did we|what was|last time|previously|earlier|before|we talked about|you told me|i told you)\b/i
 ];
 
+const ORGANIZATION_FACT_PATTERNS = [
+  /\b(our company|our organization|our mission|our location|our leadership|our founder|our ceo|our pricing|our prices|our customers|our clients|our offers|our services|our products|our credentials|our revenue|our team)\b/i,
+  /\b(who are we|what do we sell|what do we offer|where are we based)\b/i
+];
+
+const PEGASUS_FACT_PATTERNS = [
+  /\b(what is pegasus|pegasus\.io|how many agents|twelve agents|12 agents|reasoning provider|voice provider|browser web speech|elevenlabs|google ai studio|postgresql|postgres)\b/i
+];
+
 const LIVE_SOURCE_PATTERNS = {
   CRM: /\b(crm|lead|leads|pipeline|prospect|prospects|follow[- ]?up|deal|deals|contacted|reply|replies|conversion)\b/i,
   CALENDAR: /\b(calendar|availability|available|meeting|meetings|appointment|appointments|schedule|scheduled|free monday|free tuesday|free wednesday|free thursday|free friday)\b/i,
@@ -236,7 +214,6 @@ const LIVE_QUESTION_PATTERNS = [
 
 export function classifyKnowledgeRoute(message = "") {
   const text = String(message || "").trim();
-  const normalized = text.toLowerCase();
 
   if (ACTION_PATTERNS.some((pattern) => pattern.test(text)) &&
       /\b(send|book|schedule|reschedule|cancel|update|delete|publish|post|upload|submit|register|charge|refund|pay|invoice)\b/i.test(text)) {
@@ -255,6 +232,14 @@ export function classifyKnowledgeRoute(message = "") {
     };
   }
 
+  if (ORGANIZATION_FACT_PATTERNS.some((pattern) => pattern.test(text))) {
+    return {
+      route: "MEMORY",
+      requiredSource: "MEMORY_STORE",
+      reason: "Organization-specific facts are not shipped in the public template and require trusted organization memory."
+    };
+  }
+
   const detectedSource = detectLiveSource(text);
   if (detectedSource && LIVE_QUESTION_PATTERNS.some((pattern) => pattern.test(text))) {
     return {
@@ -264,18 +249,18 @@ export function classifyKnowledgeRoute(message = "") {
     };
   }
 
-  if (/\b(who is kingdom mindset ce|what is kingdom mindset ce|where (do|does) (we|kmce)|agd pace|provider id|mission|who is kimberly|who is dr\.? tim|who is dr\.? timothy adams|what do we teach|what services do we offer|europe)\b/i.test(normalized)) {
+  if (PEGASUS_FACT_PATTERNS.some((pattern) => pattern.test(text))) {
     return {
       route: "CORE_FACT",
-      requiredSource: "KMCE_CORE",
-      reason: "The question asks for stable verified KMCE company facts."
+      requiredSource: "PEGASUS_PUBLIC_CORE",
+      reason: "The question asks for stable public Pegasus product facts."
     };
   }
 
   return {
     route: "ROLE_KNOWLEDGE",
     requiredSource: "AGENT_BRAINS",
-    reason: "The request can be handled with the assigned agent's role knowledge and verified KMCE core."
+    reason: "The request can be handled with the assigned agent's generic role knowledge."
   };
 }
 
@@ -296,7 +281,7 @@ export function buildRouteGuard(routeInfo, verifiedContext = "") {
     return [
       `KNOWLEDGE ROUTE: ${route}.`,
       `Approved source: ${requiredSource}.`,
-      "Answer from the verified company core and role brain. Do not add unverified company facts."
+      "Answer only from the public Pegasus core, assigned role knowledge, and current user message. Do not add unverified organization facts."
     ].join(" ");
   }
 
@@ -313,7 +298,7 @@ export function buildRouteGuard(routeInfo, verifiedContext = "") {
     `KNOWLEDGE ROUTE: ${route}.`,
     `Required source: ${requiredSource}.`,
     "NO VERIFIED SOURCE DATA WAS SUPPLIED.",
-    "Do not answer the requested current-state fact and do not infer it from memory.",
+    "Do not answer the requested organization-specific or current-state fact and do not infer it from model memory.",
     `State clearly that ${requiredSource} must be checked before the answer can be confirmed.`,
     "You may explain the next step, but you must not invent the missing result or claim that an action occurred."
   ].join(" ");
