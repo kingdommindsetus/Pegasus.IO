@@ -12,7 +12,7 @@ if(!databaseUrl)throw new Error('DATABASE_URL is required. Copy .env.example to 
 
 const migrationsDir=path.join(root,'core','database','migrations');
 const files=fs.readdirSync(migrationsDir)
-  .filter(name=>/^\\d+.*\\.sql$/i.test(name))
+  .filter(name=>/^\d+.*\.sql$/i.test(name))
   .sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}));
 
 if(!files.length)throw new Error('No database migrations found.');
