@@ -15,8 +15,9 @@ export function makeSessionCookie(){
 function cookieValue(req:any){const raw=String(req.headers?.cookie||'');for(const part of raw.split(';')){const [k,...v]=part.trim().split('=');if(k===COOKIE)return v.join('=');}return '';}
 function validSession(req:any){const token=cookieValue(req);const [payload,sig]=token.split('.');if(!payload||!sig||!isCoreAuthConfigured())return false;let expected='';try{expected=sign(payload);}catch{return false;}if(!safeEqual(sig,expected))return false;try{const data=JSON.parse(Buffer.from(payload,'base64url').toString());return data.role==='founder'&&Number(data.exp)>Date.now();}catch{return false;}}
 export function hasValidCoreSession(req:any){return validSession(req);}
-export function sessionCookieHeader(token:string){return COOKIE+'='+token+'; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=28800';}
-export function clearSessionCookieHeader(){return COOKIE+'=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0';}
+function secureCookieFlag(){return String(process.env.NODE_ENV||'').toLowerCase()==='production'?'; Secure':'';}
+export function sessionCookieHeader(token:string){return COOKIE+'='+token+'; HttpOnly'+secureCookieFlag()+'; SameSite=Strict; Path=/; Max-Age=28800';}
+export function clearSessionCookieHeader(){return COOKIE+'=; HttpOnly'+secureCookieFlag()+'; SameSite=Strict; Path=/; Max-Age=0';}
 export function validAdminPassword(value:unknown){const configured=String(process.env.PEGASUS_ADMIN_PASSWORD||'');return !!configured&&safeEqual(String(value||''),configured);}
 export function getRequestIp(req:any){const xf=String(req.headers?.['x-forwarded-for']||'').split(',')[0].trim();return xf||String(req.headers?.['x-real-ip']||req.socket?.remoteAddress||'unknown');}
 export function enforceRateLimit(req:any,res:any,limit=30,windowMs=60_000){const now=Date.now(),key=getRequestIp(req),cur=buckets.get(key);if(!cur||cur.reset<=now){buckets.set(key,{count:1,reset:now+windowMs});return true;}if(cur.count>=limit){res.setHeader?.('Retry-After',String(Math.max(1,Math.ceil((cur.reset-now)/1000))));res.status(429).json({error:'Too many requests'});return false;}cur.count++;return true;}
