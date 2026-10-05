@@ -71,6 +71,7 @@ After Booker completes, accumulated persisted decisions and evidence route back 
 
 ### Prerequisites
 
+- Git
 - Node.js **22+**
 - npm
 - PostgreSQL-compatible database
@@ -92,6 +93,8 @@ npm install
 
 For CI/reproducible installs, use `npm ci`.
 
+> **Windows PowerShell:** if your execution policy blocks `npm.ps1`, use `npm.cmd install` (and `npm.cmd run ...` for later commands) or run the commands from Command Prompt.
+
 ### 3. Create your local environment file
 
 macOS/Linux:
@@ -110,14 +113,18 @@ Populate only your local `.env.local`. Never commit real credentials.
 
 ### 4. Initialize PostgreSQL
 
-Set `DATABASE_URL`, then apply all SQL migrations in `core/database/migrations/` **in numeric order**.
-
-Example with `psql`:
+Use a **fresh PostgreSQL database** for first-time setup, set `DATABASE_URL` in `.env.local`, then run:
 
 ```bash
-for f in core/database/migrations/*.sql; do
-  psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f "$f"
-done
+npm run db:migrate
+```
+
+The migration runner loads `.env.local`, applies every SQL migration in numeric order with the required `pegasus_core` schema context, and records applied migrations. It intentionally refuses to run against an existing untracked Pegasus schema so a local onboarding command cannot accidentally mutate an established production database.
+
+On Windows PowerShell with restricted script execution:
+
+```powershell
+npm.cmd run db:migrate
 ```
 
 ### 5. Start Pegasus
