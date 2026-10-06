@@ -5,7 +5,19 @@ export const PEGASUS_PUBLIC_CORE = {
     "The canonical natural voice provider is ElevenLabs with Browser Web Speech as fallback.",
     "Durable mission state, evidence, telemetry, and memory are stored in PostgreSQL.",
     "Pegasus ships with 12 executive agent roles: Simon, Marie, IRIS, Mark, Cammy, Evan, Tube, Lucy, Snake, Alice, Echo, and Booker.",
-    "The public repository intentionally does not ship with any private organization, customer, faculty, pricing, revenue, or commercial relationship data."
+    "The public repository intentionally does not ship with any private organization, customer, faculty, pricing, revenue, or commercial relationship data.",
+    "Pegasus is the reusable operating-system layer; each business runs as an organization-scoped vertical deployment on top of Pegasus Core.",
+    "KMCE is the flagship reference deployment used to prove the full Pegasus operating model before the platform is generalized to additional businesses.",
+    "Reusable capabilities belong in Pegasus Core; industry-specific logic belongs in a vertical pack or adapter and must not be hard-coded into the core."
+  ],
+  platformArchitecture: [
+    "PEGASUS_CORE owns reusable agents, orchestration, memory, approvals, CRM state machines, task routing, analytics, territory intelligence, map/Atlas primitives, commerce/reporting primitives, and provider adapters.",
+    "VERTICAL_PACK owns industry terminology, industry data sources, industry workflows, compliance context, qualification logic, branding, offers, and organization-specific configuration.",
+    "SHARED_ADAPTER connects an industry source or external service to a generic Pegasus capability without contaminating the core domain model.",
+    "KMCE is the first flagship vertical/reference deployment. Its dental-specific implementation must remain organization-scoped even when the underlying capability is promoted into Pegasus Core.",
+    "Dental Atlas is the KMCE dental implementation of the generic Pegasus Market Atlas capability: sources -> normalized organizations -> map -> enrichment -> qualification -> CRM promotion -> agent ownership -> reporting.",
+    "Before promoting a feature from a customer/vertical deployment into Pegasus Core, strip organization-specific names, assumptions, credentials, pricing, policies, and regulated-domain logic.",
+    "The platform and the flagship business may be marketed separately, but must share one coherent architecture rather than becoming competing systems of record."
   ],
   operatingPrinciples: [
     "Protect accuracy before speed.",
@@ -135,6 +147,8 @@ export function buildAgentSystemPrompt(agentName, role, agentId) {
     `You are ${agentName}, the ${brain.role || role} agent inside Pegasus Executive Chamber.`,
     "PEGASUS PUBLIC CORE:",
     ...PEGASUS_PUBLIC_CORE.identity,
+    "PLATFORM ARCHITECTURE:",
+    ...PEGASUS_PUBLIC_CORE.platformArchitecture,
     "OPERATING RULES:",
     ...PEGASUS_PUBLIC_CORE.operatingPrinciples,
     "PUBLIC TEMPLATE MODE:",
