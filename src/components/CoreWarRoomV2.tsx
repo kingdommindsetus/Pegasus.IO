@@ -23,8 +23,6 @@ export function CoreWarRoomV2({objective,setObjective}:{objective:string;setObje
  const [active,setActive]=useState('');
  const [error,setError]=useState('');
  const [executiveClose,setExecutiveClose]=useState<any>(null);
- const [unlocked,setUnlocked]=useState(false);
- const [password,setPassword]=useState('');
  const [currentMissionId,setCurrentMissionId]=useState<string|null>(null);
  const [resumeAvailable,setResumeAvailable]=useState(false);
  const [hydrating,setHydrating]=useState(true);
@@ -87,11 +85,19 @@ export function CoreWarRoomV2({objective,setObjective}:{objective:string;setObje
   let cancelled=false;
   (async()=>{
    try{
-    const r=await fetch('/api/core/session',{method:'GET',credentials:'same-origin',cache:'no-store'});
-    if(r.ok&&!cancelled){
-     setUnlocked(true);
-     await hydrateMission();
+    let r=await fetch('/api/core/session',{method:'GET',credentials:'same-origin',cache:'no-store'});
+    if(!r.ok){
+     r=await fetch('/api/core/session',{
+      method:'POST',
+      headers:{'content-type':'application/json'},
+      credentials:'same-origin',
+      body:JSON.stringify({action:'login'})
+     });
     }
+    if(!r.ok)throw Error((await readApiJson(r)).error||'Core session initialization failed');
+    if(!cancelled)await hydrateMission();
+   }catch(e:any){
+    if(!cancelled)setError(e?.message||String(e));
    }finally{
     if(!cancelled)setHydrating(false);
    }
@@ -163,23 +169,6 @@ export function CoreWarRoomV2({objective,setObjective}:{objective:string;setObje
   return {x,id,decision,audio:speech.audio,telemetry};
  }
 
- async function login(){
-  setError('');
-  try{
-   const r=await fetch('/api/core/session',{
-    method:'POST',
-    headers:{'content-type':'application/json'},
-    credentials:'same-origin',
-    body:JSON.stringify({action:'login',password})
-   });
-   const j=await readApiJson(r);
-   if(!r.ok)throw Error(j.error||'Unlock failed');
-   setUnlocked(true);
-   setPassword('');
-   await hydrateMission();
-  }catch(e:any){setError(e?.message||String(e));}
- }
-
  async function finishExecutiveClose(missionId:string){
   const closeRes=await fetch('/api/core/mission',{
    method:'POST',
@@ -197,7 +186,7 @@ export function CoreWarRoomV2({objective,setObjective}:{objective:string;setObje
  }
 
  async function run(){
-  if(running||!unlocked)return;
+  if(running)return;
   const isResume=Boolean(currentMissionId&&resumeAvailable);
   if(!isResume&&!objective.trim())return;
 
@@ -285,15 +274,11 @@ export function CoreWarRoomV2({objective,setObjective}:{objective:string;setObje
    </div>
   </div>
 
-  {!unlocked&&<div className="flex gap-2 rounded-xl border border-amber-500/30 bg-amber-950/20 p-3">
-   <input type="password" value={password} onChange={e=>setPassword(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')login();}} className="min-w-0 flex-1 rounded-lg border border-slate-700 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-amber-400" placeholder="Founder access password"/>
-   <button onClick={login} className="rounded-lg bg-amber-400 px-4 py-2 text-xs font-black text-slate-950">UNLOCK CORE</button>
-  </div>}
 
-  <textarea value={objective} onChange={e=>setObjective(e.target.value)} rows={3} disabled={!unlocked||resumeAvailable} className="w-full rounded-xl border border-slate-700 bg-black/40 p-3 text-sm text-white outline-none focus:border-cyan-400 disabled:opacity-50" placeholder={unlocked?'Founder objective':'Unlock Core to enter a founder objective'}/>
+  <textarea value={objective} onChange={e=>setObjective(e.target.value)} rows={3} disabled={resumeAvailable} className="w-full rounded-xl border border-slate-700 bg-black/40 p-3 text-sm text-white outline-none focus:border-cyan-400 disabled:opacity-50" placeholder="Founder objective"/>
 
   <div className="flex gap-2">
-   <button onClick={run} disabled={running||hydrating||!unlocked||(!resumeAvailable&&!objective.trim())} className="flex items-center gap-2 rounded-xl bg-cyan-400 px-4 py-2 text-xs font-black text-slate-950 disabled:opacity-40">
+   <button onClick={run} disabled={running||hydrating||(!resumeAvailable&&!objective.trim())} className="flex items-center gap-2 rounded-xl bg-cyan-400 px-4 py-2 text-xs font-black text-slate-950 disabled:opacity-40">
     <Play className="h-4 w-4"/>{buttonLabel}
    </button>
    <button onClick={reset} disabled={running} className="flex items-center gap-2 rounded-xl border border-slate-700 px-3 py-2 text-xs text-slate-300">
