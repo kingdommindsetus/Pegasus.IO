@@ -164,6 +164,7 @@ export const VoiceStudioModal: React.FC<VoiceStudioModalProps> = ({
       });
 
       const data = await res.json();
+      if (!res.ok || !data.text) throw new Error(data.error || 'Agent response unavailable.');
       const replyText = data.text || 'Directive acknowledged.';
 
       const agentMsg: Message = {
@@ -180,7 +181,7 @@ export const VoiceStudioModal: React.FC<VoiceStudioModalProps> = ({
       handleSpeakText(replyText, agentMsg.id);
     } catch (err: any) {
       console.error('Chat error:', err);
-      const fallbackText = `I hear you loud and clear. As ${agent.name} (${agent.tagline}), my priority remains focused on executing ${agent.department} directives.`;
+      const fallbackText = `${agent.name} could not reach the reasoning service. Please retry your request. No action was completed.`;
       const errorMsg: Message = {
         id: `agent-${Date.now()}`,
         sender: 'agent',
