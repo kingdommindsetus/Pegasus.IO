@@ -4,6 +4,7 @@ import { HolographicAgent } from "./agents/HolographicAgent";
 import type { AgentState, SpeechResult } from "./agents/types";
 import { estimateVisemesFromText } from "./agents/rig/visemes";
 import { agentExecutionChain, agentRegistry } from "./agents/agentRegistry";
+import { getAgentVoiceConfig, selectAgentSpeechVoice } from "../lib/agent-voice-registry";
 
 const greeting =
   "Greetings, Kimberly. Echo online. Sales Outreach is ready. What directive should we execute?";
@@ -45,68 +46,28 @@ export function ExecutiveChamber() {
   const speak = useCallback(async (text: string) => {
     stopAudio();
 
-    const response = await fetch("/api/agent/speak", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text, agentId: activeAgentId })
-    });
-
-    if (!response.ok) throw new Error("Voice request failed.");
-    const data = await response.json();
-
-    if (data.fallbackToWebSpeech || !data.audioUrl) {
-      if (!("speechSynthesis" in window)) throw new Error("Browser speech is unavailable.");
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = activeAgentId === "simon" || activeAgentId === "alice" ? "en-GB" : "en-US";
-      setSpeech({ transcript: text, duration: Math.max(2, text.split(/\\s+/).length / 2.6), visemes: [], provider: "BROWSER_SPEECH", audioUrl: "" });
-      setState("SPEAKING");
-      await new Promise<void>((resolve) => {
-        utterance.onend = () => { setState("IDLE"); setSpeech(null); resolve(); };
-        utterance.onerror = () => { setState("ERROR"); setSpeech(null); resolve(); };
-        window.speechSynthesis.speak(utterance);
-      });
-      return;
-    }
-
-    const url = String(data.audioUrl);
-    const audio = new Audio(url);
-    audio.preload = "auto";
-    audioRef.current = audio;
-
-    const duration = await new Promise<number>((resolve, reject) => {
-      const fallback = Math.max(2, text.split(/\s+/).length / 2.6);
-      audio.onloadedmetadata = () => {
-        resolve(Number.isFinite(audio.duration) && audio.duration > 0 ? audio.duration : fallback);
-      };
-      audio.onerror = () => reject(new Error("Audio could not be loaded."));
-      audio.load();
-    });
-
+    if (!("speechSynthesis" in window)) throw new Error("Browser speech is unavailable.");
+    window.speechSynthesis.cancel();
+    const config = getAgentVoiceConfig(activeAgentId);
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = config.lang;
+    utterance.pitch = config.pitch;
+    utterance.rate = config.rate;
+    utterance.voice = selectAgentSpeechVoice(window.speechSynthesis.getVoices(), config);
+    const duration = Math.max(2, text.split(/\s+/).length / 2.6);
     setSpeech({
       transcript: text,
       duration,
       visemes: estimateVisemesFromText(text, duration),
-      provider: "ELEVENLABS",
-      audioUrl: url
+      provider: "BROWSER_SPEECH",
+      audioUrl: ""
     });
     setState("SPEAKING");
-
-    audio.onended = () => {
-      setState("IDLE");
-      setSpeech(null);
-      if (objectUrlRef.current === url) {
-        URL.revokeObjectURL(url);
-        objectUrlRef.current = null;
-      }
-      audioRef.current = null;
-    };
-
-    audio.onerror = () => {
-      setState("ERROR");
-      setSpeech(null);
-    };
-
-    await audio.play();
+    await new Promise<void>((resolve) => {
+      utterance.onend = () => { setState("IDLE"); setSpeech(null); resolve(); };
+      utterance.onerror = () => { setState("ERROR"); setSpeech(null); resolve(); };
+      window.speechSynthesis.speak(utterance);
+    });
   }, [activeAgentId, stopAudio]);
 
   const askAgent = useCallback(async (directive: string) => {
@@ -170,7 +131,7 @@ export function ExecutiveChamber() {
         </div>
         <div className="header-actions">
           <button className="voice-chip" onClick={() => void speak(message)} disabled={state === "THINKING"}>
-            <Volume2 size={16} /> Natural Voice Synced
+            <Volume2 size={16} /> Browser Voice Synced
           </button>
           <button className="close-chip" aria-label="Close chamber"><X size={20} /></button>
         </div>
@@ -203,7 +164,7 @@ export function ExecutiveChamber() {
             <div><span>IDENTITY:</span><strong>{activeAgent.displayName.toUpperCase()} // AGENT-{activeAgentId.toUpperCase()}</strong></div>
             <div><span>STATUS:</span><strong className="green">● ACTIVE & SYNCHRONIZED</strong></div>
             <div><span>LLM CORE:</span><strong className="cyan">GOOGLE AI STUDIO</strong></div>
-            <div><span>VOICE:</span><strong className="cyan">ELEVENLABS · BROWSER FALLBACK</strong></div>
+            <div><span>VOICE:</span><strong className="cyan">BROWSER WEB SPEECH</strong></div>
           </div>
         </aside>
 

@@ -302,7 +302,7 @@ export const AgentBlueprintDrawer: React.FC<AgentBlueprintDrawerProps> = ({
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-sm font-semibold text-white">Voice Engineering Specification</h3>
-                  <p className="text-xs text-slate-400 mt-0.5">Parameters for Gemini 3.8 Flash TTS & Browser Synthesis</p>
+                  <p className="text-xs text-slate-400 mt-0.5">Parameters for native Browser Web Speech synthesis</p>
                 </div>
                 <button
                   onClick={() => handleCopy(JSON.stringify(agent.voiceConfig, null, 2), 'voice')}
@@ -315,7 +315,7 @@ export const AgentBlueprintDrawer: React.FC<AgentBlueprintDrawerProps> = ({
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="p-3 rounded-lg bg-slate-950 border border-slate-800">
-                  <div className="text-[11px] text-slate-400 font-mono">ElevenLabs Voice</div>
+                  <div className="text-[11px] text-slate-400 font-mono">Browser Voice Target</div>
                   <div className="text-sm font-semibold text-amber-300 mt-1">{agent.voiceConfig.voiceName}</div>
                 </div>
 

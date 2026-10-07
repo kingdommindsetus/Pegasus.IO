@@ -17,16 +17,23 @@ test('reasoning uses the canonical Google AI Studio reasoner only',()=>{
   assert.equal(fs.existsSync(path.join(ROOT,'core/runtime/agents/openaiReasoner.ts')),false);
 });
 
-test('voice uses the canonical Pegasus ElevenLabs registry with browser fallback',()=>{
+test('client voice uses the zero-cost browser Web Speech registry',()=>{
+  const audio=read('src/utils/audio.ts');
+  const warRoom=read('src/components/CoreWarRoomV2.tsx');
   const speak=read('api/agent/speak.ts');
-  const registry=read('api/pegasusVoiceRegistry.js');
-  assert.match(speak,/getPegasusAgentVoice/);
-  assert.match(speak,/api\.elevenlabs\.io/);
-  assert.match(speak,/WEB_SPEECH_FALLBACK/);
+  const registry=read('lib/agent-voice-registry.ts');
+  assert.match(audio,/window\.speechSynthesis\.speak/);
+  assert.match(audio,/getAgentVoiceConfig/);
+  assert.match(audio,/selectAgentSpeechVoice/);
+  assert.equal(audio.includes('/api/agent/speak'),false);
+  assert.equal(warRoom.includes('/api/agent/speak'),false);
+  assert.equal(audio.includes('api.elevenlabs.io'),false);
+  assert.equal(audio.includes('api.openai.com'),false);
+  assert.equal(speak.includes('api.elevenlabs.io'),false);
   assert.equal(speak.includes('api.openai.com'),false);
   assert.equal(fs.existsSync(path.join(ROOT,'api/tts.js')),false);
   assert.equal(fs.existsSync(path.join(ROOT,'api/elevenLabsVoiceMap.js')),false);
 
-  const agents=['simon','marie','iris','mark','cammy','evan','tube','lucy','snake','alice','echo','booker'];
+  const agents=['Simon','Marie','IRIS','Mark','Cammy','Evan','Tube','Lucy','Snake','Alice','Echo','Booker'];
   for(const id of agents)assert.match(registry,new RegExp(`\\b${id}:\\s*\\{`),`Missing voice registry entry: ${id}`);
 });

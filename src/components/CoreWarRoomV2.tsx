@@ -3,6 +3,7 @@ import {Play,RotateCcw,ShieldCheck} from 'lucide-react';
 import {AGENTS} from '../data/agents';
 import {AvatarFace} from './AvatarFace';
 import {speakWebSpeech,stopAllAudio} from '../utils/audio';
+import {getAgentVoiceConfig} from '../../lib/agent-voice-registry';
 import {playMissionSpeech} from '../utils/missionSpeech';
 
 type Proof={completedTasks:number;completedRuns:number;evidenceCount:number;memoryCount:number;verified:boolean};
@@ -107,35 +108,14 @@ export function CoreWarRoomV2({objective,setObjective}:{objective:string;setObje
   return()=>{cancelled=true;};
  },[]);
 
- async function prepareSpeech(id:string,text:string,jobId?:string){
-  try{
-   const r=await fetch('/api/agent/speak',{
-    method:'POST',
-    headers:{'content-type':'application/json'},
-    body:JSON.stringify({agentId:id,text:text.slice(0,450),...(jobId?{jobId}:{})})
-   });
-   const j=await readApiJson(r);
-   if(!r.ok)return {audio:null,provider:'Voice Error',voiceName:null,fallback:true};
-   if(j.fallbackToWebSpeech||!j.audioUrl)return {audio:null,provider:'Browser Speech',voiceName:null,fallback:true};
-   const a=new Audio(j.audioUrl);
-   a.preload='auto';
-   a.load();
-   await new Promise<void>(ok=>{
-    let done=false;
-    const finish=()=>{if(done)return;done=true;ok();};
-    a.oncanplaythrough=finish;
-    a.onerror=finish;
-    setTimeout(finish,2500);
-   });
-   return {
-    audio:a,
-    provider:j.provider==='ELEVENLABS'?'ElevenLabs':String(j.provider||'Voice'),
-    voiceName:j.voiceName||j.voice||null,
-    fallback:String(j.provider||'').includes('FALLBACK')
-   };
-  }catch{
-   return {audio:null,provider:'Browser Speech',voiceName:null,fallback:true};
-  }
+ async function prepareSpeech(id:string){
+  const config=getAgentVoiceConfig(id);
+  return {
+   audio:null,
+   provider:'Browser Web Speech',
+   voiceName:config.preferredVoices[0]||config.lang,
+   fallback:false
+  };
  }
 
  async function playPrepared(a:HTMLAudioElement|null,id:string,text:string){
@@ -159,7 +139,7 @@ export function CoreWarRoomV2({objective,setObjective}:{objective:string;setObje
   const id=x.agentId;
   const decision=x.result?.decision;
   const text=decision?.rationale||id+' completed the mission stage.';
-  const speech=await prepareSpeech(id,text,x.jobId);
+  const speech=await prepareSpeech(id);
   const runtime=decision?.runtime||{};
   const telemetry={
    reasoningProvider:runtime.reasoningProvider||'Unknown provider',
@@ -184,7 +164,7 @@ export function CoreWarRoomV2({objective,setObjective}:{objective:string;setObje
   setExecutiveClose(close);
   const closeText=close.briefing?.spokenSummary||close.briefing?.finalDecision||'Executive close complete.';
   setActive('simon');
-  const closeSpeech=await prepareSpeech('simon',closeText);
+  const closeSpeech=await prepareSpeech('simon');
   await playPrepared(closeSpeech.audio,'simon',closeText);
   setActive('');
  }
