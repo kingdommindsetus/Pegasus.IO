@@ -89,6 +89,7 @@ State what happened overnight, your top focus today, and the critical handoff. I
         }),
       });
       const data = await res.json();
+      if (!res.ok || !data.text) throw new Error(data.error || 'Agent response unavailable.');
       const text = data.text || agent.voiceConfig.samplePhrase;
       setDailyBriefingText(text);
       setIsLoadingBriefing(false);
@@ -96,7 +97,7 @@ State what happened overnight, your top focus today, and the critical handoff. I
       // Auto-start face talking
       startTalking(text);
     } catch {
-      const fallback = `Good morning Commander. This is ${agent.name} with your daily ${agent.tagline} briefing. All systems in ${agent.department} are locked onto our core leverage point. Let us execute today's mission.`;
+      const fallback = `${agent.name} could not load a verified briefing. Please retry when the reasoning service is available.`;
       setDailyBriefingText(fallback);
       setIsLoadingBriefing(false);
       startTalking(fallback);
