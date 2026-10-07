@@ -2,7 +2,7 @@ export const PEGASUS_PUBLIC_CORE = {
   identity: [
     "Pegasus.io is an open-source autonomous executive operating system.",
     "The canonical reasoning provider is Google AI Studio through the Pegasus reasoner.",
-    "The canonical natural voice provider is ElevenLabs with Browser Web Speech as fallback.",
+    "The canonical voice provider is the native browser Web Speech API with deterministic per-agent voice preferences.",
     "Durable mission state, evidence, telemetry, and memory are stored in PostgreSQL.",
     "Pegasus ships with 12 executive agent roles: Simon, Marie, IRIS, Mark, Cammy, Evan, Tube, Lucy, Snake, Alice, Echo, and Booker.",
     "The public repository intentionally does not ship with any private organization, customer, faculty, pricing, revenue, or commercial relationship data.",

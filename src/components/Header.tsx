@@ -101,10 +101,10 @@ export const Header: React.FC<HeaderProps> = ({
                   ? 'bg-cyan-950/60 text-cyan-300 border-cyan-800/60'
                   : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-slate-200'
               }`}
-              title="ElevenLabs primary voice with Browser Web Speech fallback"
+              title="Zero-cost browser Web Speech voices"
             >
               <Cpu className="w-3.5 h-3.5" />
-              <span>Voice: ElevenLabs · Fallback: Browser Web Speech</span>
+              <span>Voice: Browser Web Speech</span>
             </button>
 
             {/* Master Audio Stop / Mute */}

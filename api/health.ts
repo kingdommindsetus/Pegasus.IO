@@ -4,9 +4,9 @@ export default function handler(req: any, res: any) {
     product: 'Pegasus.io',
     reasoningProvider: 'Google AI Studio',
     reasoningConfigured: Boolean(process.env.GOOGLE_GENERATIVE_AI_API_KEY),
-    voiceProvider: 'ElevenLabs',
-    voiceConfigured: Boolean(process.env.ELEVENLABS_API_KEY),
-    voiceFallback: 'Browser Web Speech',
+    voiceProvider: 'Browser Web Speech',
+    voiceConfigured: true,
+    voiceFallback: null,
     totalAgents: 12,
     timestamp: new Date().toISOString(),
   });

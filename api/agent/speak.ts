@@ -1,4 +1,3 @@
-import { getPegasusAgentVoice } from '../pegasusVoiceRegistry.js';
 import { db } from '../../core/database/client.js';
 
 
@@ -36,52 +35,6 @@ async function recordVoiceTelemetry(agentId:string,jobId:string|undefined,meta:{
   `;
 }
 
-async function elevenLabsTts(agentId: string, text: string) {
-  const apiKey = String(process.env.ELEVENLABS_API_KEY || '').trim();
-  if (!apiKey) return null;
-
-  const profile = getPegasusAgentVoice(agentId);
-  const modelId = process.env.ELEVENLABS_TTS_MODEL || 'eleven_flash_v2_5';
-
-  const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${profile.voiceId}`, {
-    method: 'POST',
-    headers: {
-      'xi-api-key': apiKey,
-      'Content-Type': 'application/json',
-      'Accept': 'audio/mpeg',
-    },
-    body: JSON.stringify({
-      text,
-      model_id: modelId,
-      voice_settings: {
-        stability: 0.48,
-        similarity_boost: 0.82,
-        style: 0.18,
-        use_speaker_boost: true,
-      },
-    }),
-  });
-
-  if (!response.ok) {
-    const detail = await response.text();
-    const error: any = new Error('ElevenLabs TTS failed');
-    error.status = response.status;
-    error.detail = detail.slice(0, 500);
-    throw error;
-  }
-
-  const bytes = Buffer.from(await response.arrayBuffer());
-  return {
-    audioUrl: `data:audio/mpeg;base64,${bytes.toString('base64')}`,
-    provider: 'ELEVENLABS',
-    agentId,
-    voice: profile.voiceId,
-    voiceName: profile.name,
-    aiGeneratedVoice: true,
-    fallbackToWebSpeech: false,
-  };
-}
-
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
@@ -96,18 +49,7 @@ export default async function handler(req: any, res: any) {
   if (!text) return res.status(400).json({ error: 'Text is required.' });
 
   try {
-    try {
-      const eleven = await elevenLabsTts(agentId, text);
-      if (eleven) { await recordVoiceTelemetry(agentId,jobId,{provider:'ElevenLabs',voiceName:eleven.voiceName||eleven.voice,fallback:false}); return res.status(200).json(eleven); }
-    } catch (error: any) {
-      const status = Number(error?.status || 0);
-      const quotaLike = status === 429 || status === 401 || status === 403;
-      if (!quotaLike) {
-        console.warn('ElevenLabs TTS error', error?.detail || error?.message || error);
-      }
-    }
-
-    await recordVoiceTelemetry(agentId,jobId,{provider:'Browser Speech',voiceName:null,fallback:true});
+    await recordVoiceTelemetry(agentId,jobId,{provider:'Browser Web Speech',voiceName:null,fallback:false});
     return res.status(200).json({
       provider: 'WEB_SPEECH_FALLBACK',
       agentId,
@@ -115,7 +57,7 @@ export default async function handler(req: any, res: any) {
       quotaCooldown: false,
     });
   } catch (error: any) {
-    await recordVoiceTelemetry(agentId,jobId,{provider:'Browser Speech',voiceName:null,fallback:true}).catch(()=>{});
+    await recordVoiceTelemetry(agentId,jobId,{provider:'Browser Web Speech',voiceName:null,fallback:false}).catch(()=>{});
     return res.status(200).json({
       provider: 'WEB_SPEECH_FALLBACK',
       agentId,

@@ -218,7 +218,7 @@ export const BlueprintsView: React.FC<BlueprintsViewProps> = ({
               </div>
               <div className="space-y-1.5 text-xs text-slate-300">
                 <div className="flex justify-between">
-                  <span className="text-slate-400">ElevenLabs Voice:</span>
+                  <span className="text-slate-400">Browser Voice Target:</span>
                   <span className="font-mono text-amber-300">{selectedAgent.voiceConfig.voiceName}</span>
                 </div>
                 <div className="flex justify-between">
