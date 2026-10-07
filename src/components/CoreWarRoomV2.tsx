@@ -162,7 +162,7 @@ export function CoreWarRoomV2({objective,setObjective}:{objective:string;setObje
   const speech=await prepareSpeech(id,text,x.jobId);
   const runtime=decision?.runtime||{};
   const telemetry={
-   reasoningProvider:runtime.reasoningProvider||'Google AI Studio',
+   reasoningProvider:runtime.reasoningProvider||'Unknown provider',
    model:runtime.model||'unknown',
    reasoningMs:runtime.reasoningMs||0,
    quotaWaitMs:runtime.quotaWaitMs||0,
@@ -297,13 +297,13 @@ export function CoreWarRoomV2({objective,setObjective}:{objective:string;setObje
     const agent=AGENTS.find(a=>a.id===id)!;
     const s=states[id];
     const live=active===id;
-    const voiceLabel=s.telemetry?.voiceProvider||'Voice persisted';
+    const voiceLabel=s.telemetry?.voiceProvider||'Voice unverified';
     return <article key={id} className={"rounded-2xl border bg-slate-900 p-3 "+(s.state==='completed'?'border-emerald-500/30':live?'border-cyan-400/60':'border-slate-800')}>
      <div className="flex h-28 items-center justify-center"><AvatarFace agent={agent} isSpeaking={live} frequencyData={new Uint8Array(32)}/></div>
      <div className="text-center font-black text-white">{agent.name}</div>
      <div className="text-center text-[9px] uppercase tracking-widest text-slate-500">{s.state}</div>
      {s.telemetry&&<div className={"mx-auto mt-1 w-fit rounded-full border px-2 py-0.5 text-[8px] font-black "+(s.telemetry.fallback?'border-amber-500/40 bg-amber-950/30 text-amber-300':'border-emerald-500/30 bg-emerald-950/20 text-emerald-300')} title={(s.telemetry.model||'unknown')+" · "+(s.telemetry.voiceName||voiceLabel)}>
-      {s.telemetry.fallback?'Fallback':'Google · '+voiceLabel}
+      {(s.telemetry.reasoningProvider||'Unknown provider')+' · '+(s.telemetry.reasoningFallback?'Reasoning fallback · ':'')+voiceLabel}
      </div>}
      {s.decision&&<div className="mt-2 rounded-xl bg-black/30 p-2 text-[10px] text-slate-300">
       <div className="flex items-center justify-between gap-2"><b className="text-cyan-300">{s.decision.skillKey}</b><span className="text-[8px] uppercase tracking-widest text-slate-600">decision</span></div>
