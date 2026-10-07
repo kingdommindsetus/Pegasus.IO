@@ -2,6 +2,8 @@ import React,{useEffect,useState} from 'react';
 import {Play,RotateCcw,ShieldCheck} from 'lucide-react';
 import {AGENTS} from '../data/agents';
 import {AvatarFace} from './AvatarFace';
+import {speakWebSpeech,stopAllAudio} from '../utils/audio';
+import {playMissionSpeech} from '../utils/missionSpeech';
 
 type Proof={completedTasks:number;completedRuns:number;evidenceCount:number;memoryCount:number;verified:boolean};
 const IDS=['simon','marie','iris','mark','cammy','evan','tube','lucy','snake','alice','echo','booker'];
@@ -136,12 +138,14 @@ export function CoreWarRoomV2({objective,setObjective}:{objective:string;setObje
   }
  }
 
- async function playPrepared(a:HTMLAudioElement|null){
-  if(!a)return;
+ async function playPrepared(a:HTMLAudioElement|null,id:string,text:string){
+  const agent=AGENTS.find(agent=>agent.id===id);
   try{
-   await a.play();
-   await new Promise<void>(ok=>{a.onended=()=>ok();a.onerror=()=>ok();});
-  }catch{}
+   await playMissionSpeech(a,done=>{
+    if(!agent){done();return;}
+    speakWebSpeech(text.slice(0,450),agent.voiceConfig,id,undefined,done);
+   });
+  }finally{stopAllAudio();}
  }
 
  async function fetchPreparedStep(missionId:string){
@@ -181,7 +185,7 @@ export function CoreWarRoomV2({objective,setObjective}:{objective:string;setObje
   const closeText=close.briefing?.spokenSummary||close.briefing?.finalDecision||'Executive close complete.';
   setActive('simon');
   const closeSpeech=await prepareSpeech('simon',closeText);
-  await playPrepared(closeSpeech.audio);
+  await playPrepared(closeSpeech.audio,'simon',closeText);
   setActive('');
  }
 
@@ -235,7 +239,7 @@ export function CoreWarRoomV2({objective,setObjective}:{objective:string;setObje
      }
 
      setStates((p:any)=>({...p,[id]:{...p[id],state:'speaking'}}));
-     await playPrepared(current.audio);
+     await playPrepared(current.audio,id,decision?.spokenUpdate||decision?.workSummary||decision?.rationale||id+' completed the mission stage.');
      setStates((p:any)=>({...p,[id]:{...p[id],state:'completed'}}));
 
      if(nextPrepared)prepared=nextPrepared;
