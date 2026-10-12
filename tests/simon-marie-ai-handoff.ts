@@ -4,7 +4,7 @@ import {db,closeDb} from '../core/database/client.js';
 import {claimNextJobForObjective,postgresJobStore,closeJobRun,unlockDependents} from '../core/work/jobs/repository.js';
 import {runJob} from '../core/work/workers/runJob.js';
 const u=new URL(process.env.DATABASE_URL||'http://invalid');
-if(u.hostname!=='127.0.0.1'||u.pathname!=='/pegasus_world_accept_1011')throw Error('Isolated DB only');
+if(u.hostname!=='127.0.0.1'||u.pathname!=='/pegasus_world_windows_accept_1011')throw Error('Isolated DB only');
 const sql=db();
 const agents=[
 {id:'simon',brain:'C:/Users/info/PEGASUS_OS/01-agent-brains/SIMON_SOUL.md',prompt:'Draft a short internal-only work assignment for Marie to produce a QA checklist for a simulated course onboarding process. State that there are no real patients, no external actions, and no work has actually been performed.'},
@@ -20,7 +20,7 @@ async function infer(system:string,prompt:string){
  }finally{clearTimeout(timer)}
 }
 try{
- const [dbid]=await sql`SELECT current_database() db,current_user role`;if(dbid.db!=='pegasus_world_accept_1011'||dbid.role!=='pegasus_world_test_1011')throw Error('Unexpected role');
+ const [dbid]=await sql`SELECT current_database() db,current_user role`;if(dbid.db!=='pegasus_world_windows_accept_1011'||dbid.role!=='pegasus_windows_accept_role')throw Error('Unexpected role');
  const [p]=await sql`INSERT INTO pegasus_core.projects(name,objective) VALUES('Two-agent AI acceptance','Draft-only Simon to Marie work handoff') RETURNING id`;
  const [o]=await sql`INSERT INTO pegasus_core.objectives(project_id,title) VALUES(${p.id},'Simulated internal onboarding QA') RETURNING id`;
  let previousTask:string|undefined,previousOutput='';
@@ -41,7 +41,8 @@ try{
   previousOutput=String(done.result?.content||'');previousTask=task.id;
   console.log('HANDOFF_STAGE',JSON.stringify({agent:agent.id,jobId:job.id,status:done.status,brainSource:agent.brain.split('/').pop(),content:previousOutput.slice(0,230)}));
  }
- const rows=await sql`SELECT agent_id,status,result->>'brainSource' as brain FROM pegasus_core.jobs j JOIN pegasus_core.tasks t ON t.id=j.task_id WHERE t.objective_id=${o.id} ORDER BY j.created_at`;
+ const rows=await sql`SELECT j.agent_id,j.status,j.result->>'brainSource' as brain FROM pegasus_core.jobs j JOIN pegasus_core.tasks t ON t.id=j.task_id WHERE t.objective_id=${o.id} ORDER BY j.created_at`;
  if(rows.length!==2||rows.some(x=>x.status!=='completed'))throw Error('Two-stage persistence failed');
  console.log('TWO_AGENT_HANDOFF_PASSED',JSON.stringify(rows));
 }finally{await closeDb()}
+
