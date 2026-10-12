@@ -18,7 +18,7 @@ try{
     if(target.agent_id!=='simon'||target.input?.draftOnly!==true||target.input?.externalActionsAllowed!==false||target.input?.reasoningProvider!=='ollama_local'){console.log('UNSAFE_JOB_SKIPPED',target.id)}
     else{
      const job=await claimNextJobForObjective(objective,'isolated-ai-worker',90);
-     if(job?.id===target.id){
+     if(job && job.id===target.id){
       await postgresJobStore.recordEvent(job,'job_claimed',{workerId:'isolated-ai-worker'});
       const finished=await runJob(job,postgresJobStore,async()=>{
        const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),75000);
