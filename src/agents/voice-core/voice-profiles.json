@@ -1,0 +1,209 @@
+{
+  "simon": {
+    "agent_id": "simon",
+    "engine": "kokoro",
+    "voice_id": "bm_george",
+    "language": "en-gb",
+    "version": 1,
+    "approved": false,
+    "source": "provisional_lab_mapping"
+  },
+  "marie": {
+    "agent_id": "marie",
+    "engine": "kokoro",
+    "voice_id": "af_heart",
+    "language": "en-us",
+    "version": 1,
+    "approved": false,
+    "source": "provisional_lab_mapping"
+  },
+  "iris": {
+    "agent_id": "iris",
+    "engine": "kokoro",
+    "voice_id": "af_sarah",
+    "language": "en-us",
+    "version": 1,
+    "approved": false,
+    "source": "provisional_lab_mapping"
+  },
+  "mark": {
+    "agent_id": "mark",
+    "engine": "kokoro",
+    "voice_id": "am_eric",
+    "language": "en-us",
+    "version": 4,
+    "approved": true,
+    "source": "user_approved_audition_v2"
+  },
+  "cammy": {
+    "agent_id": "cammy",
+    "engine": "kokoro",
+    "voice_id": "bf_emma",
+    "language": "en-gb",
+    "version": 1,
+    "approved": false,
+    "source": "provisional_lab_mapping"
+  },
+  "evan": {
+    "agent_id": "evan",
+    "engine": "kokoro",
+    "voice_id": "am_liam",
+    "language": "en-us",
+    "version": 2,
+    "approved": false,
+    "source": "provisional_lab_mapping"
+  },
+  "tube": {
+    "agent_id": "tube",
+    "engine": "kokoro",
+    "voice_id": "am_puck",
+    "language": "en-us",
+    "version": 2,
+    "approved": false,
+    "source": "provisional_lab_mapping"
+  },
+  "lucy": {
+    "agent_id": "lucy",
+    "engine": "kokoro",
+    "voice_id": "af_bella",
+    "language": "en-us",
+    "version": 1,
+    "approved": false,
+    "source": "provisional_lab_mapping"
+  },
+  "snake": {
+    "agent_id": "snake",
+    "engine": "kokoro",
+    "voice_id": "bm_daniel",
+    "language": "en-gb",
+    "version": 2,
+    "approved": false,
+    "source": "provisional_lab_mapping"
+  },
+  "alice": {
+    "agent_id": "alice",
+    "engine": "kokoro",
+    "voice_id": "af_sky",
+    "language": "en-us",
+    "version": 2,
+    "approved": false,
+    "source": "provisional_lab_mapping"
+  },
+  "echo": {
+    "agent_id": "echo",
+    "engine": "kokoro",
+    "voice_id": "bf_isabella",
+    "language": "en-gb",
+    "version": 2,
+    "approved": false,
+    "source": "provisional_lab_mapping"
+  },
+  "booker": {
+    "agent_id": "booker",
+    "engine": "kokoro",
+    "voice_id": "bm_lewis",
+    "language": "en-gb",
+    "version": 1,
+    "approved": false,
+    "source": "provisional_lab_mapping"
+  },
+  "midas": {
+    "agent_id": "midas",
+    "engine": "kokoro",
+    "voice_id": "am_onyx",
+    "language": "en-us",
+    "version": 1,
+    "approved": false,
+    "source": "provisional_workforce_audition",
+    "role": "Product & Revenue Architect",
+    "vocal_character": "confident strategic male"
+  },
+  "scout": {
+    "agent_id": "scout",
+    "engine": "kokoro",
+    "voice_id": "am_fenrir",
+    "language": "en-us",
+    "version": 1,
+    "approved": false,
+    "source": "provisional_workforce_audition",
+    "role": "Lead Discovery Specialist",
+    "vocal_character": "younger energetic male"
+  },
+  "claire": {
+    "agent_id": "claire",
+    "engine": "kokoro",
+    "voice_id": "af_jessica",
+    "language": "en-us",
+    "version": 1,
+    "approved": false,
+    "source": "provisional_workforce_audition",
+    "role": "Contact Research & Enrichment Specialist",
+    "vocal_character": "precise sophisticated woman"
+  },
+  "atlas": {
+    "agent_id": "atlas",
+    "engine": "kokoro",
+    "voice_id": "am_echo",
+    "language": "en-us",
+    "version": 1,
+    "approved": false,
+    "source": "provisional_workforce_audition",
+    "role": "Lead Qualification Analyst",
+    "vocal_character": "calm methodical male"
+  },
+  "sofia": {
+    "agent_id": "sofia",
+    "engine": "kokoro",
+    "voice_id": "af_nova",
+    "language": "en-us",
+    "version": 1,
+    "approved": false,
+    "source": "provisional_workforce_audition",
+    "role": "Growth & Digital Presence Director",
+    "vocal_character": "modern confident woman"
+  },
+  "maven": {
+    "agent_id": "maven",
+    "engine": "kokoro",
+    "voice_id": "bf_lily",
+    "language": "en-gb",
+    "version": 1,
+    "approved": false,
+    "source": "provisional_workforce_audition",
+    "role": "Campaign & Content Architect",
+    "vocal_character": "elegant refined British woman"
+  },
+  "gatekeeper": {
+    "agent_id": "gatekeeper",
+    "engine": "kokoro",
+    "voice_id": "bm_fable",
+    "language": "en-gb",
+    "version": 1,
+    "approved": false,
+    "source": "provisional_workforce_audition",
+    "role": "Compliance & Approval Officer",
+    "vocal_character": "mature serious man"
+  },
+  "flow": {
+    "agent_id": "flow",
+    "engine": "kokoro",
+    "voice_id": "af_river",
+    "language": "en-us",
+    "version": 1,
+    "approved": false,
+    "source": "provisional_workforce_audition",
+    "role": "Client & Educator Onboarding Manager",
+    "vocal_character": "approachable organized woman"
+  },
+  "ledger": {
+    "agent_id": "ledger",
+    "engine": "kokoro",
+    "voice_id": "am_michael",
+    "language": "en-us",
+    "version": 1,
+    "approved": false,
+    "source": "provisional_workforce_audition",
+    "role": "Finance & Revenue Operations Analyst",
+    "vocal_character": "professional analytical male"
+  }
+}

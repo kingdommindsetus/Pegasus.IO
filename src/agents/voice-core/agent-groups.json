@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "huddle_agents": [
+    "simon",
+    "marie",
+    "iris",
+    "mark",
+    "cammy",
+    "evan",
+    "tube",
+    "lucy",
+    "snake",
+    "alice",
+    "echo",
+    "booker"
+  ],
+  "workforce_agents": [
+    "midas",
+    "scout",
+    "claire",
+    "atlas",
+    "sofia",
+    "maven",
+    "gatekeeper",
+    "flow",
+    "ledger"
+  ],
+  "extension_agents_pending": [
+    "doc"
+  ],
+  "notes": "Huddle membership remains 12. Doc is not registered."
+}
