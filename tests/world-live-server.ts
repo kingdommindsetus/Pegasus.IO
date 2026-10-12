@@ -12,6 +12,12 @@ const srv=createServer(async(req,res)=>{
  if(req.method!=='GET'){res.writeHead(405);res.end('Method not allowed');return}
  try {
   const u=new URL(req.url||'/', 'http://localhost');
+  if(u.pathname==='/api/gatekeeper-status'){
+   const rows=await sql`SELECT status::text AS status,count(*)::int AS total FROM pegasus_core.approvals WHERE requested_by_agent_id='gatekeeper' GROUP BY status`;
+   const counts={pending:0,approved:0,rejected:0};
+   for(const r of rows){if(Object.prototype.hasOwnProperty.call(counts,r.status))counts[r.status as keyof typeof counts]=r.total}
+   res.setHeader('Content-Type','application/json');res.end(JSON.stringify({source:'pegasus_core.approvals',...counts}));return;
+  }
   if(u.pathname==='/api/core-jobs'){
    const jobs=await sql`SELECT j.id,j.agent_id,j.status,j.attempts,j.updated_at,t.title FROM pegasus_core.jobs j LEFT JOIN pegasus_core.tasks t ON t.id=j.task_id ORDER BY j.updated_at DESC LIMIT 100`;
    res.setHeader('Content-Type','application/json');res.end(JSON.stringify({source:'pegasus_core.jobs',jobs:jobs.map(j=>({id:j.id,agentId:j.agent_id,status:j.status,title:j.title||'',attempts:j.attempts,updatedAt:j.updated_at}))}));return;
