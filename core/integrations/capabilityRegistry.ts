@@ -2,6 +2,7 @@
 export const CAPABILITY_REGISTRY = {
  pegasus:{role:'control_plane',mode:'existing_core',license:'owned',authority:'system_of_record'},
  gods_eye:{role:'founder_observability',mode:'read_model_planned',license:'owned',authority:'read_only'},
+ paperclip:{role:'optional_agent_management_adapter',mode:'not_enabled',license:'MIT',authority:'no_execution'},
  astra:{role:'knowledge_draft',mode:'isolated_prototype',license:'internal',authority:'review_only'},
  rea:{role:'software_evidence',mode:'synthetic_verified',license:'MIT',authority:'review_only'},
  openmontage:{role:'video_production',mode:'planning_only',license:'AGPL-3.0',authority:'no_execution'},

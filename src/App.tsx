@@ -10,6 +10,7 @@ import { WarRoomWorkflow } from './components/WarRoomWorkflow';
 import { CoreWarRoomV2 } from './components/CoreWarRoomV2';
 import { JarvisHealthPanel } from './components/JarvisHealthPanel';
 import { GodsEyeLabDashboard } from './components/GodsEyeLabDashboard';
+import { PegasusBuildBoard } from './components/PegasusBuildBoard';
 import { VoiceStudioModal } from './components/VoiceStudioModal';
 import { AgentBlueprintDrawer } from './components/AgentBlueprintDrawer';
 import { BlueprintsView } from './components/BlueprintsView';
@@ -30,6 +31,9 @@ export default function App() {
   }
   if (new URLSearchParams(window.location.search).get('gods-eye-lab') === '1') {
     return <GodsEyeLabDashboard />;
+  }
+  if (new URLSearchParams(window.location.search).get('build-board') === '1') {
+    return <PegasusBuildBoard />;
   }
   const [activeTab, setActiveTab] = useState<'workflow' | 'grid' | 'blueprints'>('workflow');
   const [projectBrief, setProjectBrief] = useState<string>(
@@ -114,6 +118,7 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
+            <a href="/?build-board=1" className="inline-flex items-center gap-1.5 rounded-xl border border-amber-600/50 bg-amber-950/40 px-3 py-1.5 text-xs font-black text-amber-200 hover:bg-amber-900/40">BUILD TASKBOARD</a>
             <button onClick={() => setAgentFactoryOpen(true)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black text-slate-950 bg-cyan-400 hover:bg-cyan-300 transition-all">
               <Sparkles className="w-3.5 h-3.5"/><span>+ BUILD AGENT</span>
             </button>

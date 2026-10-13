@@ -5,6 +5,7 @@ import {CAPABILITY_REGISTRY} from '../../core/integrations/capabilityRegistry';
 const definitions:Record<string,{name:string,detail:string,owner:string}> = {
  pegasus:{name:'PEGASUS CORE',detail:'Canonical identities, jobs, durable evidence and approval rules',owner:'Simon'},
  gods_eye:{name:"GOD'S EYE",detail:'Founder read model; no live database endpoint connected',owner:'Founder'},
+ paperclip:{name:'PAPERCLIP',detail:'Optional agent-management adapter; not installed or connected',owner:'Marie / Simon'},
  astra:{name:'ASTRA',detail:'Isolated source-grounded knowledge drafts',owner:'Simon'},
  rea:{name:'REA',detail:'Actual synthetic JavaScript analysis verified; production adapter not enabled',owner:'IRIS'},
  openmontage:{name:'OPENMONTAGE',detail:'Video storyboard contract only; no renders yet',owner:'Tube'},
@@ -31,7 +32,7 @@ export function GodsEyeLabDashboard(){
      <h1 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">GOD'S EYE <span className="text-amber-300">COMMAND FLOOR</span></h1>
      <p className="mt-2 max-w-3xl text-sm text-slate-400">Architecture preview. Capabilities below are pulled from the code registry, not a live operational feed.</p>
     </div>
-    <a href="/" className="flex items-center gap-2 rounded-xl border border-slate-700 px-4 py-2 text-sm font-medium text-slate-200 hover:bg-slate-900"><ArrowLeft size={15}/> Return to Pegasus</a>
+    <div className="flex flex-wrap gap-2"><a href="/?build-board=1" className="flex items-center gap-2 rounded-xl border border-amber-700/40 px-4 py-2 text-sm font-bold text-amber-200 hover:bg-amber-900/20">Build Taskboard</a><a href="/" className="flex items-center gap-2 rounded-xl border border-slate-700 px-4 py-2 text-sm font-medium text-slate-200 hover:bg-slate-900"><ArrowLeft size={15}/> Return to Pegasus</a></div>
    </header>
    <div className="grid gap-3 sm:grid-cols-3">
     <div className="rounded-2xl border border-slate-800 bg-[#101623] p-5">
