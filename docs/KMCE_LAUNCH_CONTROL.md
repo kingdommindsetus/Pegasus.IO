@@ -11,10 +11,10 @@
 **Launch definition:** no founder approval to publicly launch until M00–M08 are evidenced, with controlled exceptions documented and risk-approved. MVP = stable runtime + secure educator task assistant + one founder-to-review simulated lead workflow; commercial launch also needs payments, support, compliance and release gates.
 
 ## Progress
-- Verified items: **7**
-- Open items: **65**
+- Verified items: **8**
+- Open items: **64**
 - Total items: **72**
-- Next critical path: **R08 -> S01-S05 -> D04/D05 -> V04/V05 -> A01-A06 -> L02/L03**
+- Next critical path: **S01 -> S01-S05 -> D04/D05 -> V04/V05 -> A01-A06 -> L02/L03**
 - Estimates: rough engineering effort per milestone; NOT dates or target weeks.
 
 ## M00 — Evidence baseline and scope (rough effort 1-2h)
@@ -33,7 +33,7 @@
 - [x] **R05** Prove idempotency, retries, dead-letter state and timeouts. **Done when:** Duplicate workload does not duplicate actions.
 - [x] **R06** Connect Jarvis to Windows runtime and distinguish stale/down/blocked. **Done when:** Health dashboard and alert tests.
 - [x] **R07** Capture structured logs, job trace IDs, error causes and evidence links. **Done when:** Founder can follow each job lifecycle.
-- [ ] **R08** Enforce no live production, email, publishing or payments in tests. **Done when:** Negative authorization tests.
+- [x] **R08** Enforce no live production, email, publishing or payments in tests. **Done when:** Negative authorization tests.
 
 ## M02 — Identity, permissions and isolation (rough effort 4-10h)
 
@@ -138,6 +138,8 @@
 - 2026-10-12 — **R07 ACCEPTED (isolated development only):** Inspected actual Pegasus Postgres schema for jobs, job_runs, events, evidence, memories, tasks. Added bounded read-only "/api/dev/job-trace" bridge (`core/runtime/jobTraceDevelopment.ts`) with dedicated Windows test role/objective checks, loopback + bearer authorization, foreign Origin rejection, no-store, production route excluded, stale fail-closed on DB error. War Room `JobTracePanel` displays real job/run/event/evidence IDs, worker, attempts, status, last error, expired lease and linked memory IDs with no raw input/evidence/memory content; 15-second refresh, 45-second freshness limit. `tests/r07-job-trace-acceptance.ts` created synthetic completed/failed/interrupted/retrying histories in isolated Windows DB and verified all four statuses, real IDs and linked records via authenticated HTTP; synthetic rows cleaned. Headless Chrome `tests/r07-browser-acceptance.mjs` confirmed panel visible, authenticated LIVE status and actual persistent job IDs. API checks: unauthenticated 401, valid token 200, foreign origin 403. `tsc --noEmit` and `git diff --check` exit 0. Technical contract in `docs/R07_ISOLATED_JOB_TRACE.md`. **Not a production Founder Command Center deployment**; no external actions, original DB, voice, agent brains or D: drive changes.
 
 - 2026-10-12 — **R08 PARTIAL — negative authorization checks passed, milestone OPEN:** Inspected actual R08 requirement (no live production, email, publishing or payments in tests) and existing approval/isolated worker code. Added `core/work/jobs/isolatedSafetyPolicy.ts` deny-by-default intent guard restricted to Windows 127.0.0.1 `pegasus_world_windows_accept_1011`, role `pegasus_windows_accept_role`, approved objective, Simon draft-only `search_company_memory` or local Ollama `generate_content`, and explicit rejection of side-effect flags/actions. Wired guard into `claimIsolatedDraftJob` before claimed job mutation, so rejected candidate transaction rolls back. `tests/r08-negative-authorization.test.ts`: 19/19 passed, including negative cases for production/wrong database and role, wrong objective/agent, email, publish, checkout, deployment, live work, external actions and remote reasoning. `tsc --noEmit` and `git diff --check` passed. Tests were pure/in-memory authorization checks, not real external communications, payments or production writes. **R08 remains OPEN:** must still verify an actual isolated database-claim negative test and audit all execution adapters for possible outbound side effects; no full-system production safety claim. No changes to live production, D: Astra, agents or voices.
+
+- 2026-10-12 — **R08 ACCEPTED — isolated Windows test-execution boundary only:** 19/19 negative/positive authorization tests passed in `tests/r08-negative-authorization.test.ts`, covering production database, wrong role/objective, unauthorized agents/skills, email, publishing, payments, deployments, live work, remote reasoning, and side-effect flags. Follow-up `tests/r08-isolated-database-denial.ts` exercised actual PostgreSQL transactional claim with unsafe `send=true` candidate and proved rejection with job still queued, attempts=0, lease NULL, zero run rows, no side effects; fixture removed. Audited imports of both isolated workers; no live mail/post/payment/deployment adapter and only local Ollama HTTP endpoint. `tsc --noEmit` and `git diff --check` passed. Acceptance and limitations documented `docs/R08_ISOLATED_SAFETY_ACCEPTANCE.md`. Scope does NOT certify production routes, external integrations or future agents; S01 security matrix next. Production, D: Astra, brain/voice registrations untouched.
 
 ## Change control
 
