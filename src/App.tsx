@@ -9,6 +9,7 @@ import { AgentCard } from './components/AgentCard';
 import { WarRoomWorkflow } from './components/WarRoomWorkflow';
 import { CoreWarRoomV2 } from './components/CoreWarRoomV2';
 import { JarvisHealthPanel } from './components/JarvisHealthPanel';
+import { GodsEyeLabDashboard } from './components/GodsEyeLabDashboard';
 import { VoiceStudioModal } from './components/VoiceStudioModal';
 import { AgentBlueprintDrawer } from './components/AgentBlueprintDrawer';
 import { BlueprintsView } from './components/BlueprintsView';
@@ -26,6 +27,9 @@ export default function App() {
   }
   if (new URLSearchParams(window.location.search).get('voice-studio') === '1') {
     return <TalkingAvatarShowcase />;
+  }
+  if (new URLSearchParams(window.location.search).get('gods-eye-lab') === '1') {
+    return <GodsEyeLabDashboard />;
   }
   const [activeTab, setActiveTab] = useState<'workflow' | 'grid' | 'blueprints'>('workflow');
   const [projectBrief, setProjectBrief] = useState<string>(
