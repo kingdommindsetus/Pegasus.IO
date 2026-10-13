@@ -11,10 +11,10 @@
 **Launch definition:** no founder approval to publicly launch until M00–M08 are evidenced, with controlled exceptions documented and risk-approved. MVP = stable runtime + secure educator task assistant + one founder-to-review simulated lead workflow; commercial launch also needs payments, support, compliance and release gates.
 
 ## Progress
-- Verified items: **2**
-- Open items: **70**
+- Verified items: **3**
+- Open items: **69**
 - Total items: **72**
-- Next critical path: **R03 → R04/R05 → S01–S05 → D04/D05 → V04/V05 → A01–A06 → L02/L03**
+- Next critical path: **R04 → R04/R05 → S01–S05 → D04/D05 → V04/V05 → A01–A06 → L02/L03**
 - Estimates: rough engineering effort per milestone; NOT dates or target weeks.
 
 ## M00 — Evidence baseline and scope (rough effort 1-2h)
@@ -28,7 +28,7 @@
 
 - [x] **R01** Verify restored isolated Windows Postgres access and backup restore. **Done when:** DB verification evidence.
 - [x] **R02** Verify Simon-to-Marie draft-only Ollama handoff. **Done when:** Both jobs completed and evidenced.
-- [ ] **R03** Migrate isolated scheduled workers from WSL to Windows DB. **Done when:** Scheduled service reads correct database; old workers safely retired.
+- [x] **R03** Migrate isolated scheduled workers from WSL to Windows DB. **Done when:** Scheduled service reads correct database; old workers safely retired.
 - [ ] **R04** Prove crash/restart recovery and lease expiry. **Done when:** Kill/restart simulation recovers exactly once.
 - [ ] **R05** Prove idempotency, retries, dead-letter state and timeouts. **Done when:** Duplicate workload does not duplicate actions.
 - [ ] **R06** Connect Jarvis to Windows runtime and distinguish stale/down/blocked. **Done when:** Health dashboard and alert tests.
@@ -120,6 +120,8 @@
 
 - 2026-10-12 — **R01:** Windows PostgreSQL 16 service running; restored `pegasus_world_windows_accept_1011` authenticated as dedicated role; archive SHA matched; 19 preexisting jobs, 7 audits and 17 evidence records at initial verification. Developer verification only; no production changes.
 - 2026-10-12 — **R02:** Test `tests/simon-marie-ai-handoff.ts` completed with `TWO_AGENT_HANDOFF_PASSED` and process exit 0; both local Ollama jobs saved as completed with separate brain sources, evidence. Commit `38d864f` on `feature/voice-core-identity-20261011`.
+
+- 2026-10-12 — **R03:** Both isolated recovery scripts backed up at `C:\Users\info\PegasusVoiceEngine\acceptance-isolated\backups\r03-supervisors` and updated to read `.windows-test-db-url`, validating `127.0.0.1`, `pegasus_world_windows_accept_1011` and `pegasus_windows_accept_role`. Both worker source guard checks updated accordingly. Six old isolated Node processes stopped, scheduled workers restarted. Two `postgres.js` idle connections verified on Windows test database under the dedicated test role; four Node wrapper/worker processes (two worker types) observed; two Task Scheduler `LastTaskResult=0`; PostgreSQL service running; supervisor PowerShell AST parse error count 0; TypeScript `tsc --noEmit` exit 0. **Scope:** isolated development only. Crash recovery and duplicate-job tests remain R04/R05, not claimed here.
 
 ## Change control
 

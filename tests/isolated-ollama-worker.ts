@@ -4,7 +4,7 @@ import {db,closeDb} from '../core/database/client.js';
 import {claimNextJobForObjective,postgresJobStore,closeJobRun,unlockDependents} from '../core/work/jobs/repository.js';
 import {runJob} from '../core/work/workers/runJob.js';
 const url=new URL(process.env.DATABASE_URL||'http://invalid');
-if(url.hostname!=='127.0.0.1'||url.pathname!=='/pegasus_world_accept_1011')throw Error('Isolated DB only');
+if(url.hostname!=='127.0.0.1'||url.pathname!=='/pegasus_world_windows_accept_1011')throw Error('Isolated DB only');
 const objective=process.env.PEGASUS_TEST_OBJECTIVE_ID||'';
 if(objective!=='cbe5f353-25de-4daa-a69e-09b326299fea')throw Error('Unexpected objective');
 const soulPath='C:/Users/info/PEGASUS_OS/01-agent-brains/SIMON_SOUL.md';
@@ -15,7 +15,7 @@ const sql=db();const sleep=(ms:number)=>new Promise(r=>setTimeout(r,ms));
 let stop=false;process.on('SIGINT',()=>stop=true);process.on('SIGTERM',()=>stop=true);
 try{
  const [identity]=await sql`SELECT current_database() db,current_user role`;
- if(identity.db!=='pegasus_world_accept_1011'||identity.role!=='pegasus_world_test_1011')throw Error('Wrong database');
+ if(identity.db!=='pegasus_world_windows_accept_1011'||identity.role!=='pegasus_windows_accept_role')throw Error('Wrong database');
  console.log('AI_DRAFT_WORKER_READY');
  while(!stop){
   try{

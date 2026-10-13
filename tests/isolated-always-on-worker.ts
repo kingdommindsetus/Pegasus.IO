@@ -2,7 +2,7 @@ import {db,closeDb} from '../core/database/client.js';
 import {claimNextJobForObjective,postgresJobStore,closeJobRun,unlockDependents} from '../core/work/jobs/repository.js';
 import {runJob} from '../core/work/workers/runJob.js';
 const url=new URL(process.env.DATABASE_URL||'http://invalid');
-if(url.hostname!=='127.0.0.1'||url.pathname!=='/pegasus_world_accept_1011')throw Error('Only isolated database is permitted');
+if(url.hostname!=='127.0.0.1'||url.pathname!=='/pegasus_world_windows_accept_1011')throw Error('Only isolated database is permitted');
 const sql=db();
 const objective=process.env.PEGASUS_TEST_OBJECTIVE_ID||'';
 if(!/^[a-f0-9-]{36}$/i.test(objective))throw Error('Missing scoped test objective');
@@ -11,7 +11,7 @@ let shuttingDown=false;
 process.on('SIGINT',()=>{shuttingDown=true});process.on('SIGTERM',()=>{shuttingDown=true});
 try{
  const [who]=await sql`SELECT current_database() db,current_user role`;
- if(who.db!=='pegasus_world_accept_1011'||who.role!=='pegasus_world_test_1011')throw Error('Role mismatch');
+ if(who.db!=='pegasus_world_windows_accept_1011'||who.role!=='pegasus_windows_accept_role')throw Error('Role mismatch');
  console.log('ISOLATED_WORKER_READY',objective);
  while(!shuttingDown){
   try{
