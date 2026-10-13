@@ -25,3 +25,35 @@ Scope: read-only inspection of KMCE educator-platform Git `origin/main` (previou
 4. Test authenticated data routes and public-token exceptions, then document patch and rollback plan before any production rollout.
 
 **S02 remains OPEN.** No production or D:\Astra modifications; no voices, brains or live identities altered.
+
+## 2026-10-13 — Isolated runtime acceptance progress (NOT FINAL)
+
+### Standalone staging environment
+
+- Created `C:\Users\info\PegasusVoiceEngine\acceptance-isolated\s02-auth-staging`, using a **separate real node_modules directory** (not the former kmce-current junction). Ran `npm.cmd install --offline --ignore-scripts` successfully; @neondatabase/auth `0.5.0-beta`, Next `16.3.6`, no live credentials or account connections.
+- Copied `frontend/lib/auth/server.ts`, `frontend/middleware.ts`, and `frontend/app/api/auth/[...path]/route.ts` from inspected KMCE source to the staging app, then added an isolated `/secure` test route and a local HTTP auth-provider fixture on loopback only.
+- The Next 16 initial boot attempted TypeScript/dev dependency installation in **the staging directory only** and reported peer-dependency warnings and one high-severity dependency advisory; those need dedicated dependency review before any real release. No production installation.
+- Staging cookie secret is synthetic. Identity fixtures use `.invalid` email domains and fixed fake account IDs, not actual KMCE account records.
+
+### Observed pass cases
+
+1. `tests/s02-isolated-neon-auth-core.mjs`: real Neon Auth framework-independent middleware with local provider fixture: no cookie denied; forged denied; five synthetic sessions allowed; expired and revoked bare session tokens denied; a locally issued replacement token allowed; independent synthetic scope mapping kept founder, educator A/B and student A/B within their assigned resources. **Synthetic scope map is not the live `currentUser()` database implementation.**
+2. `tests/s02-neon-cache-revocation.test.mjs`: real signed session-data JWT with `HttpOnly`, `Secure`, `SameSite=Lax`; invalid signature rejected; deliberately expired signed cache refreshed using an **active** local provider session.
+3. `tests/s02-next-http-test.mjs`: actual minimal Next.js staging middleware: no cookie -> 307 sign-in, forged -> 307, expired -> 307, active synthetic identity -> 200 protected route.
+4. `tests/s02-next-logout-mitigated.test.mjs`: actual Next API auth proxy produced a signed `__Secure-neon-auth.local.session_data` cookie with expected security flags; `POST /api/auth/sign-out` revoked the provider session in the local fixture and bare old token was rejected.
+
+### Security gap reproduced — S02 BLOCKER
+
+Before staging hardening, the signed session-data cookie plus a **revoked session token** continued to authorize `/secure` (HTTP 200) after successful mock-provider logout. The framework-independent core yielded `action=allow` in the same revoked-cache case. This is a cached-session revocation window; it is not proof of a live production exploit, and its maximum lifetime is bounded by the signed cache JWT expiration and configured cache TTL (source sets 300 seconds).
+
+A **staging-only mitigation prototype** (saved as `docs/S02_STAGING_MIDDLEWARE_PROTOTYPE.txt`) forces provider revalidation for the protected `/secure` route using a server-built request with `disableCookieCache=true`. After this change, the exact previous old-token-plus-signed-cache attempt was denied with HTTP 307. This mitigation must be independently reviewed for correctness, performance and sensitive-route coverage before proposed production use. A client-supplied query parameter is not a sufficient authorization policy. Do **not** blindly copy the prototype to the live app.
+
+### Remaining mandatory verification
+
+- Real Neon Auth hosted/session-service **token renewal** and refresh semantics have not been tested. The SDK's signed-cache refresh was tested; these are different claims.
+- Authenticated `currentUser()` and founder/educator/student **database** separation must be tested with dedicated *staging* identities and a staging database, including cross-tenant negative access and revocation.
+- Verify actual production deployment revision, effective cookie/session configuration, and signout behavior via an approved controlled process. Do not assume source/localhost parity.
+- Stage a reviewed mitigation for protected routes; prove no authorization via revoked cached credentials before any production rollout.
+- Fix or risk-review the isolated staging dependency advisory, and establish reliable staging lifecycle/teardown scripts.
+
+**S02 is intentionally OPEN.** Session-core/staging proofs are logged here, but all required secure-session and portal tenant tests have not passed. No production deployment, emails, payments, real sessions or D:\Astra changes were made.

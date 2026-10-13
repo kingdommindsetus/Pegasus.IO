@@ -1,0 +1,12 @@
+import {NextRequest} from 'next/server';
+import {auth} from './lib/auth/server';
+const base=auth.middleware({loginUrl:'/auth/sign-in'});
+export default function middleware(req:NextRequest){
+ const url=req.nextUrl.clone();
+ if(url.pathname==='/secure'){
+  url.searchParams.set('disableCookieCache','true');
+  return base(new NextRequest(url,{headers:req.headers}));
+ }
+ return base(req);
+}
+export const config={matcher:['/secure/:path*','/auth/:path*','/api/auth/:path*']};
