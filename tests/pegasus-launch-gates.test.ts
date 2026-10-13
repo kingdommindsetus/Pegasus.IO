@@ -1,11 +1,11 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {PEGASUS_LAUNCH_GATES,launchProgress} from '../core/integrations/pegasusLaunchGates.js';
-test('fixed launch denominator and audited 40% engineering gate coverage',()=>{
+test('fixed launch denominator and audited 50% engineering gate coverage',()=>{
  const result=launchProgress();
- assert.equal(result.total,10);assert.equal(result.completed,4);assert.equal(result.percent,40);
+ assert.equal(result.total,10);assert.equal(result.completed,5);assert.equal(result.percent,50);
  assert.equal(result.productionVerified,false);
- assert.equal(PEGASUS_LAUNCH_GATES.filter(x=>x.passed).length,4);
+ assert.equal(PEGASUS_LAUNCH_GATES.filter(x=>x.passed).length,5);
 });
 test('missing proof, mutated gate set and duplicates fail closed',()=>{
  const gates=PEGASUS_LAUNCH_GATES.map(x=>({...x}));
