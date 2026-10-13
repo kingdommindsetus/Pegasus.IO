@@ -1,9 +1,9 @@
 import {db} from '../../database/client.js';
-import {assertIsolatedIntent} from './isolatedSafetyPolicy.js';
-import {startOwnedIsolatedRun,finishOwnedIsolatedRun} from './isolatedAtomicExecution.js';
+import {startOwnedIsolatedRun,finishOwnedIsolatedRun,failOwnedIsolatedAstraRun} from './isolatedAtomicExecution.js';
 import {answerKmceWithValidation} from '../../runtime/execution/kmceAstraValidator.js';
 import {validateAstraDraft,type draftWithAstra} from '../../runtime/execution/astraDraftBridge.js';
 import {selectKmceKnowledge} from '../../runtime/execution/kmceAstraKnowledge.js';
+import {classifyAstraDraftReview} from './astraDraftReview.js';
 
 const OBJECTIVE='cbe5f353-25de-4daa-a69e-09b326299fea';
 export const ASTRA_JOB_MARKER='astra_kmce_readonly_v1';
@@ -41,7 +41,7 @@ export async function queueOneAstraPilot(taskId:string,jobKey:string,input:Astra
  if(!task)throw Error('ASTRA_QUEUE_DENIED: task must belong to Simon in isolated objective');
  const [row]=await sql`INSERT INTO pegasus_core.jobs
  (task_id,agent_id,skill_key,status,input,max_attempts,idempotency_key,priority)
- VALUES (${taskId},'simon','generate_content','queued',${sql.json(input)},1,${jobKey},-100)
+ VALUES (${taskId},'simon','astra_knowledge_draft','queued',${sql.json(input)},1,${jobKey},-100)
  ON CONFLICT (idempotency_key) DO UPDATE SET updated_at=pegasus_core.jobs.updated_at
  RETURNING id`;
  return row.id as string;
@@ -53,15 +53,13 @@ export async function processOneAstraPilot(jobId:string,invoke?:typeof draftWith
   const rows=await tx`SELECT j.id,j.input,j.status FROM pegasus_core.jobs j
     JOIN pegasus_core.tasks t ON t.id=j.task_id
     WHERE j.id=${jobId} AND t.objective_id=${OBJECTIVE}
-      AND j.agent_id='simon' AND j.skill_key='generate_content'
+      AND j.agent_id='simon' AND j.skill_key='astra_knowledge_draft'
       AND j.status='queued'
       AND j.attempts=0 AND j.max_attempts=1
       AND j.input->>'bridgeKind'=${ASTRA_JOB_MARKER}
       FOR UPDATE OF j`;
   const j=rows[0];if(!j)return null;
   validatePilotInput(j.input);
-  assertIsolatedIntent({objectiveId:OBJECTIVE,databaseUrl:process.env.DATABASE_URL||'',agentId:'simon',
-    skillKey:'generate_content',input:j.input});
   const [changed]=await tx`UPDATE pegasus_core.jobs SET status='claimed',
     lease_expires_at=now()+interval '90 seconds',updated_at=now()
     WHERE id=${jobId} AND status='queued' RETURNING id`;
@@ -74,10 +72,19 @@ export async function processOneAstraPilot(jobId:string,invoke?:typeof draftWith
  const owned=await startOwnedIsolatedRun(OBJECTIVE,jobId,WORKER);
  if(!owned)throw Error('ASTRA_QUEUE_OWNERSHIP_LOST');
  // Process output is only a draft or review status; never publish it or approve a side effect.
- const result=await answerKmceWithValidation(
-   {question:picked.input.question,taskId:'astra_job_'+jobId.replace(/[^\w]/g,'').slice(0,48),
-    agentId:'simon',draftOnly:true,externalActionsAllowed:false},invoke);
- const output={status:'draft_assessed',validationStatus:result.status,
+ let result;
+ try{
+  result=await answerKmceWithValidation(
+    {question:picked.input.question,taskId:'astra_job_'+jobId.replace(/[^\w]/g,'').slice(0,48),
+     agentId:'simon',draftOnly:true,externalActionsAllowed:false},invoke);
+ }catch(error){
+  // Local model errors are recorded as failed runs, never as approved or publishable content.
+  if(!await failOwnedIsolatedAstraRun(OBJECTIVE,owned))
+    throw new Error('ASTRA_QUEUE_STALE_FAILURE_REJECTED',{cause:error});
+  throw error;
+ }
+ const review=classifyAstraDraftReview({status:'draft_assessed',validationStatus:result.status,draftOnly:true,externalActionsExecuted:false});
+ const output={status:'draft_assessed',reviewState:review.state,reviewReason:review.reason,validationStatus:result.status,
    answer:result.answer,knowledgeVersion:result.knowledgeVersion,
    reasons:result.reasons,draftOnly:true,externalActionsExecuted:false,
    sourceIds:result.citedSources.map(s=>s.id)};

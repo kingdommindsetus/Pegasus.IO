@@ -35,3 +35,14 @@ The acceptance job was intentionally retained as traceable evidence in the **iso
 Before final commit, `validatePilotInput` was hardened to require at least one matching approved knowledge source, and to invoke the existing Astra draft guard **before enqueue**, rejecting unsupported and side-effect-seeking questions rather than leaving an invalid job claimed. TypeScript check passed.
 
 Re-ran isolated database/model acceptance after that change: second unique job `535f0fd3-6f87-4290-9d07-9ee2f3138a51` completed with validation `needs_review`, 2 evidence rows, 1 project memory, 1 completion event, 1 completed run, and 0 external actions. The job remains in the isolated database for inspection. Both records are synthetic.
+
+## 2026-10-13 continuation: worker isolation and failure handling
+
+- An Astra-only `astra_knowledge_draft` skill now marks pilot jobs. Generic global, objective-scoped, and isolated draft workers exclude jobs bearing `astra_kmce_readonly_v1`. Only the explicit `isolated-astra-worker` may start a marked pilot job, after revalidating its safe inputs.
+- `astraDraftReview` classifies even factually complete drafts as `pending_human_review`; automatic approval deliberately raises a denial. A completed *execution* is not an approved answer.
+- The worker now records a local model failure through `failOwnedIsolatedAstraRun`, using the same owned-run lease fencing. It sets the job and run to `failed` and writes a failure event; it does not publish draft content, create evidence or memory, or perform external actions.
+- The acceptance script now covers both a deterministic validated-draft path and a simulated local model outage. The positive persistence path was observed passing on the isolated database; the negative test reached its SQL assertions, encountered a test-only text/UUID comparison error, and the query was corrected. A fresh database rerun is **still required** because subsequent database execution attempts were blocked by connection controls.
+- TypeScript `tsc --noEmit` passed, 17/17 offline bridge/knowledge/validator/isolation tests passed, and `git diff --check` passed. These do **not** replace the outstanding database failure-path acceptance test.
+- No deployment, production data, email, payment, or patient data modification was part of this continuation. The feature branch is not production.
+
+**Next safety gate:** rerun both database assertions when the isolated database test runner is available; then review the worker's lease timeout/expiration recovery and consider a permissioned human-review workflow. Do not enable Astra dispatch, automatic publishing, or production data access before S02 authorization and tenant isolation pass.

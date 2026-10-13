@@ -16,7 +16,8 @@ export async function startOwnedIsolatedRun(scope:string,jobId:string,workerId:s
     FROM pegasus_core.jobs j JOIN pegasus_core.tasks t ON t.id=j.task_id
     WHERE j.id=${jobId} AND t.objective_id=${scope}
       AND j.status='claimed' AND j.lease_expires_at>now()
-      AND j.agent_id='simon' AND j.skill_key IN ('search_company_memory','generate_content')
+      AND j.agent_id='simon' AND j.skill_key IN ('search_company_memory','generate_content','astra_knowledge_draft')
+      AND (COALESCE(j.input->>'bridgeKind','') <> 'astra_kmce_readonly_v1' OR (j.skill_key='astra_knowledge_draft' AND j.input->>'bridgeKind'='astra_kmce_readonly_v1' AND ${workerId}='isolated-astra-worker'))
       AND j.input->>'draftOnly'='true' AND j.input->>'externalActionsAllowed'='false'
     FOR UPDATE OF j`;
   if(!j||Number(j.attempts)>=Number(j.max_attempts))return null;
@@ -78,6 +79,7 @@ export async function claimIsolatedDraftJob(
       AND j.available_at<=now()
       AND (j.lease_expires_at IS NULL OR j.lease_expires_at<=now())
       AND j.attempts<j.max_attempts
+      AND COALESCE(j.input->>'bridgeKind','') <> 'astra_kmce_readonly_v1'
       AND j.input->>'draftOnly'='true'
       AND j.input->>'externalActionsAllowed'='false'
       AND (${skill}!='generate_content' OR j.input->>'reasoningProvider'='ollama_local')
@@ -96,5 +98,33 @@ export async function claimIsolatedDraftJob(
    status:'claimed' as const,attempts:Number(j.attempts),
    maxAttempts:Number(j.max_attempts),input:j.input as Record<string,unknown>,
    leaseExpiresAt:updated.lease_expires_at?.toISOString?.()};
+ });
+}
+
+// Fail the currently owned Astra test run atomically; never create output, evidence or memory.
+export async function failOwnedIsolatedAstraRun(scope:string,owned:OwnedRun):Promise<boolean>{
+ guard(scope);const sql=db();
+ return sql.begin(async tx=>{
+  const [j]=await tx`SELECT j.id,j.agent_id,j.status,j.lease_expires_at::text AS lease
+    FROM pegasus_core.jobs j JOIN pegasus_core.tasks t ON t.id=j.task_id
+    WHERE j.id=${owned.jobId} AND t.objective_id=${scope}
+      AND j.agent_id='simon' AND j.skill_key='astra_knowledge_draft'
+      AND j.input->>'bridgeKind'='astra_kmce_readonly_v1'
+    FOR UPDATE OF j`;
+  if(!j||j.status!=='running'||j.lease!==owned.lease)return false;
+  const [run]=await tx`SELECT id FROM pegasus_core.job_runs
+    WHERE id=${owned.runId} AND job_id=${owned.jobId}
+      AND worker_id='isolated-astra-worker' AND finished_at IS NULL FOR UPDATE`;
+  if(!run)return false;
+  const [updated]=await tx`UPDATE pegasus_core.jobs SET status='failed',
+    lease_expires_at=NULL,last_error='ASTRA_LOCAL_DRAFT_FAILED',updated_at=now()
+    WHERE id=${owned.jobId} AND status='running' AND lease_expires_at>now() RETURNING id`;
+  if(!updated)return false;
+  await tx`UPDATE pegasus_core.job_runs SET status='failed',finished_at=now(),
+    error='ASTRA_LOCAL_DRAFT_FAILED' WHERE id=${owned.runId} AND finished_at IS NULL`;
+  await tx`INSERT INTO pegasus_core.events(agent_id,event_type,entity_type,entity_id,payload)
+    VALUES('simon','astra_draft_failed','job',${owned.jobId},
+      ${tx.json({runId:owned.runId,externalActionsExecuted:false})})`;
+  return true;
  });
 }

@@ -6,7 +6,7 @@ const map=(r:any):PegasusJob=>({id:r.id,taskId:r.task_id||undefined,agentId:r.ag
 export async function claimNextJob(workerId:string,leaseSeconds=60):Promise<PegasusJob|null>{
  const sql=db();
  const rows=await sql.begin(async tx=>{
-  const picked=await tx.unsafe("SELECT * FROM pegasus_core.jobs WHERE status IN ('queued','retrying') AND available_at<=now() AND (lease_expires_at IS NULL OR lease_expires_at<=now()) ORDER BY priority DESC,available_at,id FOR UPDATE SKIP LOCKED LIMIT 1");
+  const picked=await tx.unsafe("SELECT * FROM pegasus_core.jobs WHERE COALESCE(input->>'bridgeKind','') <> 'astra_kmce_readonly_v1' AND status IN ('queued','retrying') AND available_at<=now() AND (lease_expires_at IS NULL OR lease_expires_at<=now()) ORDER BY priority DESC,available_at,id FOR UPDATE SKIP LOCKED LIMIT 1");
   if(!picked.length)return [];
   const id=picked[0].id;
   const updated=await tx`UPDATE pegasus_core.jobs SET status='claimed',lease_expires_at=now()+(${leaseSeconds}*interval '1 second'),updated_at=now() WHERE id=${id} RETURNING *`;
@@ -18,7 +18,7 @@ export async function claimNextJob(workerId:string,leaseSeconds=60):Promise<Pega
 export async function claimNextJobForObjective(objectiveId:string,workerId:string,leaseSeconds=60):Promise<PegasusJob|null>{
  const sql=db();
  const rows=await sql.begin(async tx=>{
-  const picked=await tx`SELECT j.* FROM pegasus_core.jobs j JOIN pegasus_core.tasks t ON t.id=j.task_id WHERE t.objective_id=${objectiveId} AND j.status IN ('queued','retrying') AND j.available_at<=now() AND (j.lease_expires_at IS NULL OR j.lease_expires_at<=now()) ORDER BY j.priority DESC,j.available_at,j.id FOR UPDATE OF j SKIP LOCKED LIMIT 1`;
+  const picked=await tx`SELECT j.* FROM pegasus_core.jobs j JOIN pegasus_core.tasks t ON t.id=j.task_id WHERE t.objective_id=${objectiveId} AND COALESCE(j.input->>'bridgeKind','') <> 'astra_kmce_readonly_v1' AND j.status IN ('queued','retrying') AND j.available_at<=now() AND (j.lease_expires_at IS NULL OR j.lease_expires_at<=now()) ORDER BY j.priority DESC,j.available_at,j.id FOR UPDATE OF j SKIP LOCKED LIMIT 1`;
   if(!picked.length)return [];
   const id=picked[0].id;
   const updated=await tx`UPDATE pegasus_core.jobs SET status='claimed',lease_expires_at=now()+(${leaseSeconds}*interval '1 second'),updated_at=now() WHERE id=${id} RETURNING *`;
