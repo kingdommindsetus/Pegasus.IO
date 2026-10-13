@@ -1,4 +1,5 @@
 import {db} from '../../database/client.js';
+import {assertIsolatedIntent} from './isolatedSafetyPolicy.js';
 const SCOPE='cbe5f353-25de-4daa-a69e-09b326299fea';
 function guard(scope:string){
  const u=new URL(process.env.DATABASE_URL||'http://invalid');
@@ -84,6 +85,7 @@ export async function claimIsolatedDraftJob(
     FOR UPDATE OF j SKIP LOCKED LIMIT 1`;
   if(!rows.length)return null;
   const j=rows[0];
+  assertIsolatedIntent({objectiveId:scope,databaseUrl:process.env.DATABASE_URL||'',agentId:j.agent_id,skillKey:j.skill_key,input:j.input});
   const [updated]=await tx`UPDATE pegasus_core.jobs SET status='claimed',
     lease_expires_at=now()+(${leaseSeconds}*interval '1 second'),updated_at=now()
     WHERE id=${j.id} AND status IN ('queued','retrying') RETURNING *`;
