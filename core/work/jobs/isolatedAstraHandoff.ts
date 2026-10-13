@@ -3,7 +3,7 @@ import {startOwnedIsolatedRun,finishOwnedIsolatedRun,failOwnedIsolatedAstraRun} 
 import {answerKmceWithValidation} from '../../runtime/execution/kmceAstraValidator.js';
 import {validateAstraDraft,type draftWithAstra} from '../../runtime/execution/astraDraftBridge.js';
 import {selectKmceKnowledge} from '../../runtime/execution/kmceAstraKnowledge.js';
-import {classifyAstraDraftReview} from './astraDraftReview.js';
+import {classifyAstraDraftReview,createSimonAstraReceipt,type SimonAstraReceipt} from './astraDraftReview.js';
 
 const OBJECTIVE='cbe5f353-25de-4daa-a69e-09b326299fea';
 export const ASTRA_JOB_MARKER='astra_kmce_readonly_v1';
@@ -46,7 +46,7 @@ export async function queueOneAstraPilot(taskId:string,jobKey:string,input:Astra
  RETURNING id`;
  return row.id as string;
 }
-export async function processOneAstraPilot(jobId:string,invoke?:typeof draftWithAstra):Promise<{jobId:string;status:string;validationStatus:string}|null> {
+export async function processOneAstraPilot(jobId:string,invoke?:typeof draftWithAstra):Promise<{jobId:string;status:string;validationStatus:string;simonReceipt:SimonAstraReceipt}|null> {
  safety();
  const sql=db();
  const picked=await sql.begin(async tx=>{
@@ -92,7 +92,9 @@ export async function processOneAstraPilot(jobId:string,invoke?:typeof draftWith
    source:s.path,sourceRevision:s.revision,sourceId:s.id,
    validationStatus:result.status,knowledgeVersion:result.knowledgeVersion
  }));
- if(!await finishOwnedIsolatedRun(OBJECTIVE,owned,output,evidence))
+ const simonReceipt=createSimonAstraReceipt(jobId,output);
+ const storedOutput={...output,simonReceipt};
+ if(!await finishOwnedIsolatedRun(OBJECTIVE,owned,storedOutput,evidence))
   throw Error('ASTRA_QUEUE_STALE_RUN_NOT_COMMITTED');
- return {jobId,status:'completed',validationStatus:result.status};
+ return {jobId,status:'completed',validationStatus:result.status,simonReceipt};
 }

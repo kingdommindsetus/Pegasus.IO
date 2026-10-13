@@ -46,3 +46,10 @@ Re-ran isolated database/model acceptance after that change: second unique job `
 - No deployment, production data, email, payment, or patient data modification was part of this continuation. The feature branch is not production.
 
 **Next safety gate:** rerun both database assertions when the isolated database test runner is available; then review the worker's lease timeout/expiration recovery and consider a permissioned human-review workflow. Do not enable Astra dispatch, automatic publishing, or production data access before S02 authorization and tenant isolation pass.
+
+## 2026-10-13 reliability continuation (follow-up)
+
+- An expired Astra-specific claimed or running lease is now recognized by the existing **isolated** recovery routine. Both pre-start and in-flight Astra leases become terminal `failed` records instead of `retrying`. The routine closes unfinished run records and emits `isolated_astra_lease_expired`; generic development worker recovery behavior is preserved.
+- A deterministic, non-actionable `simon_astra_internal_review_v1` receipt is generated after Astra validation, included in the successful job result, and returned to the development caller. It has source IDs and review metadata, not the answer text; `publishAllowed` and `externalActionsAllowed` are false, and `nextAction` requires authenticated human review. It does not create an operational Simon dispatch, human approval, customer message, or cross-agent production queue.
+- The isolated database acceptance script now checks persistence of the Simon review receipt, fail-closed local model outage, and synthetic Astra claim expiry with no retry or external action. These database assertions remain **pending execution** owing to connection-control blocking. The latest verified offline result is **19/19 tests passing**, TypeScript typecheck passing, and git whitespace checks passing.
+- No live systems, tenant/customer records, real student/patient information, payments, mail, registered agent brains, or voices were changed. Keep all new code in the feature branch until the isolated database acceptance and S02 security gates pass.
