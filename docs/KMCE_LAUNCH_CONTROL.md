@@ -11,10 +11,10 @@
 **Launch definition:** no founder approval to publicly launch until M00–M08 are evidenced, with controlled exceptions documented and risk-approved. MVP = stable runtime + secure educator task assistant + one founder-to-review simulated lead workflow; commercial launch also needs payments, support, compliance and release gates.
 
 ## Progress
-- Verified items: **8**
-- Open items: **64**
+- Verified items: **9**
+- Open items: **63**
 - Total items: **72**
-- Next critical path: **S01 -> S01-S05 -> D04/D05 -> V04/V05 -> A01-A06 -> L02/L03**
+- Next critical path: **S02 -> S02-S05 -> D04/D05 -> V04/V05 -> A01-A06 -> L02/L03**
 - Estimates: rough engineering effort per milestone; NOT dates or target weeks.
 
 ## M00 — Evidence baseline and scope (rough effort 1-2h)
@@ -37,7 +37,7 @@
 
 ## M02 — Identity, permissions and isolation (rough effort 4-10h)
 
-- [ ] **S01** Map roles: founder, staff, educator, doctor, student, public visitor, service-agent. **Done when:** Permission matrix approved.
+- [x] **S01** Map roles: founder, staff, educator, doctor, student, public visitor, service-agent. **Done when:** Permission matrix approved.
 - [ ] **S02** Verify authentication and session refresh on portal. **Done when:** Unauthorized and expired access denied.
 - [ ] **S03** Add tenant/educator ownership checks to every portal read and write. **Done when:** Cross-account tests denied.
 - [ ] **S04** Secure /api/admin/leads and /api/admin/metrics and any founder routes. **Done when:** Unauthorized requests get 401/403.
@@ -142,6 +142,8 @@
 - 2026-10-12 — **R08 ACCEPTED — isolated Windows test-execution boundary only:** 19/19 negative/positive authorization tests passed in `tests/r08-negative-authorization.test.ts`, covering production database, wrong role/objective, unauthorized agents/skills, email, publishing, payments, deployments, live work, remote reasoning, and side-effect flags. Follow-up `tests/r08-isolated-database-denial.ts` exercised actual PostgreSQL transactional claim with unsafe `send=true` candidate and proved rejection with job still queued, attempts=0, lease NULL, zero run rows, no side effects; fixture removed. Audited imports of both isolated workers; no live mail/post/payment/deployment adapter and only local Ollama HTTP endpoint. `tsc --noEmit` and `git diff --check` passed. Acceptance and limitations documented `docs/R08_ISOLATED_SAFETY_ACCEPTANCE.md`. Scope does NOT certify production routes, external integrations or future agents; S01 security matrix next. Production, D: Astra, brain/voice registrations untouched.
 
 - 2026-10-12 — **S01 DRAFT AUDITED / FOUNDER APPROVAL PENDING:** Read Core session authentication, agent-skill permissions, role grant migrations and isolated Windows PostgreSQL. Found core founder session minted without individual identity/password validation (depends on deployment gate not yet verified). Existing agent_skills deny-by-default fallback and outbound approval-required grants are not human RBAC. Isolated PostgreSQL role is not superuser and cannot bypass RLS; all inspected pegasus_core tables currently have row security disabled. No educator/student membership or enrollment tables identified in isolated schema. Separate live KMCE portal authorization was not verified. Prepared proposed founder/staff/educator/doctor/student/public/service-agent least-privilege matrix in `docs/S01_ROLE_PERMISSION_MATRIX_DRAFT.md`, with explicit access caveats, owner/assignment scoping and approval gates. Isolated pure policy helper `core/approvals/roleMatrixDraft.ts` is **NOT installed as real authorization middleware**. `tests/s01-role-matrix-draft.test.ts` 7/7 passed, TypeScript noEmit and diff checks passed. **S01 stays OPEN pending founder approval and verification of separate KMCE portal roles/identities.** No production or D: Astra changes, and agent brains/voices untouched.
+
+- 2026-10-13 — **S01 ACCEPTED AS DESIGN BASELINE ONLY:** Founder explicitly approved the proposed seven-role least-privilege permission matrix in this conversation; no production rollout approved. Re-ran `tests/s01-role-matrix-draft.test.ts` (7 passed, 0 failed), `tsc --noEmit` (0) and diff validation (0). Audited the separate KMCE educator-platform `origin/main` source commit `31438cc1` read-only on Kingdom, with findings in `docs/S01_KMCE_PORTAL_AUTH_AUDIT.md`: Neon Auth session wrapper, three implemented app roles (founder/educator/student), founder/doctor email bootstraps, server-scoped educator routes, founder finance checks, public certificate/evaluation token routes, session read that upserts users, and missing staff/doctor/service-agent role representation. Observed unauthenticated live GET: `/api/auth/me`=401 and two educator endpoints=307 sign-in redirect. These checks do NOT establish cross-tenant isolation, production DB row security, or deployed commit parity. S02-S05 and separate production security release acceptance remain OPEN. No live production edits, no D: Astra or voice/brain changes.
 
 ## Change control
 
