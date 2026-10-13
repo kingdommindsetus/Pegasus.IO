@@ -11,10 +11,10 @@
 **Launch definition:** no founder approval to publicly launch until M00–M08 are evidenced, with controlled exceptions documented and risk-approved. MVP = stable runtime + secure educator task assistant + one founder-to-review simulated lead workflow; commercial launch also needs payments, support, compliance and release gates.
 
 ## Progress
-- Verified items: **5**
-- Open items: **67**
+- Verified items: **6**
+- Open items: **66**
 - Total items: **72**
-- Next critical path: **R04 → R04/R05 → S01–S05 → D04/D05 → V04/V05 → A01–A06 → L02/L03**
+- Next critical path: **R07 -> S01-S05 -> D04/D05 -> V04/V05 -> A01-A06 -> L02/L03**
 - Estimates: rough engineering effort per milestone; NOT dates or target weeks.
 
 ## M00 — Evidence baseline and scope (rough effort 1-2h)
@@ -31,7 +31,7 @@
 - [x] **R03** Migrate isolated scheduled workers from WSL to Windows DB. **Done when:** Scheduled service reads correct database; old workers safely retired.
 - [x] **R04** Prove crash/restart recovery and lease expiry. **Done when:** Kill/restart simulation recovers exactly once.
 - [x] **R05** Prove idempotency, retries, dead-letter state and timeouts. **Done when:** Duplicate workload does not duplicate actions.
-- [ ] **R06** Connect Jarvis to Windows runtime and distinguish stale/down/blocked. **Done when:** Health dashboard and alert tests.
+- [x] **R06** Connect Jarvis to Windows runtime and distinguish stale/down/blocked. **Done when:** Health dashboard and alert tests.
 - [ ] **R07** Capture structured logs, job trace IDs, error causes and evidence links. **Done when:** Founder can follow each job lifecycle.
 - [ ] **R08** Enforce no live production, email, publishing or payments in tests. **Done when:** Negative authorization tests.
 
@@ -132,6 +132,8 @@
 - 2026-10-12 — **R06 PARTIAL — isolated Jarvis health probe validated, milestone OPEN:** Added read-only PowerShell health probe `tests/jarvis-isolated-health.ps1` for isolated Windows PostgreSQL dedicated role/DB, queued/retrying and expired lease counts, failed-job totals, local Ollama HTTP, both worker process families and Task Scheduler definitions. It emits JSON status `healthy`, `degraded`, `offline`, `blocked` and per-signal evidence; no secrets emitted. `tests/jarvis-isolated-health-acceptance.ps1` passed five states (healthy baseline, simulated database-offline, Ollama-offline, workers-offline, queue-blocked), without stopping services. Actual baseline reports Windows test DB and Ollama available; both worker families healthy and no expired active leases at probe. **Still required before R06 checkmark:** integrate persistent Jarvis dashboard/watch into command room, independently verify stale/last-seen detection and reporting under recurring outages, and test alert/visibility; standalone probe does not establish monitoring in production. Zero production changes; D: Astra untouched.
 
 - 2026-10-12 — **R06 PERSISTENT MONITOR PROVEN / UI INTEGRATION STILL OPEN:** `tests/jarvis-persistent-health.ps1` now captures atomic `latest.json` snapshots plus append-only `history.jsonl` in local isolated development storage; read-only mode validates age and fails stale for missing, aged, future or corrupt snapshots. `docs/JARVIS_ISOLATED_HEALTH_CONTRACT.md` documents JSON schema for a future authenticated Founder Command Room bridge. `tests/jarvis-persistent-health-acceptance.ps1` PASS: healthy, simulated Ollama offline, simulated blocked queue, aged/missing stale, history count=3, read-only operation no writes. Scheduled task `Pegasus-Isolated-Jarvis-Health` registered every 2 minutes with allowed battery execution and IgnoreNew; scheduler result=0 at 22:08:47, 3 actual history snapshots, live read status healthy age=48s/stale=false. Original base health probe previously passed database/worker/Ollama/blocked simulations. **R06 intentionally remains OPEN:** no authenticated bridge or visible health dashboard integration in the Founder Command Room has been demonstrated. Production and D: Astra untouched; no secret content persisted.
+
+- 2026-10-12 — **R06 ACCEPTED (isolated Windows development only):** Local `src/App.tsx` War Room mounts `JarvisHealthPanel` and `JarvisStatusBadge`; authenticated dev-only Express `/api/dev/jarvis-health` bridge in `core/runtime/jarvisDevelopment.ts` consumes persistent snapshots/history read-only with 180-second server freshness and no-store response. Development server binds 127.0.0.1; token file lives outside Git with restricted Windows ACL; unauthorized = 401, cross-site Origin = 403, invalid method = 405, production handler = 404. Actual development HTTP authorization and Chrome UI acceptance passed: panel present, unauthenticated STALE, authenticated real HEALTHY; browser test-only intercepted responses rendered OFFLINE, BLOCKED, STALE without modifying service snapshots. `tests/jarvis-ui-acceptance.tsx`: 4/4 tests passed (all badge states, fail-closed missing/corrupt/expired/future, bearer/origin/HTTP restrictions, production disabled). `tests/jarvis-browser-acceptance.mjs`: pass, exit 0; `tsc --noEmit` exit 0. Scheduled `Pegasus-Isolated-Jarvis-Health` reports Ready/LastTaskResult 0 and continues writing snapshots; timeout adjusted to 3 minutes, battery execution enabled. **Scope limitation:** local development UI acceptance, not verified public production Founder Center, not external notifications. Original 21 agent registry/voice files untouched; D: Astra read-only/unmodified, no production deployment or production database writes.
 
 ## Change control
 

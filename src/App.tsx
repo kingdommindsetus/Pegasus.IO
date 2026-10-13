@@ -8,6 +8,7 @@ import { Header } from './components/Header';
 import { AgentCard } from './components/AgentCard';
 import { WarRoomWorkflow } from './components/WarRoomWorkflow';
 import { CoreWarRoomV2 } from './components/CoreWarRoomV2';
+import { JarvisHealthPanel } from './components/JarvisHealthPanel';
 import { VoiceStudioModal } from './components/VoiceStudioModal';
 import { AgentBlueprintDrawer } from './components/AgentBlueprintDrawer';
 import { BlueprintsView } from './components/BlueprintsView';
@@ -133,6 +134,7 @@ export default function App() {
         {/* Tab 1: War Room Pipeline */}
         {activeTab === 'workflow' && (
           <div className="space-y-6">
+            <JarvisHealthPanel />
             <CoreWarRoomV2 objective={projectBrief} setObjective={setProjectBrief} />
             <details className="rounded-2xl border border-slate-800 bg-slate-900/40 p-4">
               <summary className="cursor-pointer text-xs font-bold tracking-wider text-slate-400">LEGACY 12-STAGE WORKFLOW</summary>
