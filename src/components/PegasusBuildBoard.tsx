@@ -1,6 +1,7 @@
 import React,{useMemo,useState} from 'react';
 import {ArrowLeft,CheckCircle2,Clock3,ClipboardList,ExternalLink,LockKeyhole,ShieldAlert,ShieldCheck} from 'lucide-react';
 import {BOARD_UPDATED_AT,PEGASUS_BUILD_MILESTONES,buildBoardSnapshot} from '../../core/integrations/pegasusBuildBoard';
+import {PEGASUS_LAUNCH_GATES,launchProgress} from '../../core/integrations/pegasusLaunchGates';
 import type {BoardState,Priority} from '../../core/integrations/pegasusBuildBoard';
 const colors:Record<BoardState,string>={
  verified_lab:'border-emerald-700/50 bg-emerald-950/30 text-emerald-300',
@@ -23,7 +24,8 @@ export function PegasusBuildBoard(){
  const summary=useMemo(()=>buildBoardSnapshot(),[]);
  const entries=PEGASUS_BUILD_MILESTONES.filter(x=>
   (statusFilter==='all'||x.status===statusFilter)&&(!onlyP0||x.priority==='P0'));
- const progress=Math.round(100*summary.verifiedLabOnly/Math.max(1,summary.total));
+ const launch=useMemo(()=>launchProgress(),[]);
+ const progress=launch.percent;
  return <div className="min-h-screen bg-[#080c14] text-white p-5 sm:p-9 font-sans">
   <div className="mx-auto max-w-6xl space-y-7">
    <header className="flex flex-wrap items-start justify-between gap-4">
@@ -60,11 +62,12 @@ export function PegasusBuildBoard(){
     </div>
    </div>
    <section className="rounded-2xl border border-slate-800 bg-[#101725] p-5">
-    <div className="flex justify-between text-xs text-slate-400"><span>Lab milestone coverage — not overall product completion</span><span>{progress}%</span></div>
+    <div className="flex justify-between text-xs text-slate-400"><span>Fixed launch acceptance gates · {launch.completed}/{launch.total} verified</span><span data-testid="pegasus-launch-percent">{progress}%</span></div>
     <div className="mt-3 h-2 rounded-full bg-slate-800 overflow-hidden">
      <div className="h-full rounded-full bg-emerald-400" style={{width:`${progress}%`}}/>
     </div>
-    <div className="mt-3 text-xs text-slate-500">Last reviewed {BOARD_UPDATED_AT}. No synthetic result is counted as a completed production launch gate.</div>
+    <div className="mt-3 text-xs text-slate-500">Fixed ten-gate baseline reviewed {BOARD_UPDATED_AT}. This is acceptance checklist coverage, not business or production readiness. Production is NOT launched.</div>
+    <div className="mt-4 grid gap-2 sm:grid-cols-2">{PEGASUS_LAUNCH_GATES.map(g=><div key={g.id} className="flex items-start gap-2 rounded-lg border border-slate-800 p-2 text-xs"><span className={g.passed?'text-emerald-300':'text-amber-300'}>{g.passed?'✓':'○'}</span><div><div className="font-semibold">{g.name}</div><div className="mt-1 text-slate-500">{g.proof||'Not yet verified'}</div></div></div>)}</div>
    </section>
    <div className="flex flex-wrap items-center gap-2">
     <label className="text-sm text-slate-400" htmlFor="pegasus-board-filter">Filter</label>

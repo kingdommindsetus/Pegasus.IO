@@ -1,6 +1,7 @@
 import React from 'react';
 import { Activity, ArrowLeft, BrainCircuit, Database, Eye, Film, LockKeyhole, ShieldCheck, Workflow } from 'lucide-react';
 import {CAPABILITY_REGISTRY} from '../../core/integrations/capabilityRegistry';
+import {GodsEyeLocalEvidencePanel} from './GodsEyeLocalEvidencePanel';
 
 const definitions:Record<string,{name:string,detail:string,owner:string}> = {
  pegasus:{name:'PEGASUS CORE',detail:'Canonical identities, jobs, durable evidence and approval rules',owner:'Simon'},
@@ -48,9 +49,10 @@ export function GodsEyeLabDashboard(){
     <div className="rounded-2xl border border-amber-600/30 bg-[#17140d] p-5">
      <LockKeyhole className="mb-3 text-amber-300" size={21}/>
      <div className="text-xs uppercase tracking-wider text-slate-400">Live founder activity feed</div>
-     <div className="mt-1 font-semibold text-amber-200">Not connected</div>
+     <div className="mt-1 font-semibold text-amber-200">Production not connected</div>
     </div>
    </div>
+   <GodsEyeLocalEvidencePanel />
    <div className="flex items-center gap-3">
     <Workflow className="text-amber-300" size={20}/>
     <h2 className="text-xl font-bold">Capability family</h2>
