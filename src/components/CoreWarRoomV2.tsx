@@ -5,6 +5,11 @@ import {AvatarFace} from './AvatarFace';
 import {PreviewDatabaseAudit} from './PreviewDatabaseAudit';
 
 type Proof={completedTasks:number;completedRuns:number;evidenceCount:number;memoryCount:number;verified:boolean};
+type WorkspaceStatus='checking'|'ready'|'needs_setup'|'unavailable';
+function isCompanySetupRequired(message:string){
+ return message==='Founder organization scope is not configured'
+  ||message==='Configured founder organization does not exist';
+}
 const IDS=['simon','marie','iris','mark','cammy','evan','tube','lucy','snake','alice','echo','booker'];
 
 async function readApiJson(r:Response){
@@ -29,6 +34,7 @@ export function CoreWarRoomV2({objective,setObjective}:{objective:string;setObje
  const [currentMissionId,setCurrentMissionId]=useState<string|null>(null);
  const [resumeAvailable,setResumeAvailable]=useState(false);
  const [hydrating,setHydrating]=useState(true);
+ const [workspaceStatus,setWorkspaceStatus]=useState<WorkspaceStatus>('checking');
 
  function clearMissionView(){
   setStates(fresh());
@@ -46,6 +52,7 @@ export function CoreWarRoomV2({objective,setObjective}:{objective:string;setObje
 
  async function hydrateMission(missionId?:string){
   setHydrating(true);
+  setWorkspaceStatus('checking');
   try{
    const r=await fetch('/api/core/mission',{
     method:'POST',
@@ -55,6 +62,8 @@ export function CoreWarRoomV2({objective,setObjective}:{objective:string;setObje
    });
    const h=await readApiJson(r);
    if(!r.ok)throw Error(h.error||'Mission hydration failed');
+   setWorkspaceStatus('ready');
+   setError('');
    if(!h.found){setHydrating(false);return null;}
 
    const restored=fresh();
@@ -77,7 +86,14 @@ export function CoreWarRoomV2({objective,setObjective}:{objective:string;setObje
    if(typeof h.founderObjective==='string')setObjective(h.founderObjective);
    return h;
   }catch(e:any){
-   setError(e?.message||String(e));
+   const message=String(e?.message||e);
+   if(isCompanySetupRequired(message)){
+    setWorkspaceStatus('needs_setup');
+    setError('');
+   }else{
+    setWorkspaceStatus('unavailable');
+    setError(message);
+   }
    return null;
   }finally{
    setHydrating(false);
@@ -203,7 +219,7 @@ export function CoreWarRoomV2({objective,setObjective}:{objective:string;setObje
  }
 
  async function run(){
-  if(running||!unlocked)return;
+  if(running||!unlocked||workspaceStatus!=='ready')return;
   const isResume=Boolean(currentMissionId&&resumeAvailable);
   if(!isResume&&!objective.trim())return;
 
@@ -269,7 +285,11 @@ export function CoreWarRoomV2({objective,setObjective}:{objective:string;setObje
    if(q.ok)setProof(await readApiJson(q));
    setResumeAvailable(false);
   }catch(e:any){
-   setError(e?.message||String(e));
+   const message=String(e?.message||e);
+   if(isCompanySetupRequired(message)){
+    setWorkspaceStatus('needs_setup');
+    setError('');
+   }else setError(message);
    if(currentMissionId)setResumeAvailable(true);
   }finally{
    setActive('');
@@ -287,7 +307,7 @@ export function CoreWarRoomV2({objective,setObjective}:{objective:string;setObje
     <p className="text-xs text-slate-400">Real reasoning → governed skills → memory → evidence → database verification.</p>
    </div>
    <div className={"h-fit rounded-full border px-3 py-1 text-[10px] font-black "+(proof.verified?'border-emerald-500/50 text-emerald-300':'border-slate-700 text-slate-400')}>
-    {hydrating?'RESTORING CORE':proof.verified?'VERIFIED COMPLETE':resumeAvailable?'RESUME READY':'CORE READY'}
+    {!unlocked?'FOUNDER SIGN-IN':hydrating||workspaceStatus==='checking'?'CHECKING CORE':workspaceStatus==='needs_setup'?'SETUP REQUIRED':workspaceStatus==='unavailable'?'CORE UNAVAILABLE':proof.verified?'VERIFIED COMPLETE':resumeAvailable?'RESUME READY':'CORE READY'}
    </div>
   </div>
 
@@ -301,7 +321,7 @@ export function CoreWarRoomV2({objective,setObjective}:{objective:string;setObje
   <textarea value={objective} onChange={e=>setObjective(e.target.value)} rows={3} disabled={!unlocked||resumeAvailable} className="w-full rounded-xl border border-slate-700 bg-black/40 p-3 text-sm text-white outline-none focus:border-cyan-400 disabled:opacity-50" placeholder={unlocked?'Founder objective':'Unlock Core to enter a founder objective'}/>
 
   <div className="flex gap-2">
-   <button onClick={run} disabled={running||hydrating||!unlocked||(!resumeAvailable&&!objective.trim())} className="flex items-center gap-2 rounded-xl bg-cyan-400 px-4 py-2 text-xs font-black text-slate-950 disabled:opacity-40">
+   <button onClick={run} disabled={running||hydrating||!unlocked||workspaceStatus!=='ready'||(!resumeAvailable&&!objective.trim())} className="flex items-center gap-2 rounded-xl bg-cyan-400 px-4 py-2 text-xs font-black text-slate-950 disabled:opacity-40">
     <Play className="h-4 w-4"/>{buttonLabel}
    </button>
    <button onClick={reset} disabled={running} className="flex items-center gap-2 rounded-xl border border-slate-700 px-3 py-2 text-xs text-slate-300">
@@ -309,7 +329,17 @@ export function CoreWarRoomV2({objective,setObjective}:{objective:string;setObje
    </button>
   </div>
 
-  {error&&<div className="rounded-xl border border-red-500/30 bg-red-950/30 p-3 text-xs text-red-300">{error}</div>}
+  {unlocked&&workspaceStatus==='needs_setup'&&<div role="status" className="flex gap-3 rounded-xl border border-slate-700 bg-slate-900/55 px-4 py-3 text-sm text-slate-300">
+   <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-amber-300"/>
+   <div><div className="font-semibold text-slate-100">Company workspace setup pending</div>
+    <p className="mt-1 text-xs leading-relaxed text-slate-400">Founder access is active. Missions are safely paused until Pegasus is linked to your verified company. Use Verify Database above to complete Gate 6.</p>
+   </div>
+  </div>}
+  {unlocked&&workspaceStatus==='unavailable'&&!error&&<div role="status" className="rounded-xl border border-slate-700 bg-slate-900/55 px-4 py-3 text-xs text-slate-300">Mission storage could not be verified. No agent execution has been started.</div>}
+  {error&&<div role="alert" className="rounded-xl border border-slate-700 bg-slate-900/55 px-4 py-3 text-xs text-slate-300">
+   <div className="font-semibold text-slate-100">Mission request could not be completed</div>
+   <details className="mt-2"><summary className="cursor-pointer text-slate-400">Technical details</summary><p className="mt-2 break-words text-amber-200">{error}</p></details>
+  </div>}
 
   <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6">
    {IDS.map(id=>{

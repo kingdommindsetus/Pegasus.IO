@@ -1,5 +1,6 @@
 import React,{useCallback,useState} from 'react';
 import {Database,ShieldCheck,LockKeyhole,RefreshCw} from 'lucide-react';
+import {launchProgress} from '../../core/integrations/pegasusLaunchGates';
 
 type Diagnostic={
  readOnly:true;environment:'preview';databaseName:string;connectionRole:string;
@@ -8,6 +9,7 @@ type Diagnostic={
  configuration:{companyScopeConfigured:boolean;matchesCanonicalCompany:boolean};
 };
 type Result='idle'|'loading'|'ready'|'locked'|'unavailable';
+const gateProgress=launchProgress();
 /** Operator-only visibility, not an authorization or execution surface. */
 export function PreviewDatabaseAudit({unlocked}:{unlocked:boolean}){
  const [state,setState]=useState<Result>('idle');
@@ -42,8 +44,8 @@ export function PreviewDatabaseAudit({unlocked}:{unlocked:boolean}){
    </button>
   </div>
   <div className="space-y-2">
-   <div className="flex items-center justify-between gap-2 text-xs"><span className="font-semibold text-white">PEGASUS LAUNCH</span><span className="font-bold text-amber-200">50% · 10 of 20 gates</span></div>
-   <div className="h-2 overflow-hidden rounded-full bg-slate-800"><div className="h-full w-1/2 bg-amber-400"/></div>
+   <div className="flex items-center justify-between gap-2 text-xs"><span className="font-semibold text-white">PEGASUS LAUNCH</span><span className="font-bold text-amber-200">{gateProgress.percent}% · {gateProgress.completed} of {gateProgress.total} gates</span></div>
+   <div className="h-2 overflow-hidden rounded-full bg-slate-800"><div className="h-full bg-amber-400" style={{width:`${gateProgress.percent}%`}}/></div>
   </div>
   {!unlocked&&<p className="flex items-center gap-2 text-sm text-amber-200"><LockKeyhole size={16}/>Unlock Core with your founder password above, then select Verify Database.</p>}
   {unlocked&&state==='idle'&&<p className="text-sm text-slate-300">Founder session active. Ready for a read-only verification.</p>}

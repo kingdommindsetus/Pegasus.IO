@@ -17,8 +17,18 @@ assert.ok(existsSync(join(root,'index.html')),'Build dist/ before browser accept
 const chrome='C:/Program Files/Google/Chrome/Application/chrome.exe';
 assert.ok(existsSync(chrome),'Local Chrome missing');
 const type={'.js':'text/javascript','.css':'text/css','.html':'text/html','.svg':'image/svg+xml','.png':'image/png','.woff2':'font/woff2'};
+let simulateMissingCompany=false;
 const server=createServer((request,response)=>{
  const raw=new URL(request.url||'/', 'http://127.0.0.1');
+ // Mock an authenticated founder plus a missing company ONLY on isolated localhost.
+ if(simulateMissingCompany && raw.pathname==='/api/core/session'){
+  response.writeHead(200,{'Content-Type':'application/json','Cache-Control':'no-store'});
+  response.end(JSON.stringify({ok:true}));return;
+ }
+ if(simulateMissingCompany && raw.pathname==='/api/core/mission'){
+  response.writeHead(503,{'Content-Type':'application/json','Cache-Control':'no-store'});
+  response.end(JSON.stringify({error:'Founder organization scope is not configured'}));return;
+ }
  const name=raw.pathname==='/'?'index.html':raw.pathname.replace(/^\/+/, '');
  const file=resolve(root,name);
  if(!file.startsWith(root+'\\')&&!file.startsWith(root+'/')&&file!==root){
@@ -120,10 +130,22 @@ try{
   'Local dev token panel must not ship in production build');
  await navigate(origin+'/?staging-audit=1','PEGASUS CORE · WAR ROOM v2');
  await waitFor('document.body.textContent?.includes("Verify the real Pegasus database")');
- assert.equal(await evaluate('document.body.innerText.includes("50% · 10 of 20 gates")'),true);
+ assert.equal(await evaluate('document.body.innerText.includes("50% · 5 of 10 gates")'),true);
  assert.equal(await evaluate('document.body.innerText.includes("Unlock Core with your founder password")'),true);
  assert.equal(await evaluate(`(()=>{const b=[...document.querySelectorAll('button')].find(b=>b.textContent?.includes('VERIFY DATABASE'));return Boolean(b&&b.disabled)})()`),true,
    'Diagnostic must remain disabled without founder sign-in');
+ simulateMissingCompany=true;
+ await navigate(origin+'/?staging-audit=1&mock-company-setup=1','PEGASUS CORE · WAR ROOM v2');
+ await waitFor('document.body.innerText.includes("Company workspace setup pending")');
+ assert.equal(await evaluate('document.body.innerText.includes("SETUP REQUIRED")'),true);
+ assert.equal(await evaluate('document.body.innerText.includes("Founder organization scope is not configured")'),false,
+  'Do not expose raw configuration failures as frightening red banners');
+ assert.equal(await evaluate(`(()=>{const b=[...document.querySelectorAll('button')].find(x=>x.textContent?.includes('START CORE MISSION'));return Boolean(b&&b.disabled)})()`),true,
+  'Never start a mission without an assigned company');
+ assert.equal(await evaluate(`(()=>{const b=[...document.querySelectorAll('button')].find(x=>x.textContent?.trim()==='RESET');if(!b)return false;b.click();return true})()`),true);
+ assert.equal(await evaluate('document.body.innerText.includes("Company workspace setup pending")'),true,
+  'Reset must not conceal missing company configuration');
+ simulateMissingCompany=false;
  await navigate(origin+'/', 'PEGASUS 12-Agent Execution Chain');
  const gotoBoard=await evaluate(`(()=>{const a=document.querySelector('a[href="/?build-board=1"]');if(!a)return false;a.click();return true})()`);
  assert.equal(gotoBoard,true);
