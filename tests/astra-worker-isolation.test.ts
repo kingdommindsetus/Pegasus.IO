@@ -26,6 +26,17 @@ test('all draft results remain pending human review',()=>{
   assert.equal(result.state,'pending_human_review');
  }
 });
+test('Simon isolated database reader requires completed evidence-backed Astra jobs',()=>{
+ const source=readFileSync(new URL('isolatedSimonAstraRead.ts',root),'utf8');
+ assert.match(source,/pegasus_world_windows_accept_1011/);
+ assert.match(source,/pegasus_windows_accept_role/);
+ assert.match(source,/j\.status='completed'/);
+ assert.match(source,/j\.skill_key='astra_knowledge_draft'/);
+ assert.match(source,/receipt mismatch/);
+ assert.match(source,/source evidence mismatch/);
+ assert.match(source,/completed_runs!==1/);
+ assert.doesNotMatch(source,/\b(?:INSERT|UPDATE|DELETE)\s+(?:INTO|pegasus_core)/i);
+});
 test('Simons Astra receipt contains only review metadata, never approval or dispatch',()=>{
  const jobId='a1234567-b123-c123-d123-e12345678901';
  const result={status:'draft_assessed',validationStatus:'needs_review',draftOnly:true,

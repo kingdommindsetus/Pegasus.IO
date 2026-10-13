@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {db,closeDb} from '../core/database/client.js';
 import {recoverExpiredIsolatedLeases} from '../core/work/jobs/isolatedLeaseRecovery.js';
+import {readSimonAstraHandoff} from '../core/work/jobs/isolatedSimonAstraRead.js';
 import {queueOneAstraPilot,processOneAstraPilot,ASTRA_JOB_MARKER,type AstraPilotInput} from '../core/work/jobs/isolatedAstraHandoff.js';
 const sql=db();
 let jobId:string|undefined;
@@ -30,6 +31,12 @@ try{
  assert.equal(job.result.simonReceipt.jobId,jobId);
  assert.equal(job.result.simonReceipt.publishAllowed,false);
  assert.notEqual(job.result.reviewState,'approved');
+ const readBack=await readSimonAstraHandoff(jobId);
+ assert.ok(readBack);
+ assert.deepEqual(readBack.receipt,job.result.simonReceipt);
+ assert.equal(readBack.proof.completedRuns,1);
+ assert.equal(readBack.proof.sourceEvidence,2);
+ assert.equal(readBack.receipt.nextAction,'request_authenticated_human_review');
  const [counts]=await sql`SELECT (SELECT count(*)::int FROM pegasus_core.evidence WHERE job_id=${jobId}) evidence,(SELECT count(*)::int FROM pegasus_core.memories WHERE metadata->>'jobId'=${jobId}) memories,(SELECT count(*)::int FROM pegasus_core.events WHERE entity_id=${jobId} AND event_type='job_completed') events,(SELECT count(*)::int FROM pegasus_core.job_runs WHERE job_id=${jobId} AND status='completed') runs`;
  assert.ok(counts.evidence>=1);assert.equal(counts.memories,1);assert.equal(counts.events,1);assert.equal(counts.runs,1);
  console.log('ASTRA_PERSISTENCE_ACCEPTANCE',JSON.stringify({jobId,status:job.status,validation:job.result.validationStatus,evidence:counts.evidence,memories:counts.memories,events:counts.events,runs:counts.runs,externalActionsExecuted:false}));
@@ -45,6 +52,7 @@ try{
  assert.equal(failed.status,'failed');assert.equal(failed.last_error,'ASTRA_LOCAL_DRAFT_FAILED');
  assert.equal(Number(failed.attempts),1);assert.equal(failed.failed_runs,1);
  assert.equal(failed.evidence,0);assert.equal(failed.memories,0);assert.equal(failed.failure_events,1);
+ assert.equal(await readSimonAstraHandoff(failedId),null);
  console.log('ASTRA_MODEL_FAILURE_ACCEPTANCE',JSON.stringify({jobId:failedId,status:failed.status,failedRuns:failed.failed_runs,evidence:failed.evidence,memories:failed.memories,failureEvents:failed.failure_events}));
  // Simulated crashed worker: expiration closes the one-shot Astra job without retrying.
  const staleId=await queueOneAstraPilot(task.id,key+'-expired',input);
