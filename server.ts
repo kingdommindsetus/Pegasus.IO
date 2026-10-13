@@ -11,6 +11,7 @@ import coreSessionHandler from './api/core/session.js';
 import coreMissionHandler from './api/core/mission.js';
 import coreStepHandler from './api/core/step.js';
 import {jarvisDevelopmentHandler} from './core/runtime/jarvisDevelopment.js';
+import {jobTraceDevelopmentHandler} from './core/runtime/jobTraceDevelopment.js';
 
 dotenv.config();
 
@@ -26,6 +27,7 @@ app.use(express.urlencoded({extended:true}));
 // This prevents provider drift between Vercel and open-source/self-hosted runs.
 app.all('/api/health',(req,res)=>healthHandler(req,res));
 if(process.env.NODE_ENV!=='production')app.all('/api/dev/jarvis-health',jarvisDevelopmentHandler);
+if(process.env.NODE_ENV!=='production')app.all('/api/dev/job-trace',jobTraceDevelopmentHandler);
 app.all('/api/chat',(req,res)=>void chatHandler(req,res));
 app.all('/api/agent/chat',(req,res)=>void chatHandler(req,res));
 app.all('/api/agent/speak',(req,res)=>void speakHandler(req,res));

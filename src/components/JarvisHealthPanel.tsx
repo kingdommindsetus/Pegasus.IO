@@ -1,3 +1,4 @@
+import {JobTracePanel} from './JobTracePanel';
 import {JarvisStatusBadge} from './JarvisStatusBadge';
 import {useEffect,useRef,useState} from 'react';
 type Signal={status:string;detail:string};
@@ -45,5 +46,5 @@ export function JarvisHealthPanel(){
    {Boolean(reading?.alerts?.length)&&<ul className="text-amber-300 text-xs">{reading?.alerts.map((a,i)=><li key={i}>{a.signal}: {a.detail}</li>)}</ul>}
    <p className="text-xs text-slate-400">Last {reading?.history?.length||0} recorded snapshots: {(reading?.history||[]).map(s=>s.status).join(' · ')||'none'}</p>
   </>}
- </section>;
+  <JobTracePanel token={token}/>`n </section>;
 }
