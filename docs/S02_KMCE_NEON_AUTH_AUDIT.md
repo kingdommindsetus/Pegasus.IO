@@ -57,3 +57,9 @@ A **staging-only mitigation prototype** (saved as `docs/S02_STAGING_MIDDLEWARE_P
 - Fix or risk-review the isolated staging dependency advisory, and establish reliable staging lifecycle/teardown scripts.
 
 **S02 is intentionally OPEN.** Session-core/staging proofs are logged here, but all required secure-session and portal tenant tests have not passed. No production deployment, emails, payments, real sessions or D:\Astra changes were made.
+
+## 2026-10-13 — Reconnected Kingdom; S02 path-hardening policy checks
+
+After Desktop Commander restored terminal access, reviewed commit `458e1d2` and the existing isolated middleware revalidation prototype. Added `tests/s02-session-guard-path-policy.mjs` and ran `node --test`: **3/3 passing**. The proposed server-side URL policy forces `disableCookieCache=true` for named protected founder, educator, student, administration, and API routes; uses explicit public-route exclusions; and replaces a malicious query value of `false` or `0` with `true`. This is a **pure policy unit test**, not proof that the rule is integrated across all Next.js routes. It does not change portal middleware, staging identities or production.
+
+**S02 still OPEN:** require integrated Next.js regression for every protected route, expiry/revocation with real staging Neon Auth, and database-backed cross-account isolation. Do not generalize the synthetic role assertions or policy unit test into an accepted security guarantee.
