@@ -2,6 +2,7 @@ import React,{useEffect,useState} from 'react';
 import {Play,RotateCcw,ShieldCheck} from 'lucide-react';
 import {AGENTS} from '../data/agents';
 import {AvatarFace} from './AvatarFace';
+import {PreviewDatabaseAudit} from './PreviewDatabaseAudit';
 
 type Proof={completedTasks:number;completedRuns:number;evidenceCount:number;memoryCount:number;verified:boolean};
 const IDS=['simon','marie','iris','mark','cammy','evan','tube','lucy','snake','alice','echo','booker'];
@@ -88,10 +89,15 @@ export function CoreWarRoomV2({objective,setObjective}:{objective:string;setObje
   (async()=>{
    try{
     const r=await fetch('/api/core/session',{method:'GET',credentials:'same-origin',cache:'no-store'});
-    if(r.ok&&!cancelled){
-     setUnlocked(true);
-     await hydrateMission();
+    if(r.ok){
+     const session=await readApiJson(r);
+     if(session?.ok===true&&!cancelled){
+      setUnlocked(true);
+      await hydrateMission();
+     }
     }
+   }catch{
+    if(!cancelled)setUnlocked(false);
    }finally{
     if(!cancelled)setHydrating(false);
    }
@@ -289,6 +295,8 @@ export function CoreWarRoomV2({objective,setObjective}:{objective:string;setObje
    <input type="password" value={password} onChange={e=>setPassword(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')login();}} className="min-w-0 flex-1 rounded-lg border border-slate-700 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-amber-400" placeholder="Founder access password"/>
    <button onClick={login} className="rounded-lg bg-amber-400 px-4 py-2 text-xs font-black text-slate-950">UNLOCK CORE</button>
   </div>}
+
+  {new URLSearchParams(window.location.search).get('staging-audit')==='1'&&<PreviewDatabaseAudit unlocked={unlocked}/>}
 
   <textarea value={objective} onChange={e=>setObjective(e.target.value)} rows={3} disabled={!unlocked||resumeAvailable} className="w-full rounded-xl border border-slate-700 bg-black/40 p-3 text-sm text-white outline-none focus:border-cyan-400 disabled:opacity-50" placeholder={unlocked?'Founder objective':'Unlock Core to enter a founder objective'}/>
 

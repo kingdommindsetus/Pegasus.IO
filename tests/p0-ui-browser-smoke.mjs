@@ -118,6 +118,12 @@ try{
  assert.equal(await evaluate('document.body.innerText.includes("Production not connected")'),true);
  assert.equal(await evaluate('document.body.innerText.includes("REAL POSTGRESQL · DEVELOPMENT TRACE")'),false,
   'Local dev token panel must not ship in production build');
+ await navigate(origin+'/?staging-audit=1','PEGASUS CORE · WAR ROOM v2');
+ await waitFor('document.body.textContent?.includes("Verify the real Pegasus database")');
+ assert.equal(await evaluate('document.body.innerText.includes("50% · 10 of 20 gates")'),true);
+ assert.equal(await evaluate('document.body.innerText.includes("Unlock Core with your founder password")'),true);
+ assert.equal(await evaluate(`(()=>{const b=[...document.querySelectorAll('button')].find(b=>b.textContent?.includes('VERIFY DATABASE'));return Boolean(b&&b.disabled)})()`),true,
+   'Diagnostic must remain disabled without founder sign-in');
  await navigate(origin+'/', 'PEGASUS 12-Agent Execution Chain');
  const gotoBoard=await evaluate(`(()=>{const a=document.querySelector('a[href="/?build-board=1"]');if(!a)return false;a.click();return true})()`);
  assert.equal(gotoBoard,true);
