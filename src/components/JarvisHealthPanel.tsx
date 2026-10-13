@@ -46,5 +46,6 @@ export function JarvisHealthPanel(){
    {Boolean(reading?.alerts?.length)&&<ul className="text-amber-300 text-xs">{reading?.alerts.map((a,i)=><li key={i}>{a.signal}: {a.detail}</li>)}</ul>}
    <p className="text-xs text-slate-400">Last {reading?.history?.length||0} recorded snapshots: {(reading?.history||[]).map(s=>s.status).join(' · ')||'none'}</p>
   </>}
-  <JobTracePanel token={token}/>`n </section>;
+  <JobTracePanel token={token}/>
+ </section>;
 }

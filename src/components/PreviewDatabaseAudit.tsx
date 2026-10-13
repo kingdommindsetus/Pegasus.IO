@@ -1,4 +1,4 @@
-import React,{useCallback,useState} from 'react';
+import React,{useCallback,useEffect,useState} from 'react';
 import {Database,ShieldCheck,LockKeyhole,RefreshCw} from 'lucide-react';
 import {launchProgress} from '../../core/integrations/pegasusLaunchGates';
 
@@ -30,6 +30,10 @@ export function PreviewDatabaseAudit({unlocked}:{unlocked:boolean}){
    setData(x);setState('ready');
   }catch{setState('unavailable');setStatus('Database verification could not complete.');}
  },[]);
+ useEffect(()=>{
+  if(unlocked)void check();
+  else{setState('idle');setData(null);setStatus('');}
+ },[unlocked,check]);
  return <section aria-label="Gate 6 protected staging database audit"
    className="rounded-2xl border border-amber-500/30 bg-slate-900/65 p-5 space-y-4">
   <div className="flex flex-wrap items-start justify-between gap-3">
@@ -47,8 +51,9 @@ export function PreviewDatabaseAudit({unlocked}:{unlocked:boolean}){
    <div className="flex items-center justify-between gap-2 text-xs"><span className="font-semibold text-white">PEGASUS LAUNCH</span><span className="font-bold text-amber-200">{gateProgress.percent}% · {gateProgress.completed} of {gateProgress.total} gates</span></div>
    <div className="h-2 overflow-hidden rounded-full bg-slate-800"><div className="h-full bg-amber-400" style={{width:`${gateProgress.percent}%`}}/></div>
   </div>
-  {!unlocked&&<p className="flex items-center gap-2 text-sm text-amber-200"><LockKeyhole size={16}/>Unlock Core with your founder password above, then select Verify Database.</p>}
-  {unlocked&&state==='idle'&&<p className="text-sm text-slate-300">Founder session active. Ready for a read-only verification.</p>}
+  {!unlocked&&<p className="flex items-center gap-2 text-sm text-amber-200"><LockKeyhole size={16}/>Unlock Core with your founder password above. The protected read-only database check will run automatically.</p>}
+  {unlocked&&state==='idle'&&<p className="text-sm text-slate-300">Founder session active. Preparing read-only database verification.</p>}
+  {unlocked&&state==='loading'&&<p role="status" className="text-sm text-slate-300">Checking the staging database identity securely…</p>}
   {state==='locked'&&<p className="text-sm text-amber-200">Founder session expired or was rejected. Sign in again.</p>}
   {state==='unavailable'&&<p className="text-sm text-amber-200">{status}</p>}
   {state==='ready'&&data&&<div className="grid gap-3 sm:grid-cols-2 text-sm">

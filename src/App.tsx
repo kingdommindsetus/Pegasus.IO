@@ -35,6 +35,7 @@ export default function App() {
   if (new URLSearchParams(window.location.search).get('build-board') === '1') {
     return <PegasusBuildBoard />;
   }
+  const isLocalDev=import.meta.env.DEV && ['localhost','127.0.0.1'].includes(window.location.hostname);
   const [activeTab, setActiveTab] = useState<'workflow' | 'grid' | 'blueprints'>('workflow');
   const [projectBrief, setProjectBrief] = useState<string>(
     'Launch of an enterprise autonomous AI voice agent platform for healthcare clinics to handle 24/7 patient appointment scheduling with zero hold times.'
@@ -143,7 +144,7 @@ export default function App() {
         {/* Tab 1: War Room Pipeline */}
         {activeTab === 'workflow' && (
           <div className="space-y-6">
-            <JarvisHealthPanel />
+            {isLocalDev&&<JarvisHealthPanel />}
             <CoreWarRoomV2 objective={projectBrief} setObjective={setProjectBrief} />
             <details className="rounded-2xl border border-slate-800 bg-slate-900/40 p-4">
               <summary className="cursor-pointer text-xs font-bold tracking-wider text-slate-400">LEGACY 12-STAGE WORKFLOW</summary>

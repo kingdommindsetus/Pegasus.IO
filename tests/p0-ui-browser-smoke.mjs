@@ -29,6 +29,14 @@ const server=createServer((request,response)=>{
   response.writeHead(503,{'Content-Type':'application/json','Cache-Control':'no-store'});
   response.end(JSON.stringify({error:'Founder organization scope is not configured'}));return;
  }
+ if(simulateMissingCompany && raw.pathname==='/api/core/staging-diagnostics'){
+  response.writeHead(200,{'Content-Type':'application/json','Cache-Control':'private, no-store'});
+  response.end(JSON.stringify({
+   readOnly:true,environment:'preview',databaseName:'synthetic-preview-only',
+   connectionRole:'synthetic-readonly',coreOrganizationSchemaReady:false,
+   company:null,configuration:{companyScopeConfigured:false,matchesCanonicalCompany:false}
+  }));return;
+ }
  const name=raw.pathname==='/'?'index.html':raw.pathname.replace(/^\/+/, '');
  const file=resolve(root,name);
  if(!file.startsWith(root+'\\')&&!file.startsWith(root+'/')&&file!==root){
@@ -130,6 +138,10 @@ try{
   'Local dev token panel must not ship in production build');
  await navigate(origin+'/?staging-audit=1','PEGASUS CORE · WAR ROOM v2');
  await waitFor('document.body.textContent?.includes("Verify the real Pegasus database")');
+ assert.equal(await evaluate('document.body.innerText.includes("JARVIS · DEVELOPMENT HEALTH")'),false,
+  'Windows-local JARVIS dashboard must never appear in a packaged preview');
+ assert.equal(await evaluate('document.body.innerText.includes("JARVIS · JOB LIFECYCLE")'),false,
+  'Windows-local job trace must never appear in a packaged preview');
  assert.equal(await evaluate('document.body.innerText.includes("50% · 5 of 10 gates")'),true);
  assert.equal(await evaluate('document.body.innerText.includes("Unlock Core with your founder password")'),true);
  assert.equal(await evaluate(`(()=>{const b=[...document.querySelectorAll('button')].find(b=>b.textContent?.includes('VERIFY DATABASE'));return Boolean(b&&b.disabled)})()`),true,
@@ -137,6 +149,9 @@ try{
  simulateMissingCompany=true;
  await navigate(origin+'/?staging-audit=1&mock-company-setup=1','PEGASUS CORE · WAR ROOM v2');
  await waitFor('document.body.innerText.includes("Company workspace setup pending")');
+ await waitFor('document.body.innerText.includes("synthetic-preview-only")');
+ assert.equal(await evaluate('document.body.innerText.includes("KMCE company record")'),true,
+  'Automatic founder-only verification should display read-only staging data');
  assert.equal(await evaluate('document.body.innerText.includes("SETUP REQUIRED")'),true);
  assert.equal(await evaluate('document.body.innerText.includes("Founder organization scope is not configured")'),false,
   'Do not expose raw configuration failures as frightening red banners');
