@@ -1,7 +1,7 @@
 import {db,closeDb} from '../core/database/client.js';
 import {recoverExpiredIsolatedLeases} from '../core/work/jobs/isolatedLeaseRecovery.js';
-import {claimNextJobForObjective,postgresJobStore,closeJobRun,unlockDependents} from '../core/work/jobs/repository.js';
-import {runJob} from '../core/work/workers/runJob.js';
+import {unlockDependents} from '../core/work/jobs/repository.js';
+import {claimIsolatedDraftJob,startOwnedIsolatedRun,finishOwnedIsolatedRun} from '../core/work/jobs/isolatedAtomicExecution.js';
 const url=new URL(process.env.DATABASE_URL||'http://invalid');
 if(url.hostname!=='127.0.0.1'||url.pathname!=='/pegasus_world_windows_accept_1011')throw Error('Only isolated database is permitted');
 const sql=db();
@@ -17,19 +17,14 @@ try{
  while(!shuttingDown){
   try{
    await recoverExpiredIsolatedLeases(objective);
-   const [target]=await sql`SELECT j.id,j.agent_id,j.skill_key,j.input FROM pegasus_core.jobs j JOIN pegasus_core.tasks t ON t.id=j.task_id WHERE t.objective_id=${objective} AND j.status='queued' ORDER BY j.created_at LIMIT 1`;
-   if(target){
-    if(target.agent_id!=='simon'||target.skill_key!=='search_company_memory'||target.input?.draftOnly!==true||target.input?.externalActionsAllowed===true){
-     console.log('UNSAFE_JOB_LEFT_UNTOUCHED',target.id);
-    }else{
-     const job=await claimNextJobForObjective(objective,'isolated-worker',60);
-     if(job&&job.id===target.id){
-      await postgresJobStore.recordEvent(job,'job_claimed',{workerId:'isolated-worker'});
-      const finished=await runJob(job,postgresJobStore,async()=>({status:'completed',output:{mode:'draft_only',review:'Internal inspection evidence checkpoint',externalActionsExecuted:false},evidence:[{source:'local_isolated_worker',safe:true}]}));
-      await closeJobRun(finished,'isolated-worker');finished.leaseExpiresAt=undefined;await postgresJobStore.save(finished);await unlockDependents(finished);
-      console.log('JOB_COMPLETE',finished.id,finished.status);
-     }
-    }
+   const job=await claimIsolatedDraftJob(objective,'isolated-worker','search_company_memory',60);
+   if(job){
+      const owned=await startOwnedIsolatedRun(objective,job.id,'isolated-worker');
+      if(!owned){console.log('OWNERSHIP_LOST',job.id);continue;}
+      const output={mode:'draft_only',review:'Internal inspection evidence checkpoint',externalActionsExecuted:false};
+      const committed=await finishOwnedIsolatedRun(objective,owned,output,[{source:'local_isolated_worker',safe:true}]);
+      if(committed){await unlockDependents({...job,status:'completed'});console.log('JOB_COMPLETE',job.id,'completed');}
+      else console.log('STALE_WORKER_REJECTED',job.id);
    }
   }catch(e){console.log('WORKER_ERROR',e instanceof Error?e.message:'unknown')}
   await pause(5000);
