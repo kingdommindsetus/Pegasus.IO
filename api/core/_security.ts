@@ -23,4 +23,5 @@ export function enforceRateLimit(req:any,res:any,limit=30,windowMs=60_000){const
 export function requireCoreAuth(req:any,res:any){const configured=secret();if(!configured){res.status(503).json({error:'Core API authentication is not configured'});return false;}const provided=String(req.headers?.['x-pegasus-core-secret']||'').trim();if((provided&&safeEqual(provided,configured))||validSession(req))return true;res.status(401).json({error:'Unauthorized'});return false;}
 export function requirePost(req:any,res:any){if(req.method!=='POST'){res.status(405).json({error:'Method not allowed'});return false;}return true;}
 export function parseUuid(value:unknown,name:string){const v=String(value||'').trim();if(!UUID_RE.test(v))throw Error(name+' must be a valid UUID');return v;}
+export function configuredFounderOrgId():string|null{const id=String(process.env.PEGASUS_FOUNDER_ORGANIZATION_ID||'').trim();return UUID_RE.test(id)?id:null;}
 export function parseObjective(value:unknown){const v=String(value||'').trim();if(!v)throw Error('objective required');if(v.length>2000)throw Error('objective too long');return v;}

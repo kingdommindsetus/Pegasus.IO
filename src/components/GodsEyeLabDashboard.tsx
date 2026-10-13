@@ -2,10 +2,11 @@ import React from 'react';
 import { Activity, ArrowLeft, BrainCircuit, Database, Eye, Film, LockKeyhole, ShieldCheck, Workflow } from 'lucide-react';
 import {CAPABILITY_REGISTRY} from '../../core/integrations/capabilityRegistry';
 import {GodsEyeLocalEvidencePanel} from './GodsEyeLocalEvidencePanel';
+import {GodsEyeFounderActivityPanel} from './GodsEyeFounderActivityPanel';
 
 const definitions:Record<string,{name:string,detail:string,owner:string}> = {
  pegasus:{name:'PEGASUS CORE',detail:'Canonical identities, jobs, durable evidence and approval rules',owner:'Simon'},
- gods_eye:{name:"GOD'S EYE",detail:'Founder read model; no live database endpoint connected',owner:'Founder'},
+ gods_eye:{name:"GOD'S EYE",detail:'Organization-scoped founder activity tested in an isolated database; not deployed',owner:'Founder'},
  paperclip:{name:'PAPERCLIP',detail:'Optional agent-management adapter; not installed or connected',owner:'Marie / Simon'},
  astra:{name:'ASTRA',detail:'Isolated source-grounded knowledge drafts',owner:'Simon'},
  rea:{name:'REA',detail:'Actual synthetic JavaScript analysis verified; production adapter not enabled',owner:'IRIS'},
@@ -52,6 +53,7 @@ export function GodsEyeLabDashboard(){
      <div className="mt-1 font-semibold text-amber-200">Production not connected</div>
     </div>
    </div>
+   <GodsEyeFounderActivityPanel />
    <GodsEyeLocalEvidencePanel />
    <div className="flex items-center gap-3">
     <Workflow className="text-amber-300" size={20}/>

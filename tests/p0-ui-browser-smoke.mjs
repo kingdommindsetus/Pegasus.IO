@@ -113,6 +113,8 @@ try{
  assert.equal(await evaluate('document.querySelector("[data-testid=pegasus-launch-percent]").textContent'), '50%');
  await navigate(origin+'/?gods-eye-lab=1',"GOD'S EYE");
  await waitFor('document.body.innerText.includes("PAPERCLIP")');
+ await waitFor('document.body.textContent?.includes("FOUNDER · COMPANY JOB ACTIVITY")');
+ await waitFor('document.body.textContent?.includes("Company-scoped activity is unavailable")');
  assert.equal(await evaluate('document.body.innerText.includes("Production not connected")'),true);
  assert.equal(await evaluate('document.body.innerText.includes("REAL POSTGRESQL · DEVELOPMENT TRACE")'),false,
   'Local dev token panel must not ship in production build');

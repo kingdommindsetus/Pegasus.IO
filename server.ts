@@ -10,6 +10,8 @@ import healthHandler from './api/health.js';
 import coreSessionHandler from './api/core/session.js';
 import coreMissionHandler from './api/core/mission.js';
 import coreStepHandler from './api/core/step.js';
+import founderActivityHandler from './api/core/founder-activity.js';
+import stagingDiagnosticsHandler from './api/core/staging-diagnostics.js';
 import {jarvisDevelopmentHandler} from './core/runtime/jarvisDevelopment.js';
 import {jobTraceDevelopmentHandler} from './core/runtime/jobTraceDevelopment.js';
 
@@ -35,6 +37,8 @@ app.all('/api/workflow/run-step',(req,res)=>void workflowHandler(req,res));
 app.all('/api/core/session',(req,res)=>void coreSessionHandler(req,res));
 app.all('/api/core/mission',(req,res)=>void coreMissionHandler(req,res));
 app.all('/api/core/step',(req,res)=>void coreStepHandler(req,res));
+app.all('/api/core/founder-activity',(req,res)=>void founderActivityHandler(req,res));
+app.all('/api/core/staging-diagnostics',(req,res)=>void stagingDiagnosticsHandler(req,res));
 
 async function startServer(){
   const isDev=process.env.NODE_ENV!=='production';

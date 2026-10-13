@@ -1,15 +1,17 @@
 import {claimNextJobForObjective,postgresJobStore,closeJobRun,unlockDependents} from '../../core/work/jobs/repository.js';
 import {runJob} from '../../core/work/workers/runJob.js';
 import {realAgentWork} from '../../core/runtime/execution/realAgentWork.js';
-import {requireCoreAuth,requirePost,enforceRateLimit,parseUuid} from './_security.js';
+import {requireCoreAuth,requirePost,enforceRateLimit,parseUuid,configuredFounderOrgId} from './_security.js';
 
 export default async function handler(req:any,res:any){
  if(!requirePost(req,res)||!enforceRateLimit(req,res,60,60_000)||!requireCoreAuth(req,res))return;
+ const orgId=configuredFounderOrgId();
+ if(!orgId)return res.status(503).json({error:'Founder organization scope is not configured'});
  let stage='parse';
  try{
   const missionId=parseUuid(req.body?.missionId,'missionId');
   stage='claim';
-  const job=await claimNextJobForObjective(missionId,'vercel-war-room',60);
+  const job=await claimNextJobForObjective(missionId,'vercel-war-room',60,orgId);
   if(!job)return res.status(409).json({error:'No claimable Pegasus job'});
   stage='claim-event';
   await postgresJobStore.recordEvent(job,'job_claimed',{workerId:'vercel-war-room'});

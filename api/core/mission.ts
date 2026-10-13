@@ -1,5 +1,5 @@
 import postgres from 'postgres';
-import {requireCoreAuth,requirePost,enforceRateLimit,parseUuid,parseObjective} from './_security.js';
+import {requireCoreAuth,requirePost,enforceRateLimit,parseUuid,parseObjective,configuredFounderOrgId} from './_security.js';
 import {GoogleGenAI} from '@google/genai';
 import {acquireGoogleReasoningSlot} from '../../core/runtime/agents/googleQuotaGovernor.js';
 
@@ -36,12 +36,12 @@ function parseCloseJson(raw:string){
  return JSON.parse(repaired);
 }
 
-async function executiveClose(sql:any,missionId:string){
+async function executiveClose(sql:any,missionId:string,orgId:string){
  const [objective]=await sql`
   SELECT o.id,o.title,p.objective AS founder_objective
   FROM pegasus_core.objectives o
   JOIN pegasus_core.projects p ON p.id=o.project_id
-  WHERE o.id=${missionId}
+  WHERE o.id=${missionId} AND p.organization_id=${orgId}::uuid
  `;
  if(!objective)throw Error('Mission not found');
 
@@ -108,7 +108,7 @@ async function proof(sql:any,id:string){
 }
 
 
-async function hydrate(sql:any,requestedMissionId?:string){
+async function hydrate(sql:any,orgId:string,requestedMissionId?:string){
  let objective:any;
  if(requestedMissionId){
   const missionId=parseUuid(requestedMissionId,'missionId');
@@ -118,6 +118,7 @@ async function hydrate(sql:any,requestedMissionId?:string){
    JOIN pegasus_core.projects p ON p.id=o.project_id
    WHERE o.id=${missionId}
      AND o.title='Pegasus 12-Agent War Room Mission'
+     AND p.organization_id=${orgId}::uuid
   `;
  }else{
   [objective]=await sql`
@@ -125,6 +126,7 @@ async function hydrate(sql:any,requestedMissionId?:string){
    FROM pegasus_core.objectives o
    JOIN pegasus_core.projects p ON p.id=o.project_id
    WHERE o.title='Pegasus 12-Agent War Room Mission'
+     AND p.organization_id=${orgId}::uuid
    ORDER BY o.created_at DESC
    LIMIT 1
   `;
@@ -225,9 +227,10 @@ async function hydrate(sql:any,requestedMissionId?:string){
  };
 }
 
-async function start(sql:any,text:string){
+async function start(sql:any,text:string,orgId:string){
  const slug='war-room-'+Date.now();
- const [org]=await sql`INSERT INTO pegasus_core.organizations(name,slug) VALUES('Pegasus War Room',${slug}) RETURNING id`;
+ const [org]=await sql`SELECT id FROM pegasus_core.organizations WHERE id=${orgId}::uuid`;
+ if(!org)throw Error('Configured founder organization does not exist');
  const [project]=await sql`INSERT INTO pegasus_core.projects(organization_id,name,objective) VALUES(${org.id},'War Room Mission',${text}) RETURNING id`;
  const [objective]=await sql`INSERT INTO pegasus_core.objectives(project_id,title,success_criteria,owner_agent_id,status_v2) VALUES(${project.id},'Pegasus 12-Agent War Room Mission',${sql.json(['12 completed agent tasks','12 completed job runs','durable memory for every agent','auditable evidence chain'])},'simon','active') RETURNING id`;
  const tasks:any[]=[];
@@ -240,15 +243,22 @@ async function start(sql:any,text:string){
  return {missionId:objective.id,projectId:project.id,agentCount:AGENT_CHAIN.length};
 }
 
+async function ownsMission(sql:any,missionId:string,orgId:string){
+ const [match]=await sql`SELECT o.id FROM pegasus_core.objectives o JOIN pegasus_core.projects p ON p.id=o.project_id WHERE o.id=${missionId} AND p.organization_id=${orgId}::uuid AND o.title='Pegasus 12-Agent War Room Mission'`;
+ return Boolean(match);
+}
+
 export default async function handler(req:any,res:any){
  if(!requirePost(req,res)||!enforceRateLimit(req,res,40,60_000)||!requireCoreAuth(req,res))return;
+ const orgId=configuredFounderOrgId();
+ if(!orgId)return res.status(503).json({error:'Founder organization scope is not configured'});
  const sql=getSql();
  try{
   const action=String(req.body?.action||'');
-  if(action==='start'){const objective=parseObjective(req.body?.objective);return res.json(await start(sql,objective));}
-  if(action==='hydrate'){const missionId=typeof req.body?.missionId==='string'?req.body.missionId:undefined;return res.json(await hydrate(sql,missionId));}
-  if(action==='status'){const missionId=parseUuid(req.body?.missionId,'missionId');return res.json(await proof(sql,missionId));}
-  if(action==='close'){const missionId=parseUuid(req.body?.missionId,'missionId');return res.json(await executiveClose(sql,missionId));}
+  if(action==='start'){const objective=parseObjective(req.body?.objective);return res.json(await start(sql,objective,orgId));}
+  if(action==='hydrate'){const missionId=typeof req.body?.missionId==='string'?req.body.missionId:undefined;return res.json(await hydrate(sql,orgId,missionId));}
+  if(action==='status'){const missionId=parseUuid(req.body?.missionId,'missionId');if(!(await ownsMission(sql,missionId,orgId)))return res.status(404).json({error:'Mission not found'});return res.json(await proof(sql,missionId));}
+  if(action==='close'){const missionId=parseUuid(req.body?.missionId,'missionId');if(!(await ownsMission(sql,missionId,orgId)))return res.status(404).json({error:'Mission not found'});return res.json(await executiveClose(sql,missionId,orgId));}
   return res.status(400).json({error:'unknown action'});
  }catch(e:any){
   const m=e?.message||String(e);
