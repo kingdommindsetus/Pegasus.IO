@@ -1,4 +1,5 @@
 import {db,closeDb} from '../core/database/client.js';
+import {recoverExpiredIsolatedLeases} from '../core/work/jobs/isolatedLeaseRecovery.js';
 import {claimNextJobForObjective,postgresJobStore,closeJobRun,unlockDependents} from '../core/work/jobs/repository.js';
 import {runJob} from '../core/work/workers/runJob.js';
 const url=new URL(process.env.DATABASE_URL||'http://invalid');
@@ -15,6 +16,7 @@ try{
  console.log('ISOLATED_WORKER_READY',objective);
  while(!shuttingDown){
   try{
+   await recoverExpiredIsolatedLeases(objective);
    const [target]=await sql`SELECT j.id,j.agent_id,j.skill_key,j.input FROM pegasus_core.jobs j JOIN pegasus_core.tasks t ON t.id=j.task_id WHERE t.objective_id=${objective} AND j.status='queued' ORDER BY j.created_at LIMIT 1`;
    if(target){
     if(target.agent_id!=='simon'||target.skill_key!=='search_company_memory'||target.input?.draftOnly!==true||target.input?.externalActionsAllowed===true){

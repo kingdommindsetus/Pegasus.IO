@@ -1,6 +1,7 @@
 import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {db,closeDb} from '../core/database/client.js';
+import {recoverExpiredIsolatedLeases} from '../core/work/jobs/isolatedLeaseRecovery.js';
 import {claimNextJobForObjective,postgresJobStore,closeJobRun,unlockDependents} from '../core/work/jobs/repository.js';
 import {runJob} from '../core/work/workers/runJob.js';
 const url=new URL(process.env.DATABASE_URL||'http://invalid');
@@ -19,6 +20,7 @@ try{
  console.log('AI_DRAFT_WORKER_READY');
  while(!stop){
   try{
+   await recoverExpiredIsolatedLeases(objective);
    const [target]=await sql`SELECT j.id,j.agent_id,j.skill_key,j.input FROM pegasus_core.jobs j JOIN pegasus_core.tasks t ON j.task_id=t.id WHERE t.objective_id=${objective} AND j.status='queued' AND j.skill_key='generate_content' ORDER BY j.created_at LIMIT 1`;
    if(target){
     if(target.agent_id!=='simon'||target.input?.draftOnly!==true||target.input?.externalActionsAllowed!==false||target.input?.reasoningProvider!=='ollama_local'){console.log('UNSAFE_JOB_SKIPPED',target.id)}
