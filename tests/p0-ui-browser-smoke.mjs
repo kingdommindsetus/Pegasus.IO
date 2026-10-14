@@ -33,6 +33,7 @@ const server=createServer((request,response)=>{
   response.writeHead(200,{'Content-Type':'application/json','Cache-Control':'private, no-store'});
   response.end(JSON.stringify({
    readOnly:true,environment:'preview',databaseName:'synthetic-preview-only',
+   neonEndpointId:'ep-example-staging-12345',
    connectionRole:'synthetic-readonly',coreOrganizationSchemaReady:false,
    company:null,configuration:{companyScopeConfigured:false,matchesCanonicalCompany:false}
   }));return;
@@ -150,6 +151,7 @@ try{
  await navigate(origin+'/?staging-audit=1&mock-company-setup=1','PEGASUS CORE · WAR ROOM v2');
  await waitFor('document.body.innerText.includes("Company workspace setup pending")');
  await waitFor('document.body.innerText.includes("synthetic-preview-only")');
+ assert.equal(await evaluate('document.body.innerText.includes("ep-example-staging-12345")'),true);
  assert.equal(await evaluate('document.body.innerText.includes("KMCE company record")'),true,
   'Automatic founder-only verification should display read-only staging data');
  assert.equal(await evaluate('document.body.innerText.includes("SETUP REQUIRED")'),true);

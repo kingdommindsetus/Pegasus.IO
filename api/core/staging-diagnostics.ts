@@ -7,6 +7,13 @@ import {createHash} from 'node:crypto';
 import {db} from '../../core/database/client.js';
 import {enforceRateLimit,hasValidCoreSession,configuredFounderOrgId} from './_security.js';
 
+export function neonEndpointIdForHost(hostname:string):string|null{
+ const host=hostname.toLowerCase();
+ if(!host.endsWith('.neon.tech'))return null;
+ const endpointId=host.split('.')[0].replace(/-pooler$/,'');
+ return /^ep-[a-z0-9-]+$/.test(endpointId)?endpointId:null;
+}
+
 export default async function handler(req:any,res:any){
  res.setHeader('Cache-Control','private, no-store');
  res.setHeader('Vary','Cookie');
@@ -33,11 +40,12 @@ export default async function handler(req:any,res:any){
   // ever returning the hostname, connection string, username or password.
   const connectionUrl=new URL(String(process.env.DATABASE_URL||''));
   const endpointFingerprint=createHash('sha256').update(connectionUrl.hostname.toLowerCase()).digest('hex').slice(0,20);
+  const neonEndpointId=neonEndpointIdForHost(connectionUrl.hostname);
   const configuredId=configuredFounderOrgId();
   return res.status(200).json({
    readOnly:true,environment:'preview',
    databaseName:identity.db,connectionRole:identity.role,
-   endpointFingerprint,
+   endpointFingerprint,neonEndpointId,
    coreOrganizationSchemaReady:identity.schema_present,
    company,
    configuration:{

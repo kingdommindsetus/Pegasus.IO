@@ -4,7 +4,7 @@ import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {makeSessionCookie} from '../api/core/_security.js';
 import {db,closeDb} from '../core/database/client.js';
-import stagingDiagnostics from '../api/core/staging-diagnostics.js';
+import stagingDiagnostics,{neonEndpointIdForHost} from '../api/core/staging-diagnostics.js';
 
 const localConfig='C:\\Users\\info\\PegasusVoiceEngine\\acceptance-isolated\\.windows-test-db-url';
 const raw=readFileSync(localConfig,'utf8').trim();
@@ -52,6 +52,11 @@ try{
  assert.equal(r.body.databaseName,'pegasus_world_windows_accept_1011');
  assert.equal(r.body.connectionRole,'pegasus_windows_accept_role');
  assert.equal(r.body.endpointFingerprint,createHash('sha256').update('127.0.0.1').digest('hex').slice(0,20));
+ assert.equal(r.body.neonEndpointId,null);
+ assert.equal(neonEndpointIdForHost('ep-example-staging-12345.c-7.us-east-2.aws.neon.tech'),'ep-example-staging-12345');
+ assert.equal(neonEndpointIdForHost('ep-example-staging-12345-pooler.c-7.us-east-2.aws.neon.tech'),'ep-example-staging-12345');
+ assert.equal(neonEndpointIdForHost('neondb.example.com'),null);
+ assert.equal(neonEndpointIdForHost('evil.neon.tech.example.com'),null);
  assert.equal(JSON.stringify(r.body).includes(url.password),false);
  assert.equal(r.body.coreOrganizationSchemaReady,true);
  assert.equal(r.body.company.id,String(company.id));
