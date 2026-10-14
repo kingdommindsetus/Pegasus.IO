@@ -174,7 +174,7 @@ export function CoreWarRoomV2({objective,setObjective}:{objective:string;setObje
   const speech=await prepareSpeech(id,text,x.jobId);
   const runtime=decision?.runtime||{};
   const telemetry={
-   reasoningProvider:runtime.reasoningProvider||'Google AI Studio',
+   reasoningProvider:runtime.reasoningProvider||'unverified',
    model:runtime.model||'unknown',
    reasoningMs:runtime.reasoningMs||0,
    quotaWaitMs:runtime.quotaWaitMs||0,

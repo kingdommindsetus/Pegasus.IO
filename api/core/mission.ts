@@ -1,7 +1,6 @@
 import postgres from 'postgres';
 import {requireCoreAuth,requirePost,enforceRateLimit,parseUuid,parseObjective,configuredFounderOrgId} from './_security.js';
-import {GoogleGenAI} from '@google/genai';
-import {acquireGoogleReasoningSlot} from '../../core/runtime/agents/googleQuotaGovernor.js';
+import {generatePegasusText} from '../../core/runtime/agents/pegasusReasoner.js';
 
 const getSql=()=>{
  const u=process.env.DATABASE_URL?.trim();
@@ -65,12 +64,6 @@ async function executiveClose(sql:any,missionId:string,orgId:string){
  const completed=stages.filter((x:any)=>x.result).length;
  if(completed<AGENT_CHAIN.length)throw Error('Simon Close requires all 12 agent stages completed');
 
- const apiKey=String(process.env.GOOGLE_GENERATIVE_AI_API_KEY||'').trim();
- if(!apiKey)throw Error('GOOGLE_GENERATIVE_AI_API_KEY is not configured');
- const ai=new GoogleGenAI({apiKey,httpOptions:{headers:{'User-Agent':'pegasus-simon-close'}}});
- const model=(process.env.PEGASUS_REASONING_MODELS||'gemini-3.5-flash-lite,gemini-3.6-flash,gemini-3.7-flash').split(',')[0].trim();
-
- await acquireGoogleReasoningSlot();
  const prompt={
   founderObjective:objective.founder_objective,
   boardStages:stages.map((s:any)=>({
@@ -78,23 +71,17 @@ async function executiveClose(sql:any,missionId:string,orgId:string){
    skillOutput:s.result?.skillOutput||null,evidence:s.evidence||[]
   }))
  };
- const response=await ai.models.generateContent({
-  model,
-  contents:[{role:'user',parts:[{text:JSON.stringify(prompt)}]}],
-  config:{
-   systemInstruction:'You are Simon, Pegasus Executive Orchestrator. Synthesize the completed 12-agent board meeting for the founder using only the persisted decisions, outputs, and evidence provided. Do not invent completed actions or evidence. Return ONLY valid JSON with this exact shape: {"finalDecision":"string","corePriorities":["string"],"immediateNextSteps":[{"owner":"string","action":"string"}],"riskBlockers":["string"],"actionOwners":[{"owner":"string","responsibility":"string"}],"spokenSummary":"string"}. Keep spokenSummary under 500 characters and executive in tone.',
-   temperature:0.1,
-   maxOutputTokens:1200,
-   responseMimeType:'application/json'
-  }
+ const response=await generatePegasusText({
+  system:'You are Simon, Pegasus Executive Orchestrator. Summarize ONLY persisted 12-agent decisions and evidence without inventing completed actions. Return only valid JSON: {"finalDecision":"string","corePriorities":["string"],"immediateNextSteps":[{"owner":"string","action":"string"}],"riskBlockers":["string"],"actionOwners":[{"owner":"string","responsibility":"string"}],"spokenSummary":"string"}. Keep spokenSummary under 500 characters.',
+  prompt:JSON.stringify(prompt),maxOutputTokens:1200,temperature:0.1
  });
  const briefing=parseCloseJson(response.text||'');
  const [project]=await sql`SELECT project_id FROM pegasus_core.objectives WHERE id=${missionId}`;
  await sql`
   INSERT INTO pegasus_core.memories(scope,scope_id,agent_id,project_id,memory_kind,memory_partition,subject,content,source_type,authority,metadata)
-  VALUES('project',${project.project_id},'simon',${project.project_id},'handoff','mission_run_memory','Simon Executive Close',${JSON.stringify(briefing)},'agent_execution','agent_generated',${sql.json({objectiveId:missionId,type:'executive_close',model})})
+  VALUES('project',${project.project_id},'simon',${project.project_id},'handoff','mission_run_memory','Simon Executive Close',${JSON.stringify(briefing)},'agent_execution','agent_generated',${sql.json({objectiveId:missionId,type:'executive_close',model:response.runtime.model,reasoningProvider:response.runtime.reasoningProvider,fallback:response.runtime.fallback})})
  `;
- return {briefing,runtime:{reasoningProvider:'Google AI Studio',model,fallback:false}};
+ return {briefing,runtime:response.runtime};
 }
 
 
@@ -190,7 +177,7 @@ async function hydrate(sql:any,orgId:string,requestedMissionId?:string){
 
  let executiveClose:any=null;
  if(closeMemory?.content){
-  try{executiveClose={briefing:JSON.parse(closeMemory.content),runtime:{reasoningProvider:'Google AI Studio',model:closeMemory.metadata?.model||'persisted',fallback:false}};}catch{}
+  try{executiveClose={briefing:JSON.parse(closeMemory.content),runtime:{reasoningProvider:closeMemory.metadata?.reasoningProvider||'unknown',model:closeMemory.metadata?.model||'persisted',fallback:Boolean(closeMemory.metadata?.fallback)}};}catch{}
  }
 
  const p=await proof(sql,String(objective.id));
@@ -215,7 +202,7 @@ async function hydrate(sql:any,orgId:string,requestedMissionId?:string){
    skillOutput:s.result?.skillOutput||null,
    evidenceCount:Number(s.evidence_count||0),
    telemetry:s.result?.decision?.runtime ? {
-    reasoningProvider:s.result.decision.runtime.reasoningProvider||'Google AI Studio',
+    reasoningProvider:s.result.decision.runtime.reasoningProvider||'unknown',
     model:s.result.decision.runtime.model||'unknown',
     reasoningMs:Number(s.result.decision.runtime.reasoningMs||0),
     quotaWaitMs:Number(s.result.decision.runtime.quotaWaitMs||0),

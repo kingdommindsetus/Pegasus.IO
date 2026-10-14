@@ -6,15 +6,20 @@ import test from 'node:test';
 const ROOT=process.cwd();
 const read=(p:string)=>fs.readFileSync(path.join(ROOT,p),'utf8');
 
-test('reasoning uses the canonical Google AI Studio reasoner only',()=>{
+test('staging uses a fail-closed NVIDIA reasoner with governed skill selection',()=>{
   const reasoner=read('core/runtime/agents/pegasusReasoner.ts');
+  const route=read('core/runtime/agents/nvidiaStageRoute.ts');
   const work=read('core/runtime/execution/realAgentWork.ts');
-  assert.match(reasoner,/@google\/genai/);
+  const mission=read('api/core/mission.ts');
+  assert.match(reasoner,/generateNvidiaStageText/);
+  assert.match(reasoner,/unauthorized agent skill/);
+  assert.match(route,/NVIDIA_API_KEY/);
+  assert.ok(route.includes('https://integrate.api.nvidia.com/v1/chat/completions'));
+  assert.match(route,/fallback:false/);
   assert.match(work,/pegasusReasoner/);
-  for(const forbidden of ['@ai-sdk/gateway','inclusionai/ling','OpenAIReasoner','api.openai.com']){
-    assert.equal(reasoner.includes(forbidden),false,`Legacy reasoning reference found: ${forbidden}`);
-  }
-  assert.equal(fs.existsSync(path.join(ROOT,'core/runtime/agents/openaiReasoner.ts')),false);
+  assert.match(mission,/generatePegasusText/);
+  assert.equal(reasoner.includes('governed-fallback'),false);
+  assert.equal(mission.includes('GoogleGenAI'),false);
 });
 
 test('voice uses the canonical Pegasus ElevenLabs registry with browser fallback',()=>{
