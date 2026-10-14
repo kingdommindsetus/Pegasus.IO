@@ -1,6 +1,7 @@
 /** Local-only read acceptance for the preview diagnostics route. Never writes a DB row. */
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
+import {createHash} from 'node:crypto';
 import {makeSessionCookie} from '../api/core/_security.js';
 import {db,closeDb} from '../core/database/client.js';
 import stagingDiagnostics from '../api/core/staging-diagnostics.js';
@@ -50,6 +51,8 @@ try{
  assert.equal(r.body.readOnly,true);
  assert.equal(r.body.databaseName,'pegasus_world_windows_accept_1011');
  assert.equal(r.body.connectionRole,'pegasus_windows_accept_role');
+ assert.equal(r.body.endpointFingerprint,createHash('sha256').update('127.0.0.1').digest('hex').slice(0,20));
+ assert.equal(JSON.stringify(r.body).includes(url.password),false);
  assert.equal(r.body.coreOrganizationSchemaReady,true);
  assert.equal(r.body.company.id,String(company.id));
  assert.equal(r.body.configuration.companyScopeConfigured,true);

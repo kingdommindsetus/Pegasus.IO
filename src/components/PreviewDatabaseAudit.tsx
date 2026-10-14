@@ -4,6 +4,7 @@ import {launchProgress} from '../../core/integrations/pegasusLaunchGates';
 
 type Diagnostic={
  readOnly:true;environment:'preview';databaseName:string;connectionRole:string;
+ endpointFingerprint?:string;
  coreOrganizationSchemaReady:boolean;
  company:null|{id:string;name:string;slug:string};
  configuration:{companyScopeConfigured:boolean;matchesCanonicalCompany:boolean};
@@ -59,6 +60,7 @@ export function PreviewDatabaseAudit({unlocked}:{unlocked:boolean}){
   {state==='ready'&&data&&<div className="grid gap-3 sm:grid-cols-2 text-sm">
    <div className="rounded-xl border border-slate-700 p-3"><div className="text-xs text-slate-400">Database</div><strong>{data.databaseName}</strong></div>
    <div className="rounded-xl border border-slate-700 p-3"><div className="text-xs text-slate-400">Database role</div><strong>{data.connectionRole}</strong></div>
+   {data.endpointFingerprint&&<div className="rounded-xl border border-slate-700 p-3 sm:col-span-2"><div className="text-xs text-slate-400">Database endpoint verification fingerprint</div><code className="text-xs text-amber-200">{data.endpointFingerprint}</code><p className="mt-1 text-xs text-slate-500">Non-secret endpoint identifier for matching with the approved Neon branch before provisioning.</p></div>}
    <div className="rounded-xl border border-slate-700 p-3"><div className="text-xs text-slate-400">Pegasus organizations schema</div><strong>{data.coreOrganizationSchemaReady?'Present':'Missing'}</strong></div>
    <div className="rounded-xl border border-slate-700 p-3"><div className="text-xs text-slate-400">KMCE company record</div><strong>{data.company?'Found':'Not found'}</strong></div>
    {data.company&&<div className="rounded-xl border border-slate-700 p-3 sm:col-span-2">

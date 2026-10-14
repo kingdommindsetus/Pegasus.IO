@@ -3,6 +3,7 @@
  * Read-only: does not reveal connection strings, credentials or payloads.
  * Use only behind Vercel Deployment Protection. Never enable in production.
  */
+import {createHash} from 'node:crypto';
 import {db} from '../../core/database/client.js';
 import {enforceRateLimit,hasValidCoreSession,configuredFounderOrgId} from './_security.js';
 
@@ -28,10 +29,15 @@ export default async function handler(req:any,res:any){
    `;
    if(record)company={id:String(record.id),name:record.name,slug:record.slug};
   }
+  // Compare the destination with an independently verified Neon endpoint without
+  // ever returning the hostname, connection string, username or password.
+  const connectionUrl=new URL(String(process.env.DATABASE_URL||''));
+  const endpointFingerprint=createHash('sha256').update(connectionUrl.hostname.toLowerCase()).digest('hex').slice(0,20);
   const configuredId=configuredFounderOrgId();
   return res.status(200).json({
    readOnly:true,environment:'preview',
    databaseName:identity.db,connectionRole:identity.role,
+   endpointFingerprint,
    coreOrganizationSchemaReady:identity.schema_present,
    company,
    configuration:{
