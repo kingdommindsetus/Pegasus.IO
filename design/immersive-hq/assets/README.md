@@ -18,3 +18,8 @@ Sofia room assets supplied for the KMCE Agent World integration slice:
 The original Sofia motion asset was extracted from `KMCE Agent World.zip`; the poster image was supplied separately by the user. The two gesture/circuit clips were supplied separately for this faceless composition. These are presentation assets only and do not establish live agent integration.
 
 Do not assert these assets are in GitHub until the binary GitHub blobs have been verified. Small optimized media can live in git; for large archives use cloud object storage with public immutable asset URLs and the organization's permission model. The user requested no extra local PC storage.
+
+Simon strategy-room assets:
+- simon-office.jpg — extracted from the user-supplied KMCE Agent World package; presentation-only desk reference.
+- simon-office.mp4 — extracted from the user-supplied KMCE Agent World package; presentation-only motion reference.
+
