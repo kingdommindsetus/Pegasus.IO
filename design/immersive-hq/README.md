@@ -41,6 +41,8 @@ These are design contracts; engineering must map to authenticated routes and enf
 
 The current design slice exposes a safe presentation contract: destination clicks open an accessible mock transition dialog; the `Founder HQ` dialog offers a keyboard-accessible Sofia mock entry; the office shows the intended Founder → Sofia → Simon → Gatekeeper → Partners delegation path; and the event controls preview `listening`, `working`, `approval_wait`, and `completed` labels without invoking runtime behavior. The spoken-request control is a staged presentation only. This is intentionally not a live route, auth flow, agent integration, microphone flow, report query, or voice integration.
 
+Sofia’s KMCE identity is represented with the supplied faceless-robot poster and the dedicated Agent World motion asset. The visual identity is integrated into the room; the asset presence does not prove that Sofia is connected to the KMCE CRM, a microphone, a report source, Simon, Gatekeeper, or partner agents.
+
 ## Responsive
 - Desktop target scene: 1920x1080/16:9 with content-safe overlay.
 - Mobile target: 1080x1920/9:16 crop and responsive hotspots.
