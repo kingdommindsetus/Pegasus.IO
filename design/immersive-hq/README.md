@@ -39,7 +39,7 @@ These are design contracts; engineering must map to authenticated routes and enf
 
 ## Office interaction shell
 
-The current design slice exposes a safe presentation contract: destination clicks open an accessible mock transition dialog; the `Founder HQ` dialog offers a keyboard-accessible Sofia mock entry; and the event controls preview `listening`, `working`, `approval_wait`, and `completed` labels without invoking runtime behavior. This is intentionally not a live route, auth flow, agent integration, or voice integration.
+The current design slice exposes a safe presentation contract: destination clicks open an accessible mock transition dialog; the `Founder HQ` dialog offers a keyboard-accessible Sofia mock entry; the office shows the intended Founder → Sofia → Simon → Gatekeeper → Partners delegation path; and the event controls preview `listening`, `working`, `approval_wait`, and `completed` labels without invoking runtime behavior. The spoken-request control is a staged presentation only. This is intentionally not a live route, auth flow, agent integration, microphone flow, report query, or voice integration.
 
 ## Responsive
 - Desktop target scene: 1920x1080/16:9 with content-safe overlay.
