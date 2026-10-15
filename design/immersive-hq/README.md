@@ -6,7 +6,7 @@
 The visual system comprises headquarters atrium, Founder HQ, War Room, Employee Floor, individual offices, CRM, and Client Portal. This branch introduces the lightweight interactive atrium with a video centerpiece, intro/loading state, keyboard-ready hotspots, static fallback, motion controls, a reusable transition overlay, a Sofia office interaction shell, and a mock command-deck preview that presents people, work, decisions, and memory as one CRM experience.
 
 ## Run
-Open `index.html` in this folder with the verified media files below, or serve this folder with any local static HTTP server. Deployment and integration are owned by engineering.
+Open `index.html` in this folder with the verified media files below, or serve this folder with any local static HTTP server. The included `build.mjs` creates the Vercel-ready `dist` folder for this standalone visual preview. Deployment and integration are owned by engineering.
 
 ## Verified authorized media
 - `assets/pegasus-centerpiece.mp4` — user-supplied rotating neon Pegasus loading video (1920x1080, approximately 10s)

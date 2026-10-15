@@ -1,0 +1,8 @@
+{
+  "name": "pegasus-immersive-hq-preview",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs"
+  }
+}
