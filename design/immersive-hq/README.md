@@ -6,9 +6,9 @@
 The visual system comprises headquarters atrium, Founder HQ, War Room, Employee Floor, individual offices, CRM, and Client Portal. This branch introduces the lightweight interactive atrium with a video centerpiece, intro/loading state, keyboard-ready hotspots, static fallback, motion controls, a reusable transition overlay, and a Sofia office interaction shell.
 
 ## Run
-Open `index.html` in this folder after adding approved media files at the paths below, or serve this folder with any local static HTTP server. Deployment and integration are owned by engineering.
+Open `index.html` in this folder with the verified media files below, or serve this folder with any local static HTTP server. Deployment and integration are owned by engineering.
 
-## Required authorized media (not yet uploaded to this branch)
+## Verified authorized media
 - `assets/pegasus-centerpiece.mp4` — user-supplied rotating neon Pegasus loading video (1920x1080, approximately 10s)
 - `assets/pegasus-atrium.png` — approved atrium backdrop (do not replace official logo or hologram branding)
 
