@@ -31,6 +31,7 @@ These are design contracts; engineering must map to authenticated routes and enf
 ## Motion contract
 - Intro: 2.8 second skippable reveal; never blocks CRM quick actions after loaded.
 - Centerpiece: muted 10-second video loop with playsinline, lazy-compatible poster fallback.
+- Centerpiece loop: two synchronized video players crossfade the approved clip before its endpoint, preserving forward motion and hiding the source clip's non-seamless pose reset.
 - Reduced-motion users: no animated intro or looping centerpiece.
 - Pause/resume control is always accessible.
 - Office states must be driven by verified backend events (idle, listening, speaking, working, approval_wait, completed, failed), never inferred from a decorative animation.
