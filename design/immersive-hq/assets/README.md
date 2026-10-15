@@ -19,6 +19,9 @@ The original Sofia motion asset was extracted from `KMCE Agent World.zip`; the p
 
 Do not assert these assets are in GitHub until the binary GitHub blobs have been verified. Small optimized media can live in git; for large archives use cloud object storage with public immutable asset URLs and the organization's permission model. The user requested no extra local PC storage.
 
+Simon captain motion asset:
+- `simon-captain-working.mp4` — user-supplied Captain Simon motion asset; SHA-256 `CE1DA7B49D4B95AC8E015715071143B3941D17E80D34BC41E8D4731C015FA836`.
+
 Simon strategy-room assets:
 - simon-office.jpg — extracted from the user-supplied KMCE Agent World package; presentation-only desk reference.
 - simon-office.mp4 — extracted from the user-supplied KMCE Agent World package; presentation-only motion reference.
