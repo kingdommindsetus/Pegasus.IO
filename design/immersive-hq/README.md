@@ -3,7 +3,7 @@
 **Status:** design/staging handoff only. No production integration, authentication, task execution, model inference, or real-time status in these files.
 
 ## Scope
-The visual system comprises headquarters atrium, Founder HQ, War Room, Employee Floor, individual offices, CRM, and Client Portal. This branch introduces the lightweight interactive atrium with a video centerpiece, intro/loading state, keyboard-ready hotspots, static fallback, and motion controls.
+The visual system comprises headquarters atrium, Founder HQ, War Room, Employee Floor, individual offices, CRM, and Client Portal. This branch introduces the lightweight interactive atrium with a video centerpiece, intro/loading state, keyboard-ready hotspots, static fallback, motion controls, a reusable transition overlay, and a Sofia office interaction shell.
 
 ## Run
 Open `index.html` in this folder after adding approved media files at the paths below, or serve this folder with any local static HTTP server. Deployment and integration are owned by engineering.
@@ -34,6 +34,11 @@ These are design contracts; engineering must map to authenticated routes and enf
 - Reduced-motion users: no animated intro or looping centerpiece.
 - Pause/resume control is always accessible.
 - Office states must be driven by verified backend events (idle, listening, speaking, working, approval_wait, completed, failed), never inferred from a decorative animation.
+- The Sofia office event buttons are mock-only previews and explicitly report that no agent, task, voice, or backend event was invoked.
+
+## Office interaction shell
+
+The current design slice exposes a safe presentation contract: destination clicks open an accessible mock transition dialog; the `Founder HQ` dialog offers a keyboard-accessible Sofia mock entry; and the event controls preview `listening`, `working`, `approval_wait`, and `completed` labels without invoking runtime behavior. This is intentionally not a live route, auth flow, agent integration, or voice integration.
 
 ## Responsive
 - Desktop target scene: 1920x1080/16:9 with content-safe overlay.
