@@ -41,7 +41,9 @@ These are design contracts; engineering must map to authenticated routes and enf
 
 The current design slice exposes a safe presentation contract: destination clicks open an accessible mock transition dialog; the `Founder HQ` dialog offers a keyboard-accessible Sofia mock entry; the office shows the intended Founder → Sofia → Simon → Gatekeeper → Partners delegation path; and the event controls preview `listening`, `working`, `approval_wait`, and `completed` labels without invoking runtime behavior. The spoken-request control is a staged presentation only. This is intentionally not a live route, auth flow, agent integration, microphone flow, report query, or voice integration.
 
-Sofia’s KMCE identity is represented with the supplied faceless-robot poster and the dedicated Agent World motion asset. The visual identity is integrated into the room; the asset presence does not prove that Sofia is connected to the KMCE CRM, a microphone, a report source, Simon, Gatekeeper, or partner agents.
+Sofia’s KMCE identity is intentionally gesture-first: the active room composition uses the supplied working and circuit motion clips, crops away facial detail, and labels the channel as `NO FACE SIGNAL`. The supplied posters remain preserved as source references but are not used as the active identity layer. This does not prove that Sofia is connected to the KMCE CRM, a microphone, a report source, Simon, Gatekeeper, or partner agents.
+
+The intended model is a stateful operator shell rather than a talking avatar: input becomes an intent, the room expresses state through gesture/light/labels, and delegation appears as a visible handoff path. Any future Anthropic or other model integration must provide verified events to this shell; decorative motion must never be treated as proof of listening, reasoning, dispatch, or completion.
 
 ## Responsive
 - Desktop target scene: 1920x1080/16:9 with content-safe overlay.
