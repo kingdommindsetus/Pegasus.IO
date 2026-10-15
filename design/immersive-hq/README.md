@@ -3,7 +3,7 @@
 **Status:** design/staging handoff only. No production integration, authentication, task execution, model inference, or real-time status in these files.
 
 ## Scope
-The visual system comprises headquarters atrium, Founder HQ, War Room, Employee Floor, individual offices, CRM, and Client Portal. This branch introduces the lightweight interactive atrium with a video centerpiece, intro/loading state, keyboard-ready hotspots, static fallback, motion controls, a reusable transition overlay, and a Sofia office interaction shell.
+The visual system comprises headquarters atrium, Founder HQ, War Room, Employee Floor, individual offices, CRM, and Client Portal. This branch introduces the lightweight interactive atrium with a video centerpiece, intro/loading state, keyboard-ready hotspots, static fallback, motion controls, a reusable transition overlay, a Sofia office interaction shell, and a mock command-deck preview that presents people, work, decisions, and memory as one CRM experience.
 
 ## Run
 Open `index.html` in this folder with the verified media files below, or serve this folder with any local static HTTP server. Deployment and integration are owned by engineering.
