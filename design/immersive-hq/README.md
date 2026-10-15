@@ -1,0 +1,44 @@
+# PEGASUS HQ — Immersive CRM visual prototype
+
+**Status:** design/staging handoff only. No production integration, authentication, task execution, model inference, or real-time status in these files.
+
+## Scope
+The visual system comprises headquarters atrium, Founder HQ, War Room, Employee Floor, individual offices, CRM, and Client Portal. This branch introduces the lightweight interactive atrium with a video centerpiece, intro/loading state, keyboard-ready hotspots, static fallback, and motion controls.
+
+## Run
+Open `index.html` in this folder after adding approved media files at the paths below, or serve this folder with any local static HTTP server. Deployment and integration are owned by engineering.
+
+## Required authorized media (not yet uploaded to this branch)
+- `assets/pegasus-centerpiece.mp4` — user-supplied rotating neon Pegasus loading video (1920x1080, approximately 10s)
+- `assets/pegasus-atrium.png` — approved atrium backdrop (do not replace official logo or hologram branding)
+
+Do **not** use unapproved generated logos. The HTML gracefully falls back to typographic PEGASUS branding when an asset is unavailable.
+
+## Hotspots and intended routes
+| ID | Proposed route |
+|---|---|
+| hq-founder | /hq/founder |
+| hq-war-room | /hq/war-room |
+| hq-employees | /hq/employees |
+| hq-clients | /portal |
+| quick-approvals | /crm/approvals |
+| quick-leads | /crm/leads |
+| quick-accounts | /crm/accounts |
+| quick-tasks | /crm/tasks |
+
+These are design contracts; engineering must map to authenticated routes and enforce tenant-level authorization.
+
+## Motion contract
+- Intro: 2.8 second skippable reveal; never blocks CRM quick actions after loaded.
+- Centerpiece: muted 10-second video loop with playsinline, lazy-compatible poster fallback.
+- Reduced-motion users: no animated intro or looping centerpiece.
+- Pause/resume control is always accessible.
+- Office states must be driven by verified backend events (idle, listening, speaking, working, approval_wait, completed, failed), never inferred from a decorative animation.
+
+## Responsive
+- Desktop target scene: 1920x1080/16:9 with content-safe overlay.
+- Mobile target: 1080x1920/9:16 crop and responsive hotspots.
+- Prefer AVIF/WebP static poster with a 150-300KB target. Encode video for < 3MB where practical, without sacrificing acceptable quality. These are targets, not measured output sizes.
+
+## Engineering requirements
+Do not wire synthetic counts to a real live indicator. Retain existing agent identities, voices, legal access controls, CRM API, and Gatekeeper review; this layer is presentation only. The application cannot claim model-provider integrations by showing model names or badges.
