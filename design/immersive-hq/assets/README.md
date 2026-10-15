@@ -22,6 +22,9 @@ Do not assert these assets are in GitHub until the binary GitHub blobs have been
 Simon captain motion asset:
 - `simon-captain-working.mp4` — user-supplied Captain Simon motion asset; SHA-256 `CE1DA7B49D4B95AC8E015715071143B3941D17E80D34BC41E8D4731C015FA836`.
 
+Gatekeeper review asset:
+- `gatekeeper-working.mp4` — extracted from the user-supplied KMCE Agent World package; SHA-256 `7E97B53274AE8D8D8683B5FCA9058F23BA5EFA5A141F3EF9CD1881EBDB83CCAA`.
+
 Simon strategy-room assets:
 - simon-office.jpg — extracted from the user-supplied KMCE Agent World package; presentation-only desk reference.
 - simon-office.mp4 — extracted from the user-supplied KMCE Agent World package; presentation-only motion reference.
