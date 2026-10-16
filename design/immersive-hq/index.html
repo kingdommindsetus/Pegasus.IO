@@ -71,8 +71,12 @@ button{font:inherit;color:inherit;cursor:pointer}button:focus-visible,a:focus-vi
 
 /* ---------- atrium ---------- */
 #s-atrium .bg{filter:saturate(1.08)}
-#holo,#holo2{position:absolute;left:50%;top:41%;transform:translate(-50%,-50%);width:min(46vw,620px);mix-blend-mode:screen;mask-image:radial-gradient(ellipse,#000 25%,transparent 72%);opacity:.92;transition:opacity .9s;pointer-events:none}
+/* The animated Pegasus lives in the top-right corner as a live emblem, so it never overlaps the statue in the backdrop. */
+.emblem{position:absolute;top:66px;right:clamp(14px,2vw,30px);width:clamp(96px,9vw,138px);aspect-ratio:1;border-radius:50%;overflow:hidden;background:radial-gradient(circle,#0b1a2c 0%,#03070d 70%);box-shadow:0 0 0 1px #dfba8077,0 0 0 5px #04070dcc,0 0 0 6px #dfba8040,0 0 34px #4fc3ff44;z-index:2;pointer-events:none}
+.emblem::after{content:'';position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,transparent 55%,#03070d 78%)}
+#holo,#holo2{position:absolute;left:50%;top:46%;width:150%;transform:translate(-50%,-50%);mix-blend-mode:screen;opacity:.95;transition:opacity .9s;pointer-events:none}
 #holo2{opacity:0}
+.emblem-tag{position:absolute;left:50%;bottom:9%;transform:translateX(-50%);z-index:1;font-size:7.5px;letter-spacing:.26em;color:#bfe9ff;white-space:nowrap;text-shadow:0 0 6px #4fc3ff}
 .atrium-title{position:absolute;left:50%;top:66%;transform:translate(-50%,-50%);text-align:center;pointer-events:none}
 .atrium-title h1{margin:0;font-size:clamp(28px,5.4vw,72px);letter-spacing:.32em;font-weight:500;color:var(--gold-hi);text-shadow:0 0 30px #dfba8077,0 4px 18px #000}
 .atrium-title p{margin:6px 0 0;font-size:11px;letter-spacing:.42em;color:#d6c3a2}
@@ -691,7 +695,7 @@ function hot(key,x,y,title,sub,{icon='↗',c,forward}={}){return `<button class=
 function buildAtrium(){
  const s=document.createElement('section');s.id='s-atrium';s.setAttribute('aria-label','Pegasus Headquarters');
  s.innerHTML=`<img class="bg" src="assets/pegasus-atrium.png" alt="">
- <video id="holo" muted playsinline preload="auto" src="assets/pegasus-centerpiece.mp4" aria-hidden="true"></video><video id="holo2" muted playsinline preload="auto" src="assets/pegasus-centerpiece.mp4" aria-hidden="true"></video>
+ <div class="emblem" aria-hidden="true"><video id="holo" muted playsinline preload="auto" src="assets/pegasus-centerpiece.mp4"></video><video id="holo2" muted playsinline preload="auto" src="assets/pegasus-centerpiece.mp4"></video><span class="emblem-tag">PEGASUS · LIVE</span></div>
  <div class="shade" style="background:radial-gradient(ellipse at 50% 45%,transparent 35%,#02050bcc 100%)"></div>
  <div class="atrium-title"><h1 class="serif">PEGASUS</h1><p>HEADQUARTERS</p></div>
  ${hot('executive','20%','30%','SIMON · EXECUTIVE OFFICE','Strategy · leadership · final approvals',{icon:'♛',c:'#e8c27a'})}
