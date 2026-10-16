@@ -689,14 +689,31 @@ function voiceFor(a){if(!voices.length)return null;const fem=voices.filter(v=>VO
    Otherwise the compact model runs on the processor (≈90MB, slower). Until it's ready, the browser's own voice is used. */
 const KOKORO_VOICE={simon:'bm_george',marie:'af_heart',iris:'af_sarah',mark:'am_eric',cammy:'bf_emma',evan:'am_liam',tube:'am_puck',lucy:'af_bella',snake:'am_fenrir',alice:'af_sky',echo:'bf_isabella',booker:'bm_lewis',midas:'am_onyx',scout:'am_puck',claire:'af_jessica',atlas:'am_echo',sofia:'af_nova',maven:'bf_lily',gatekeeper:'bm_fable',flow:'af_river',ledger:'am_michael'};
 const VOX={tts:null,loading:null,ctx:null,src:null};
-function loadVoices(){
- if(VOX.tts||VOX.loading)return VOX.loading;
- VOX.loading=import('https://cdn.jsdelivr.net/npm/kokoro-js@1.2.1/dist/kokoro.web.js')
-  .then(async({KokoroTTS})=>{
+const KOKORO_WORKER=`import {KokoroTTS} from 'https://cdn.jsdelivr.net/npm/kokoro-js@1.2.1/dist/kokoro.web.js';
+let tts;
+self.onmessage=async({data:{id,type,text,voice,speed}})=>{
+ try{
+  if(type==='load'){
    let gpu=null;try{gpu=await navigator.gpu?.requestAdapter()}catch{}
-   return KokoroTTS.from_pretrained('onnx-community/Kokoro-82M-v1.0-ONNX',gpu?{dtype:'fp32',device:'webgpu'}:{dtype:'q8',device:'wasm'});
-  })
-  .then(tts=>{VOX.tts=tts;return tts})
+   tts=await KokoroTTS.from_pretrained('onnx-community/Kokoro-82M-v1.0-ONNX',gpu?{dtype:'fp32',device:'webgpu'}:{dtype:'q8',device:'wasm'});
+   postMessage({id,ok:true});
+  }else{
+   const a=await tts.generate(text,{voice,speed});
+   postMessage({id,ok:true,audio:a.audio,sampling_rate:a.sampling_rate},[a.audio.buffer]);
+  }
+ }catch(err){postMessage({id,ok:false,error:String(err)})}
+};`;
+function loadVoices(){
+ if(VOX.tts||VOX.loading||VOX.failed)return VOX.loading;
+ let worker;
+ try{worker=new Worker(URL.createObjectURL(new Blob([KOKORO_WORKER],{type:'text/javascript'})),{type:'module'})}
+ catch(err){console.warn('Voice worker unavailable, using browser voice',err);VOX.failed=true;return null}
+ const pending=new Map();let seq=0;
+ const call=msg=>new Promise((ok,fail)=>{const id=++seq;pending.set(id,{ok,fail});worker.postMessage({...msg,id})});
+ worker.onmessage=({data})=>{const p=pending.get(data.id);if(!p)return;pending.delete(data.id);data.ok?p.ok(data):p.fail(new Error(data.error))};
+ worker.onerror=e=>{VOX.failed=true;VOX.tts=null;for(const p of pending.values())p.fail(new Error(e.message||'voice worker error'));pending.clear()};
+ VOX.loading=call({type:'load'})
+  .then(()=>{VOX.tts={generate:(text,{voice,speed})=>call({type:'generate',text,voice,speed})};return VOX.tts})
   .catch(err=>{console.warn('Kokoro voices unavailable, using browser voice',err);VOX.loading=null;VOX.failed=true});
  return VOX.loading;
 }
@@ -712,7 +729,7 @@ async function kokoroSay(a,text,isLive,onWord,onAmp){
  const SPEED=0.9,gen=t=>tts.generate(t,{voice,speed:SPEED});
  let base=0,next=gen(sentences[0]);
  for(let i=0;i<sentences.length;i++){
-  const audio=await next;if(!isLive())return;
+  const audio=i===0?await Promise.race([next,new Promise((_,fail)=>setTimeout(()=>fail(new Error('voice slow')),3500))]):await next;if(!isLive())return;
   if(i+1<sentences.length)next=gen(sentences[i+1]);
   const buf=ctx.createBuffer(1,audio.audio.length,audio.sampling_rate);buf.copyToChannel(audio.audio,0);
   const src=ctx.createBufferSource(),an=ctx.createAnalyser();an.fftSize=512;src.buffer=buf;src.connect(an);an.connect(ctx.destination);VOX.src=src;
@@ -788,21 +805,25 @@ function wireConversation(s,a){
   start();
   if(voiceOn&&key&&RECORDED[a.id]?.includes(key)){
    clearInterval(ampT);
-   recordedSay(a,key,text,()=>id===run,light,setAmp).then(()=>{if(id!==run)return;light(spans.length);stop()}).catch(()=>{if(id===run){light(spans.length);stop()}});
+   recordedSay(a,key,text,()=>id===run,light,setAmp).then(()=>{if(id!==run)return;light(spans.length);stop()}).catch(()=>{if(id===run&&lit===0){ampT=setInterval(()=>setAmp(.35+Math.random()*.65),110);browserSpeak()}else if(id===run){light(spans.length);stop()}});
    return;
   }
   if(voiceOn&&VOX.tts){
    clearInterval(ampT);
-   kokoroSay(a,text,()=>id===run,light,setAmp).then(()=>{if(id!==run)return;light(spans.length);stop()}).catch(()=>{if(id===run){light(spans.length);stop()}});
+   kokoroSay(a,text,()=>id===run,light,setAmp).then(()=>{if(id!==run)return;light(spans.length);stop()})
+    .catch(()=>{if(id===run&&lit===0){ampT=setInterval(()=>setAmp(.35+Math.random()*.65),110);browserSpeak()}else if(id===run){light(spans.length);stop()}});
    return;
   }
+  browserSpeak();
+  function browserSpeak(){
   // Captions always run on a timer; when the browser can speak, word boundaries keep them in sync with the voice.
-  const voiced=voiceOn&&synth&&voices.length;let synced=false;const pace=voiced?330:240;let i=0;const tick=setInterval(()=>{if(id!==run)return clearInterval(tick);i++;if(!synced)light(i);if(i>=spans.length&&!(voiceOn&&synth&&synth.speaking)){clearInterval(tick);stop()}},pace);
+  const voiced=voiceOn&&synth;let synced=false;const pace=voiced?330:240;let i=0;const tick=setInterval(()=>{if(id!==run)return clearInterval(tick);i++;if(!synced)light(i);if(i>=spans.length&&!(voiceOn&&synth&&synth.speaking)){clearInterval(tick);stop()}},pace);
   if(voiced){const u=new SpeechSynthesisUtterance(text);const v=voiceFor(a);if(v)u.voice=v;u.rate=1.02;u.pitch=FEMALE.has(a.id)?1.05:.92;
    let chars=0;const offsets=words.map(w=>{const o=chars;chars+=w.length+1;return o});
    u.onboundary=e=>{if(id!==run)return;synced=true;const n=offsets.findIndex(o=>o>e.charIndex);light(n<0?spans.length:n);setAmp(1)};
    u.onend=u.onerror=()=>{if(id!==run)return;clearInterval(tick);light(spans.length);stop()};
    synth.speak(u)}
+  }
  }
  form.onsubmit=e=>{e.preventDefault();const q=input.value.trim();if(!q)return;input.value='';ask(q)};
  s.querySelectorAll('.suggest button').forEach(b=>b.onclick=()=>ask(b.textContent));
