@@ -74,8 +74,17 @@ button{font:inherit;color:inherit;cursor:pointer}button:focus-visible,a:focus-vi
 /* The animated Pegasus lives in the top-right corner as a live emblem, so it never overlaps the statue in the backdrop. */
 .emblem{position:absolute;top:66px;right:clamp(14px,2vw,30px);width:clamp(96px,9vw,138px);aspect-ratio:1;border-radius:50%;overflow:hidden;background:radial-gradient(circle,#0b1a2c 0%,#03070d 70%);box-shadow:0 0 0 1px #dfba8077,0 0 0 5px #04070dcc,0 0 0 6px #dfba8040,0 0 34px #4fc3ff44;z-index:2;pointer-events:none}
 .emblem::after{content:'';position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,transparent 55%,#03070d 78%)}
-#holo,#holo2{position:absolute;left:50%;top:46%;width:150%;transform:translate(-50%,-50%);mix-blend-mode:screen;opacity:.95;transition:opacity .9s;pointer-events:none}
-#holo2{opacity:0}
+/* Steady hologram turntable: one crisp frame spinning at a constant speed (the AI video morphed as it turned). */
+.turntable{position:absolute;inset:8% 6% 14%;perspective:520px}
+.spinner{position:absolute;left:8%;right:8%;top:4%;height:72%;transform-style:preserve-3d;animation:turn 9s linear infinite,edge 4.5s ease-in-out infinite}
+/* soften the moment it's edge-on (90° and 270°) so it reads as a hologram flicker, not a hard line */
+@keyframes edge{0%,100%{opacity:1}50%{opacity:.45}}
+.spinner .face{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;backface-visibility:hidden;filter:drop-shadow(0 0 6px #4fc3ffaa)}
+.spinner .back{transform:rotateY(180deg) scaleX(-1)}
+.turntable .platform{position:absolute;left:0;right:0;bottom:0;width:100%;opacity:.95}
+@keyframes turn{to{transform:rotateY(360deg)}}
+.paused .spinner{animation-play-state:paused}
+@media(prefers-reduced-motion:reduce){.spinner{animation:none}}
 .emblem-tag{position:absolute;left:50%;bottom:9%;transform:translateX(-50%);z-index:1;font-size:7.5px;letter-spacing:.26em;color:#bfe9ff;white-space:nowrap;text-shadow:0 0 6px #4fc3ff}
 .atrium-title{position:absolute;left:50%;top:66%;transform:translate(-50%,-50%);text-align:center;pointer-events:none}
 .atrium-title h1{margin:0;font-size:clamp(28px,5.4vw,72px);letter-spacing:.32em;font-weight:500;color:var(--gold-hi);text-shadow:0 0 30px #dfba8077,0 4px 18px #000}
@@ -695,7 +704,7 @@ function hot(key,x,y,title,sub,{icon='↗',c,forward}={}){return `<button class=
 function buildAtrium(){
  const s=document.createElement('section');s.id='s-atrium';s.setAttribute('aria-label','Pegasus Headquarters');
  s.innerHTML=`<img class="bg" src="assets/pegasus-atrium.png" alt="">
- <div class="emblem" aria-hidden="true"><video id="holo" muted playsinline preload="auto" src="assets/pegasus-centerpiece.mp4"></video><video id="holo2" muted playsinline preload="auto" src="assets/pegasus-centerpiece.mp4"></video><span class="emblem-tag">PEGASUS · LIVE</span></div>
+ <div class="emblem" aria-hidden="true"><div class="turntable"><div class="spinner"><img class="face front" src="assets/pegasus-holo.png" alt=""><img class="face back" src="assets/pegasus-holo.png" alt=""></div><img class="platform" src="assets/pegasus-platform.png" alt=""></div><span class="emblem-tag">PEGASUS · LIVE</span></div>
  <div class="shade" style="background:radial-gradient(ellipse at 50% 45%,transparent 35%,#02050bcc 100%)"></div>
  <div class="atrium-title"><h1 class="serif">PEGASUS</h1><p>HEADQUARTERS</p></div>
  ${hot('executive','20%','30%','SIMON · EXECUTIVE OFFICE','Strategy · leadership · final approvals',{icon:'♛',c:'#e8c27a'})}
@@ -704,11 +713,6 @@ function buildAtrium(){
  ${hot('war-room','14%','62%','WAR ROOM','Mission execution',{icon:'✦',c:'#ff9a5c'})}
  ${hot('lobby','86%','62%','CLIENTS','Client portals · projects · concierge',{icon:'⌂',c:'#f0d7a8'})}`;
  s.querySelectorAll('[data-go]').forEach(b=>b.onclick=travel(b.dataset.go));
- // two players crossfade so the hologram loop never visibly resets
- const v1=s.querySelector('#holo'),v2=s.querySelector('#holo2');let active=v1,standby=v2,timer;
- function schedule(){clearTimeout(timer);if(reduced||motionPaused||!active.duration)return;timer=setTimeout(()=>{standby.currentTime=0;standby.play().catch(()=>{});standby.style.opacity='.92';active.style.opacity='0';setTimeout(()=>{active.pause();[active,standby]=[standby,active];schedule()},900)},Math.max(400,active.duration*1000-1100))}
- v1.dataset.play='';v1.addEventListener('loadedmetadata',schedule);v1.addEventListener('play',schedule);
- s.pauseLoop=()=>{clearTimeout(timer);v1.pause();v2.pause()};
  return s;
 }
 
