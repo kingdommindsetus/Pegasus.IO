@@ -331,7 +331,10 @@ const AGENTS=[
   duties:['Multi-platform publishing','Content distribution','Community engagement','Email distribution','Partnership support'],
   today:[['42','Posts scheduled'],['6','Campaigns live'],['3','Partner drops'],['1','Report due']],
   missions:[['KMCE outreach','68%'],['YouTube series','52%'],['Email launch','74%'],['Community growth','38%']]},
- {id:'snake',name:'Snake',role:'Analytics',dept:'Attribution Modeling & Performance Analytics',c:'#3ee6a0'},
+ {id:'snake',name:'Snake',role:'Analytics & Insights',dept:'Attribution Modeling & Performance Analytics',c:'#3ee68a',office:true,quote:'Data. Trends. Performance. Intelligence.',
+  duties:['Data analysis','Performance tracking','Trend forecasting','ROI optimization','Predictive modeling'],
+  today:[['1,248','Total leads'],['312','Conversions'],['$87.4K','Revenue tracked'],['+68%','Forecast growth']],
+  missions:[['Attribution model','71%'],['Revenue forecast','63%'],['Funnel dashboard','45%']]},
  {id:'alice',name:'Alice',role:'Storefront & Conversion',dept:'CRO & Storefront UX Architecture',c:'#ff7ad9',office:true,quote:'Attract. Engage. Convert.',
   duties:['KMCE Shop storefront','Conversion optimization','Customer journey','A/B testing','Product launches'],
   today:[['$24,850','Shop revenue'],['328','Orders'],['4.8%','Conversion rate'],['2','Tests running']],
@@ -366,8 +369,8 @@ const AGENTS=[
 // flag them here, e.g. simon:{listen:true,talk:true}. Agents without clips stay still and use the voice light alone.
 const CLIPS={};
 // Where each robot's body sits, for the soft mask that keeps the room still while the robot moves.
-const BODY={evan:[49,60],tube:[50,60],cammy:[40,58],mark:[49,58],simon:[50,55],marie:[47,58],gatekeeper:[51,62],lucy:[52,60],sofia:[48,62],iris:[50,62],maven:[47,64],booker:[48,62],scout:[54,68],echo:[48,60],alice:[49,60]};
-const HEAD={evan:[49,36],tube:[49,37],cammy:[41,37],mark:[48,36],simon:[50,36],marie:[45,40],gatekeeper:[47,45],lucy:[51,38],sofia:[47,38],iris:[48,41],maven:[48,42],booker:[47,40],scout:[53,55],echo:[50,34],alice:[46,34]};
+const BODY={snake:[47,58],evan:[49,60],tube:[50,60],cammy:[40,58],mark:[49,58],simon:[50,55],marie:[47,58],gatekeeper:[51,62],lucy:[52,60],sofia:[48,62],iris:[50,62],maven:[47,64],booker:[48,62],scout:[54,68],echo:[48,60],alice:[49,60]};
+const HEAD={snake:[48,33],evan:[49,36],tube:[49,37],cammy:[41,37],mark:[48,36],simon:[50,36],marie:[45,40],gatekeeper:[47,45],lucy:[51,38],sofia:[47,38],iris:[48,41],maven:[48,42],booker:[47,40],scout:[53,55],echo:[50,34],alice:[46,34]};
 const NEXT_WING=['Atlas','Claire','Flow','Ledger','Midas'];
 NEXT_WING.forEach(n=>AGENTS.push({id:n.toLowerCase(),name:n,role:'Room in production',dept:'Office build scheduled for the next slice',c:'#7ddcf3',next:true}));
 const byId=Object.fromEntries(AGENTS.map(a=>[a.id,a]));

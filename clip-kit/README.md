@@ -9,7 +9,7 @@ Each robot needs **two short clips**, both made from its first-frame image in th
 
 Example: `simon-listen.mp4`, `simon-talk.mp4`. Drop them in Downloads and say which ones are ready.
 
-Order: **Simon and Marie first**, then the rest (Mark is `12-mark-first-frame.jpg`, Cammy is `13-cammy-first-frame.jpg`, Tube is `14-tube-first-frame.jpg`, Evan is `15-evan-first-frame.jpg`).
+Order: **Simon and Marie first**, then the rest (Mark is `12-mark-first-frame.jpg`, Cammy is `13-cammy-first-frame.jpg`, Tube is `14-tube-first-frame.jpg`, Evan is `15-evan-first-frame.jpg`, Snake is `16-snake-first-frame.jpg`).
 
 ## Settings in your video tool
 
