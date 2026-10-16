@@ -577,7 +577,7 @@ function voiceFor(a){if(!voices.length)return null;const fem=voices.filter(v=>VO
 /* ===== Voices: Kokoro runs inside the browser with each agent's voice from the Pegasus voice registry =====
    On a WebGPU-capable browser the full model runs on the graphics chip (≈330MB once, then cached; faster than real time).
    Otherwise the compact model runs on the processor (≈90MB, slower). Until it's ready, the browser's own voice is used. */
-const KOKORO_VOICE={simon:'bm_george',marie:'af_heart',iris:'af_sarah',mark:'am_eric',cammy:'bf_emma',evan:'am_liam',tube:'am_puck',lucy:'af_bella',snake:'bm_daniel',alice:'af_sky',echo:'bf_isabella',booker:'bm_lewis',midas:'am_onyx',scout:'am_fenrir',claire:'af_jessica',atlas:'am_echo',sofia:'af_nova',maven:'bf_lily',gatekeeper:'bm_fable',flow:'af_river',ledger:'am_michael'};
+const KOKORO_VOICE={simon:'bm_george',marie:'af_heart',iris:'af_sarah',mark:'am_eric',cammy:'bf_emma',evan:'am_liam',tube:'am_puck',lucy:'af_bella',snake:'am_fenrir',alice:'af_sky',echo:'bf_isabella',booker:'bm_lewis',midas:'am_onyx',scout:'am_puck',claire:'af_jessica',atlas:'am_echo',sofia:'af_nova',maven:'bf_lily',gatekeeper:'bm_fable',flow:'af_river',ledger:'am_michael'};
 const VOX={tts:null,loading:null,ctx:null,src:null};
 function loadVoices(){
  if(VOX.tts||VOX.loading)return VOX.loading;
@@ -599,10 +599,11 @@ async function kokoroSay(a,text,isLive,onWord,onAmp){
  // Short first chunk = the voice starts sooner; long sentences break at commas.
  const sentences=(text.match(/[^.!?]+[.!?]*["”']?\s*/g)||[text]).map(t=>t.trim()).filter(Boolean)
   .flatMap(t=>t.split(/\s+/).length>10?t.split(/(?<=,)\s+/):[t]).filter(Boolean);
- let base=0,next=tts.generate(sentences[0],{voice});
+ const SPEED=0.9,gen=t=>tts.generate(t,{voice,speed:SPEED});
+ let base=0,next=gen(sentences[0]);
  for(let i=0;i<sentences.length;i++){
   const audio=await next;if(!isLive())return;
-  if(i+1<sentences.length)next=tts.generate(sentences[i+1],{voice});
+  if(i+1<sentences.length)next=gen(sentences[i+1]);
   const buf=ctx.createBuffer(1,audio.audio.length,audio.sampling_rate);buf.copyToChannel(audio.audio,0);
   const src=ctx.createBufferSource(),an=ctx.createAnalyser();an.fftSize=512;src.buffer=buf;src.connect(an);an.connect(ctx.destination);VOX.src=src;
   const n=sentences[i].split(/\s+/).length,data=new Uint8Array(an.fftSize);
@@ -612,6 +613,8 @@ async function kokoroSay(a,text,isLive,onWord,onAmp){
     onAmp(Math.min(1,Math.sqrt(e/data.length)*5));onWord(base+Math.ceil((ctx.currentTime-t0)/buf.duration*n))},40);
    src.onended=()=>{clearInterval(tick);done()};src.start()});
   base+=n;
+  // Breathe between phrases: longer after a full stop, shorter after a comma.
+  if(i+1<sentences.length&&isLive()){onAmp(0);await new Promise(r=>setTimeout(r,/[.!?]["”']?$/.test(sentences[i])?420:180))}
  }
 }
 // Claude writes the reply (server-side, /api/hq-chat). Anything unavailable falls back to the office's scripted answer.
