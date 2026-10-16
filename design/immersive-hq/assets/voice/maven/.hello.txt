@@ -1,0 +1,1 @@
+Hi, Maven here. What story are we telling this month?

@@ -1,0 +1,1 @@
+Qualified lead counts come straight from KMCE once we're connected. Right now, I'm scoring educator leads.

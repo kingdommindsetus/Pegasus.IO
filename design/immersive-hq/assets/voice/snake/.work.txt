@@ -1,0 +1,1 @@
+Right now I'm moving Attribution model, Revenue forecast, and Funnel dashboard. Attribution model is my top priority.

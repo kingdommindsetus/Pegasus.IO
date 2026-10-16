@@ -1,0 +1,1 @@
+Workflow stats come straight from KMCE once we're connected. Right now, I'm building the CRM automations.
