@@ -319,7 +319,10 @@ const AGENTS=[
   duties:['Campaign strategy','Content ideas','Multi-channel launches','A/B testing','Performance optimization'],
   today:[['1.3M','Campaign reach'],['86.4K','Engagements'],['22','Ideas in pipeline'],['$124K','Attributed revenue']],
   missions:[['Phoenix event launch','62%'],['KMCE spring campaign','54%'],['Influencer outreach','31%']]},
- {id:'evan',name:'Evan',role:'Content',dept:'High-Converting Copywriting & Narrative Craft',c:'#9be36d'},
+ {id:'evan',name:'Evan',role:'Content Creation',dept:'High-Converting Copywriting & Narrative Craft',c:'#4f9dff',office:true,quote:'Storytelling. Content. Media. Engage.',
+  duties:['Content strategy','Script writing','Brand storytelling','Short & long-form content','Content calendars'],
+  today:[['24','Ideas in pipeline'],['12','Scripts drafted'],['8','In production'],['5','Published']],
+  missions:[['KMCE story series','64%'],['Podcast scripts','58%'],['Course launch copy','37%']]},
  {id:'tube',name:'Tube',role:'Video Production',dept:'Viral Video Direction & Short-Form Media',c:'#ff4d4d',office:true,quote:'Film. Edit. Produce. Distribute.',
   duties:['Video strategy','Filming & production','Editing & post','Short-form content','Thumbnails & YouTube SEO'],
   today:[['2.4M','Total views'],['98.5K','Engagement'],['12.8K','New subscribers'],['134','Videos published']],
@@ -363,8 +366,8 @@ const AGENTS=[
 // flag them here, e.g. simon:{listen:true,talk:true}. Agents without clips stay still and use the voice light alone.
 const CLIPS={};
 // Where each robot's body sits, for the soft mask that keeps the room still while the robot moves.
-const BODY={tube:[50,60],cammy:[40,58],mark:[49,58],simon:[50,55],marie:[47,58],gatekeeper:[51,62],lucy:[52,60],sofia:[48,62],iris:[50,62],maven:[47,64],booker:[48,62],scout:[54,68],echo:[48,60],alice:[49,60]};
-const HEAD={tube:[49,37],cammy:[41,37],mark:[48,36],simon:[50,36],marie:[45,40],gatekeeper:[47,45],lucy:[51,38],sofia:[47,38],iris:[48,41],maven:[48,42],booker:[47,40],scout:[53,55],echo:[50,34],alice:[46,34]};
+const BODY={evan:[49,60],tube:[50,60],cammy:[40,58],mark:[49,58],simon:[50,55],marie:[47,58],gatekeeper:[51,62],lucy:[52,60],sofia:[48,62],iris:[50,62],maven:[47,64],booker:[48,62],scout:[54,68],echo:[48,60],alice:[49,60]};
+const HEAD={evan:[49,36],tube:[49,37],cammy:[41,37],mark:[48,36],simon:[50,36],marie:[45,40],gatekeeper:[47,45],lucy:[51,38],sofia:[47,38],iris:[48,41],maven:[48,42],booker:[47,40],scout:[53,55],echo:[50,34],alice:[46,34]};
 const NEXT_WING=['Atlas','Claire','Flow','Ledger','Midas'];
 NEXT_WING.forEach(n=>AGENTS.push({id:n.toLowerCase(),name:n,role:'Room in production',dept:'Office build scheduled for the next slice',c:'#7ddcf3',next:true}));
 const byId=Object.fromEntries(AGENTS.map(a=>[a.id,a]));
