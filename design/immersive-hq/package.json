@@ -4,5 +4,9 @@
   "type": "module",
   "scripts": {
     "build": "node build.mjs"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "0.131.0",
+    "esbuild": "0.28.2"
   }
 }

@@ -200,6 +200,9 @@ button{font:inherit;color:inherit;cursor:pointer}button:focus-visible,a:focus-vi
 .room .stage .clip{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .45s ease;-webkit-mask-image:radial-gradient(ellipse 25% 46% at var(--mx) var(--my),#000 52%,transparent 100%);mask-image:radial-gradient(ellipse 25% 46% at var(--mx) var(--my),#000 52%,transparent 100%)}
 .room.listening .clip-listen,.room.speaking .clip-talk{opacity:1}
 .room.listening .eye{opacity:.62;animation-duration:2.4s}
+.room.thinking .eye{opacity:.8;animation-duration:.8s}
+.caption .thinking{animation:think 1s ease-in-out infinite}
+@keyframes think{50%{opacity:.3}}
 .room.listening .vorb{animation:listenPulse 1.3s ease-in-out infinite}
 @keyframes listenPulse{50%{box-shadow:0 0 26px var(--c);transform:scale(1.12)}}
 .room .stage .eye{position:absolute;left:var(--hx);top:var(--hy);width:12%;height:20%;transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;mix-blend-mode:screen;background:radial-gradient(closest-side,color-mix(in srgb,var(--c) 70%,#fff),color-mix(in srgb,var(--c) 35%,transparent) 45%,transparent);opacity:calc(.28 + var(--amp,0)*.7);animation:eye 4.2s ease-in-out infinite}
@@ -509,7 +512,7 @@ function buildFloor(){
  </div><div class="floor-hint">SELECT A DOOR TO STEP INSIDE</div>`;
  s.querySelectorAll('[data-room]').forEach(b=>b.onclick=travel('room/'+b.dataset.room));
  // The hallway clip loops on its own; doors fade in once the camera move lands.
- s.onArrive=()=>setTimeout(()=>s.classList.add('arrived'),reduced?0:500);
+ s.onArrive=()=>{setTimeout(()=>s.classList.add('arrived'),reduced?0:500);setTimeout(loadVoices,1200)};
  return s;
 }
 
@@ -571,6 +574,55 @@ if(synth){const load=()=>voices=synth.getVoices().filter(v=>/^en/i.test(v.lang))
 const VOICE_FEMALE=/female|zira|aria|jenny|samantha|victoria|karen|moira|tessa|susan|libby|sonia|natasha|google uk english female|google us english/i;
 const FEMALE=new Set(['marie','iris','cammy','lucy','alice','sofia','claire','maven']);
 function voiceFor(a){if(!voices.length)return null;const fem=voices.filter(v=>VOICE_FEMALE.test(v.name)),male=voices.filter(v=>!VOICE_FEMALE.test(v.name));const pool=(FEMALE.has(a.id)?fem:male).length?(FEMALE.has(a.id)?fem:male):voices;let h=0;for(const ch of a.id)h=(h*31+ch.charCodeAt(0))>>>0;return pool[h%pool.length]}
+/* ===== Voices: Kokoro runs inside the browser with each agent's voice from the Pegasus voice registry =====
+   On a WebGPU-capable browser the full model runs on the graphics chip (≈330MB once, then cached; faster than real time).
+   Otherwise the compact model runs on the processor (≈90MB, slower). Until it's ready, the browser's own voice is used. */
+const KOKORO_VOICE={simon:'bm_george',marie:'af_heart',iris:'af_sarah',mark:'am_eric',cammy:'bf_emma',evan:'am_liam',tube:'am_puck',lucy:'af_bella',snake:'bm_daniel',alice:'af_sky',echo:'bf_isabella',booker:'bm_lewis',midas:'am_onyx',scout:'am_fenrir',claire:'af_jessica',atlas:'am_echo',sofia:'af_nova',maven:'bf_lily',gatekeeper:'bm_fable',flow:'af_river',ledger:'am_michael'};
+const VOX={tts:null,loading:null,ctx:null,src:null};
+function loadVoices(){
+ if(VOX.tts||VOX.loading)return VOX.loading;
+ VOX.loading=import('https://cdn.jsdelivr.net/npm/kokoro-js@1.2.1/dist/kokoro.web.js')
+  .then(async({KokoroTTS})=>{
+   let gpu=null;try{gpu=await navigator.gpu?.requestAdapter()}catch{}
+   return KokoroTTS.from_pretrained('onnx-community/Kokoro-82M-v1.0-ONNX',gpu?{dtype:'fp32',device:'webgpu'}:{dtype:'q8',device:'wasm'});
+  })
+  .then(tts=>{VOX.tts=tts;return tts})
+  .catch(err=>{console.warn('Kokoro voices unavailable, using browser voice',err);VOX.loading=null;VOX.failed=true});
+ return VOX.loading;
+}
+function stopVoice(){try{VOX.src?.stop()}catch{}VOX.src=null}
+// Speaks sentence by sentence (the next one is generated while the current one plays).
+// onWord(n) lights caption words in step with the audio; onAmp(v) feeds the robot's voice light from the real waveform.
+async function kokoroSay(a,text,isLive,onWord,onAmp){
+ const tts=VOX.tts,voice=KOKORO_VOICE[a.id]||'af_heart';
+ const ctx=VOX.ctx||(VOX.ctx=new AudioContext());if(ctx.state==='suspended')await ctx.resume();
+ // Short first chunk = the voice starts sooner; long sentences break at commas.
+ const sentences=(text.match(/[^.!?]+[.!?]*["”']?\s*/g)||[text]).map(t=>t.trim()).filter(Boolean)
+  .flatMap(t=>t.split(/\s+/).length>10?t.split(/(?<=,)\s+/):[t]).filter(Boolean);
+ let base=0,next=tts.generate(sentences[0],{voice});
+ for(let i=0;i<sentences.length;i++){
+  const audio=await next;if(!isLive())return;
+  if(i+1<sentences.length)next=tts.generate(sentences[i+1],{voice});
+  const buf=ctx.createBuffer(1,audio.audio.length,audio.sampling_rate);buf.copyToChannel(audio.audio,0);
+  const src=ctx.createBufferSource(),an=ctx.createAnalyser();an.fftSize=512;src.buffer=buf;src.connect(an);an.connect(ctx.destination);VOX.src=src;
+  const n=sentences[i].split(/\s+/).length,data=new Uint8Array(an.fftSize);
+  await new Promise(done=>{const t0=ctx.currentTime;
+   const tick=setInterval(()=>{if(!isLive()){clearInterval(tick);stopVoice();return done()}
+    an.getByteTimeDomainData(data);let e=0;for(const v of data){const x=(v-128)/128;e+=x*x}
+    onAmp(Math.min(1,Math.sqrt(e/data.length)*5));onWord(base+Math.ceil((ctx.currentTime-t0)/buf.duration*n))},40);
+   src.onended=()=>{clearInterval(tick);done()};src.start()});
+  base+=n;
+ }
+}
+// Claude writes the reply (server-side, /api/hq-chat). Anything unavailable falls back to the office's scripted answer.
+async function agentReply(a,q,history){
+ try{
+  const r=await fetch('/api/hq-chat',{method:'POST',headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(25000),
+   body:JSON.stringify({agentId:a.id,message:q,history:history.slice(-8),office:{duties:a.duties,missions:a.missions,quote:a.quote}})});
+  if(r.ok){const j=await r.json();if(j.text)return j.text}
+ }catch{}
+ return reply(a,q);
+}
 function wireConversation(s,a){
  const cap=s.querySelector('.caption'),form=s.querySelector('.composer'),input=form.querySelector('input'),voiceBtn=form.querySelector('.voice'),mic=form.querySelector('.mic'),clips={listening:s.querySelector('.clip-listen'),speaking:s.querySelector('.clip-talk')};
  let voiceOn=true,ampT,run=0,idleT,micOn=false;
@@ -583,16 +635,31 @@ function wireConversation(s,a){
  }
  function listen(){if(s.dataset.state==='speaking')return;setState('listening');clearTimeout(idleT);if(!micOn)idleT=setTimeout(()=>{if(s.dataset.state==='listening')setState('idle')},2600)}
  input.addEventListener('input',()=>input.value?listen():setState('idle'));
- voiceBtn.onclick=()=>{voiceOn=!voiceOn;voiceBtn.setAttribute('aria-pressed',String(voiceOn));voiceBtn.textContent=voiceOn?'🔊':'🔇';if(!voiceOn)synth?.cancel()};
+ voiceBtn.onclick=()=>{voiceOn=!voiceOn;voiceBtn.setAttribute('aria-pressed',String(voiceOn));voiceBtn.textContent=voiceOn?'🔊':'🔇';if(!voiceOn){synth?.cancel();stopVoice()}};
  const setAmp=v=>s.style.setProperty('--amp',v.toFixed(2));
  function start(){clearTimeout(idleT);setState('speaking');clearInterval(ampT);ampT=setInterval(()=>setAmp(.35+Math.random()*.65),110)}
  function stop(){clearInterval(ampT);setAmp(0);if(s.dataset.state==='speaking')setState('idle')}
+ const history=[];
+ async function ask(q){
+  const id=++run;synth?.cancel();stopVoice();clearTimeout(idleT);
+  cap.innerHTML=`<span class="you">You: ${q.replace(/</g,'&lt;')}</span><span class="w on thinking">…</span>`;
+  setState('listening');s.classList.add('thinking');
+  const text=await agentReply(a,q,history);
+  s.classList.remove('thinking');if(id!==run)return;
+  history.push({role:'user',text:q},{role:'assistant',text});
+  speak(text,q);
+ }
  function speak(text,asked){
-  const id=++run;synth?.cancel();
+  const id=++run;synth?.cancel();stopVoice();
   const words=text.split(/\s+/);
   cap.innerHTML=(asked?`<span class="you">You: ${asked.replace(/</g,'&lt;')}</span>`:'')+words.map(w=>`<span class="w">${w.replace(/</g,'&lt;')}</span> `).join('');
   const spans=[...cap.querySelectorAll('.w')];let lit=0;const light=n=>{for(;lit<Math.min(n,spans.length);lit++)spans[lit].classList.add('on')};
   start();
+  if(voiceOn&&VOX.tts){
+   clearInterval(ampT);
+   kokoroSay(a,text,()=>id===run,light,setAmp).then(()=>{if(id!==run)return;light(spans.length);stop()}).catch(()=>{if(id===run){light(spans.length);stop()}});
+   return;
+  }
   // Captions always run on a timer; when the browser can speak, word boundaries keep them in sync with the voice.
   const voiced=voiceOn&&synth&&voices.length;let synced=false;const pace=voiced?330:240;let i=0;const tick=setInterval(()=>{if(id!==run)return clearInterval(tick);i++;if(!synced)light(i);if(i>=spans.length&&!(voiceOn&&synth&&synth.speaking)){clearInterval(tick);stop()}},pace);
   if(voiced){const u=new SpeechSynthesisUtterance(text);const v=voiceFor(a);if(v)u.voice=v;u.rate=1.02;u.pitch=FEMALE.has(a.id)?1.05:.92;
@@ -601,14 +668,14 @@ function wireConversation(s,a){
    u.onend=u.onerror=()=>{if(id!==run)return;clearInterval(tick);light(spans.length);stop()};
    synth.speak(u)}
  }
- form.onsubmit=e=>{e.preventDefault();const q=input.value.trim();if(!q)return;input.value='';speak(reply(a,q),q)};
- s.querySelectorAll('.suggest button').forEach(b=>b.onclick=()=>speak(reply(a,b.textContent),b.textContent));
+ form.onsubmit=e=>{e.preventDefault();const q=input.value.trim();if(!q)return;input.value='';ask(q)};
+ s.querySelectorAll('.suggest button').forEach(b=>b.onclick=()=>ask(b.textContent));
  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
  if(SR){mic.hidden=false;mic.onclick=()=>{const r=new SR();r.lang='en-US';r.interimResults=true;mic.classList.add('live');synth?.cancel();run++;micOn=true;listen();
-  r.onresult=e=>{input.value=[...e.results].map(x=>x[0].transcript).join('');if(e.results[e.results.length-1].isFinal){const q=input.value.trim();input.value='';if(q)speak(reply(a,q),q)}};
+  r.onresult=e=>{input.value=[...e.results].map(x=>x[0].transcript).join('');if(e.results[e.results.length-1].isFinal){const q=input.value.trim();input.value='';if(q)ask(q)}};
   r.onend=r.onerror=()=>{mic.classList.remove('live');micOn=false;if(s.dataset.state==='listening')setState('idle')};r.start()}}
- s.onArrive=()=>{cap.innerHTML='';setTimeout(()=>{if(current===s.dataset.key)speak(a.next?`${a.name}'s office is the next room in production.`:pick([`Hey. I'm ${a.name}. ${a.quote||''}`,`Welcome to my office. I'm ${a.name}, ${a.role}.`]))},1500)};
- s.onLeave=()=>{run++;synth?.cancel();clearTimeout(idleT);stop();setState('idle')};
+ s.onArrive=()=>{cap.innerHTML='';if(voiceOn)loadVoices();setTimeout(()=>{if(current===s.dataset.key)speak(a.next?`${a.name}'s office is the next room in production.`:pick([`Hey. I'm ${a.name}. ${a.quote||''}`,`Welcome to my office. I'm ${a.name}, ${a.role}.`]))},1500)};
+ s.onLeave=()=>{run++;synth?.cancel();stopVoice();s.classList.remove('thinking');clearTimeout(idleT);stop();setState('idle')};
  setState('idle');
 }
 
