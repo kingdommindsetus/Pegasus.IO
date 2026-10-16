@@ -2,13 +2,23 @@
 //   dist/                       plain static site (open index.html locally)
 //   .vercel/output/             Vercel Build Output API: static site + /api/hq-chat function
 // Deploy with: vercel deploy --prebuilt
-import { cp, mkdir, rm, writeFile } from 'node:fs/promises';
+import { cp, mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { build } from 'esbuild';
 
 await rm('dist', { recursive: true, force: true });
 await mkdir('dist', { recursive: true });
-await cp('index.html', 'dist/index.html');
 await cp('assets', 'dist/assets', { recursive: true });
+
+// Tell the page which pre-recorded voice lines exist (assets/voice/<agent>/<key>.mp3),
+// so it plays them and never requests a missing file.
+const recorded = {};
+for (const agent of await readdir('assets/voice').catch(() => [])) {
+  const keys = (await readdir(`assets/voice/${agent}`)).filter((f) => f.endsWith('.mp3')).map((f) => f.slice(0, -4));
+  if (keys.length) recorded[agent] = keys;
+}
+const html = (await readFile('index.html', 'utf8')).replace('const RECORDED={};', `const RECORDED=${JSON.stringify(recorded)};`);
+await writeFile('dist/index.html', html);
+const lineCount = Object.values(recorded).reduce((n, k) => n + k.length, 0);
 
 const out = '.vercel/output';
 await rm(`${out}/static`, { recursive: true, force: true });
@@ -36,4 +46,4 @@ await writeFile(`${fn}/.vc-config.json`, JSON.stringify({
   maxDuration: 30,
 }, null, 2));
 await writeFile(`${out}/config.json`, JSON.stringify({ version: 3 }, null, 2));
-console.log('built dist/ and .vercel/output (static + api/hq-chat)');
+console.log(`built dist/ and .vercel/output (static + api/hq-chat); ${lineCount} recorded voice lines`);

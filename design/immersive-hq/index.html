@@ -342,7 +342,7 @@ const AGENTS=[
   duties:['Data analysis','Performance tracking','Trend forecasting','ROI optimization','Predictive modeling'],
   missions:['Attribution model','Revenue forecast','Funnel dashboard']},
  {id:'alice',name:'Alice',role:'Storefront & Conversion',dept:'CRO & Storefront UX Architecture',c:'#ff7ad9',office:true,quote:'Attract. Engage. Convert.',
-  duties:['KMCE Shop storefront','Conversion optimization','Customer journey','A/B testing','Product launches'],
+  duties:['The KMCE Shop storefront','Conversion optimization','Customer journey','A/B testing','Product launches'],
   missions:['Checkout redesign','Bundle launch','Upsell flow']},
  {id:'echo',name:'Echo',role:'Sales & Outreach',dept:'Pipeline Acceleration & Outbound Pursuit',c:'#4ea8ff',office:true,quote:'Find. Engage. Follow up.',
   duties:['Lead outreach','Email & SMS sequences','Pipeline follow-up','Call scheduling','Relationship building'],
@@ -360,7 +360,7 @@ const AGENTS=[
   duties:['Brand presence','SEO & discovery','Audience growth','Reputation management','Founder growth reports'],
   missions:['KMCE growth','Google profile','Weekly report']},
  {id:'gatekeeper',name:'Gatekeeper',role:'Approval & Compliance',dept:'Authority, Compliance & Review',c:'#f0c66d',office:true,quote:'Right process. Real progress.',
-  duties:['Review & approve content','Verify credentials','Contract & policy review','Risk & audit'],
+  duties:['Content review and approval','Verify credentials','Contract & policy review','Risk & audit'],
   missions:['CE compliance','Doc verification']},
  {id:'atlas',name:'Atlas',role:'Lead Qualification',dept:'Lead Scoring & Qualification',c:'#4ea8ff',office:true,quote:'Qualify. Prioritize. Route.',
   duties:['Lead scoring','Qualification calls','Fit & intent analysis','Routing to sales','Pipeline hygiene'],
@@ -369,7 +369,7 @@ const AGENTS=[
   duties:['Company research','Contact enrichment','License & credential checks','Lead background analysis','Decision summaries'],
   missions:['Partner research','CRM enrichment pass']},
  {id:'flow',name:'Flow',role:'Workflow Automation',dept:'Automation & Systems Architecture',c:'#3ee6b4',office:true,quote:'Connect. Automate. Optimize. Scale.',
-  duties:['Build workflows','Event automation','API integrations','Routing & monitoring','Process optimization'],
+  duties:['Workflow design','Event automation','API integrations','Routing & monitoring','Process optimization'],
   missions:['CRM automations','Payment notifications','Agent handoffs']},
  {id:'ledger',name:'Ledger',role:'Finance & Operations',dept:'Finance, Accounting & Compliance',c:'#e6b85c',office:true,quote:'Track. Reconcile. Report. Protect.',
   duties:['Revenue tracking','Payment reconciliation','Invoice management','Financial reporting','Compliance support'],
@@ -557,18 +557,39 @@ function buildRoom(a){
    model (api/chat) can drop in later: swap reply() for a fetch and keep speak() as-is. */
 const pick=arr=>arr[Math.floor(Math.random()*arr.length)];
 function suggestions(a){return a.next?['What will this office do?']:['What are you working on?','What’s your top priority?','What’s your role?','Hand this to the team']}
-function reply(a,q){
- const t=q.toLowerCase(),missions=a.missions||[],duties=a.duties||[a.dept];
+// Every agent has a fixed set of lines so each one can be pre-recorded in that agent's cloned voice
+// (assets/voice/<agent>/<key>.mp3). reply() maps a question to one of these keys.
+function agentLines(a){
+ const missions=a.missions||[],duties=a.duties||[a.dept];
  const list=xs=>xs.length>1?xs.slice(0,-1).join(', ')+', and '+xs.at(-1):xs[0]||'';
- if(a.next)return `My office is still being built. Once it opens, I'll handle ${a.dept.toLowerCase()}.`;
- if(/^(hi|hey|hello|yo|good (morning|afternoon|evening))\b/.test(t))return pick([`Hey. ${a.name} here, ${a.role}. ${a.quote||''} What do you need?`,`Welcome in. I'm ${a.name}. Ask me anything about ${a.role.toLowerCase()}.`]);
- if(/number|stat|metric|kpi|revenue|how many|how much/.test(t))return `My live numbers come straight from KMCE once this office is connected, so I won't guess at them. What I can tell you is that ${(missions[0]||duties[0]).toLowerCase()} is where my focus is right now.`;
- if(/priorit|top|most important/.test(t))return missions.length?`${missions[0]}. That's the one I'm pushing hardest, and it feeds straight into ${duties[0].toLowerCase()}.`:`${duties[0]}.`;
- if(/work|mission|project|progress|focus|doing/.test(t))return missions.length?`Right now I'm moving ${list(missions)}. ${missions[0]} is my top priority.`:`I'm focused on ${duties[0].toLowerCase()}.`;
- if(/role|who are you|what do you do|responsib|help/.test(t))return `I'm ${a.name}, ${a.role}. I own ${list(duties.slice(0,4).map(d=>d.toLowerCase()))}.`;
- if(/hand|send|approve|delegate|team|assign/.test(t))return a.id==='simon'?`Understood. I'll set the priority and pass it to Marie to dispatch. Gatekeeper reviews before anything goes out.`:a.id==='marie'?`On it. I'll split it across the floor and track every handoff. Gatekeeper gets the final review.`:a.id==='gatekeeper'?`Send it my way. Nothing goes out until it clears review, and anything sensitive comes back to you.`:`Got it. I'll draft my part, Marie routes it, and Gatekeeper signs off before it ships.`;
- return pick([`Noted: "${q}". In the live build I'll pull that straight from the CRM. For now I'm running on preview data.`,`Good question. Once I'm connected to the live CRM I'll answer that with real records. Right now this office is a preview.`]);
+ // Lowercase ordinary words only, so acronyms (KMCE, CRM, SEO, A/B) survive inside a sentence.
+ const lc=t=>t.split(' ').map(w=>/^[A-Z][a-z]/.test(w)?w[0].toLowerCase()+w.slice(1):w).join(' ');
+ const handoff=a.id==='simon'?`Understood. I'll set the priority, and pass it to Marie to dispatch. Gatekeeper reviews before anything goes out.`
+  :a.id==='marie'?`On it. I'll split it across the floor, and track every handoff. Gatekeeper gets the final review.`
+  :a.id==='gatekeeper'?`Send it my way. Nothing goes out until it clears review. Anything sensitive comes back to you.`
+  :`Got it. I'll draft my part. Marie routes it, and Gatekeeper signs off before it ships.`;
+ return {
+  greet:`Welcome to my office. I'm ${a.name}, ${a.role}.${a.quote?' '+a.quote:''}`,
+  hello:`Hey. ${a.name} here. What can I do for you?`,
+  role:`I'm ${a.name}, ${a.role}. I own ${list(duties.slice(0,4).map(lc))}.`,
+  work:missions.length?`Right now I'm moving ${list(missions)}. ${missions[0]} is my top priority.`:`I'm focused on ${lc(duties[0])}.`,
+  priority:missions.length?`${missions[0]}. That's the one I'm pushing hardest. It feeds straight into ${lc(duties[0])}.`:`${duties[0]}.`,
+  numbers:`My live numbers come straight from KMCE once this office is connected, so I won't guess at them. Right now, my focus is ${missions[0]||lc(duties[0])}.`,
+  handoff,
+  other:`Good question. Once I'm connected to the live CRM, I'll answer that with real records. For now, this office is a preview.`,
+ };
 }
+function replyKey(q){
+ const t=q.toLowerCase();
+ if(/^(hi|hey|hello|yo|good (morning|afternoon|evening))\b/.test(t))return 'hello';
+ if(/number|stat|metric|kpi|revenue|how many|how much/.test(t))return 'numbers';
+ if(/priorit|top|most important/.test(t))return 'priority';
+ if(/hand|send|approve|delegate|team|assign/.test(t))return 'handoff';
+ if(/work|mission|project|progress|focus|doing/.test(t))return 'work';
+ if(/role|who are you|what do you do|responsib|help/.test(t))return 'role';
+ return 'other';
+}
+function reply(a,q){const key=replyKey(q);return {key,text:agentLines(a)[key]}}
 const synth=window.speechSynthesis;let voices=[];
 if(synth){const load=()=>voices=synth.getVoices().filter(v=>/^en/i.test(v.lang));load();synth.addEventListener?.('voiceschanged',load)}
 const VOICE_FEMALE=/female|zira|aria|jenny|samantha|victoria|karen|moira|tessa|susan|libby|sonia|natasha|google uk english female|google us english/i;
@@ -617,12 +638,30 @@ async function kokoroSay(a,text,isLive,onWord,onAmp){
   if(i+1<sentences.length&&isLive()){onAmp(0);await new Promise(r=>setTimeout(r,/[.!?]["”']?$/.test(sentences[i])?420:180))}
  }
 }
+// Recorded lines: VoxCPM2 voices cloned from each agent's approved audition, pre-rendered on the founder's laptop.
+// RECORDED lists which lines exist so the page never requests a missing file.
+const RECORDED={};
+async function recordedSay(a,key,text,isLive,onWord,onAmp){
+ const ctx=VOX.ctx||(VOX.ctx=new AudioContext());if(ctx.state==='suspended')await ctx.resume();
+ const res=await fetch(`assets/voice/${a.id}/${key}.mp3`);if(!res.ok)throw new Error('missing line');
+ const buf=await ctx.decodeAudioData(await res.arrayBuffer());if(!isLive())return;
+ const src=ctx.createBufferSource(),an=ctx.createAnalyser();an.fftSize=512;src.buffer=buf;src.connect(an);an.connect(ctx.destination);VOX.src=src;
+ // Captions advance by character position, which tracks speech closely enough for one or two sentences.
+ const words=text.split(/\s+/),ends=[];let c=0;for(const w of words){c+=w.length+1;ends.push(c)}
+ const data=new Uint8Array(an.fftSize);
+ await new Promise(done=>{const t0=ctx.currentTime;
+  const tick=setInterval(()=>{if(!isLive()){clearInterval(tick);stopVoice();return done()}
+   an.getByteTimeDomainData(data);let e=0;for(const v of data){const x=(v-128)/128;e+=x*x}
+   onAmp(Math.min(1,Math.sqrt(e/data.length)*5));
+   const at=(ctx.currentTime-t0)/buf.duration*c;onWord(ends.findIndex(x=>x>at)+1||words.length)},40);
+  src.onended=()=>{clearInterval(tick);done()};src.start()});
+}
 // Claude writes the reply (server-side, /api/hq-chat). Anything unavailable falls back to the office's scripted answer.
 async function agentReply(a,q,history){
  try{
   const r=await fetch('/api/hq-chat',{method:'POST',headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(25000),
    body:JSON.stringify({agentId:a.id,message:q,history:history.slice(-8),office:{duties:a.duties,missions:a.missions,quote:a.quote}})});
-  if(r.ok){const j=await r.json();if(j.text)return j.text}
+  if(r.ok){const j=await r.json();if(j.text)return {key:null,text:j.text}}
  }catch{}
  return reply(a,q);
 }
@@ -647,17 +686,22 @@ function wireConversation(s,a){
   const id=++run;synth?.cancel();stopVoice();clearTimeout(idleT);
   cap.innerHTML=`<span class="you">You: ${q.replace(/</g,'&lt;')}</span><span class="w on thinking">…</span>`;
   setState('listening');s.classList.add('thinking');
-  const text=await agentReply(a,q,history);
+  const {key,text}=await agentReply(a,q,history);
   s.classList.remove('thinking');if(id!==run)return;
   history.push({role:'user',text:q},{role:'assistant',text});
-  speak(text,q);
+  speak(text,q,key);
  }
- function speak(text,asked){
+ function speak(text,asked,key){
   const id=++run;synth?.cancel();stopVoice();
   const words=text.split(/\s+/);
   cap.innerHTML=(asked?`<span class="you">You: ${asked.replace(/</g,'&lt;')}</span>`:'')+words.map(w=>`<span class="w">${w.replace(/</g,'&lt;')}</span> `).join('');
   const spans=[...cap.querySelectorAll('.w')];let lit=0;const light=n=>{for(;lit<Math.min(n,spans.length);lit++)spans[lit].classList.add('on')};
   start();
+  if(voiceOn&&key&&RECORDED[a.id]?.includes(key)){
+   clearInterval(ampT);
+   recordedSay(a,key,text,()=>id===run,light,setAmp).then(()=>{if(id!==run)return;light(spans.length);stop()}).catch(()=>{if(id===run){light(spans.length);stop()}});
+   return;
+  }
   if(voiceOn&&VOX.tts){
    clearInterval(ampT);
    kokoroSay(a,text,()=>id===run,light,setAmp).then(()=>{if(id!==run)return;light(spans.length);stop()}).catch(()=>{if(id===run){light(spans.length);stop()}});
@@ -677,7 +721,7 @@ function wireConversation(s,a){
  if(SR){mic.hidden=false;mic.onclick=()=>{const r=new SR();r.lang='en-US';r.interimResults=true;mic.classList.add('live');synth?.cancel();run++;micOn=true;listen();
   r.onresult=e=>{input.value=[...e.results].map(x=>x[0].transcript).join('');if(e.results[e.results.length-1].isFinal){const q=input.value.trim();input.value='';if(q)ask(q)}};
   r.onend=r.onerror=()=>{mic.classList.remove('live');micOn=false;if(s.dataset.state==='listening')setState('idle')};r.start()}}
- s.onArrive=()=>{cap.innerHTML='';if(voiceOn)loadVoices();setTimeout(()=>{if(current===s.dataset.key)speak(a.next?`${a.name}'s office is the next room in production.`:pick([`Hey. I'm ${a.name}. ${a.quote||''}`,`Welcome to my office. I'm ${a.name}, ${a.role}.`]))},1500)};
+ s.onArrive=()=>{cap.innerHTML='';if(voiceOn)loadVoices();setTimeout(()=>{if(current===s.dataset.key)speak(agentLines(a).greet,null,'greet')},1500)};
  s.onLeave=()=>{run++;synth?.cancel();stopVoice();s.classList.remove('thinking');clearTimeout(idleT);stop();setState('idle')};
  setState('idle');
 }
