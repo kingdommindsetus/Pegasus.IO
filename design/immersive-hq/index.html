@@ -414,6 +414,37 @@ button{font:inherit;color:inherit;cursor:pointer}button:focus-visible,a:focus-vi
 .r-sep{margin:6px 10px 2px;font-size:9.5px;letter-spacing:.22em;color:var(--mute)}
 @media(max-width:860px){.roster{left:12px;right:12px;width:auto;top:auto;bottom:70px;height:46vh}}
 
+
+/* ---------- war room ---------- */
+.wf-row{display:flex;align-items:stretch;gap:0;overflow-x:auto;padding:4px 2px 6px}
+.wf-step{flex:1 1 0;min-width:120px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 10px;border:1px solid color-mix(in srgb,var(--c,#dfba80) 40%,transparent);border-radius:14px;background:linear-gradient(180deg,#0e1828,#070c15);color:inherit;text-align:center;transition:transform .2s,border-color .2s,box-shadow .2s}
+button.wf-step:hover{transform:translateY(-3px);border-color:var(--c);box-shadow:0 10px 30px color-mix(in srgb,var(--c) 25%,transparent)}
+.wf-step .orb{width:52px;height:52px}
+.wf-step.founder{--c:#dfba80;background:linear-gradient(180deg,#1a140a,#0b0a08)}
+.wf-step.founder .orb{display:grid;place-items:center;font-size:18px;color:var(--gold-hi)}
+.wf-step b{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:#fff}
+.wf-step small{font-size:11px;color:var(--mute)}
+.wf-crew{display:flex;justify-content:center;height:52px;align-items:center}
+.wf-crew .orb{width:34px;height:34px;margin-left:-10px}
+.wf-crew .orb:first-child{margin-left:0}
+.wf-arrow{flex:0 0 26px;align-self:center;height:2px;margin:0 2px;background:linear-gradient(90deg,#dfba8033,#dfba80);position:relative}
+.wf-arrow::after{content:'';position:absolute;right:-1px;top:-4px;border:5px solid transparent;border-left-color:#dfba80;border-right:0}
+.dash.in .wf-arrow{background-size:200% 100%;animation:flowPulse 2.4s linear infinite}
+@keyframes flowPulse{0%{opacity:.5}50%{opacity:1}100%{opacity:.5}}
+.mprog{height:6px;border-radius:4px;background:#ffffff0d;margin:-2px 0 10px;overflow:hidden}
+.mprog span{display:block;height:100%;width:var(--p);border-radius:4px;background:linear-gradient(90deg,#9b7a45,var(--gold-hi))}
+.ws{display:flex;align-items:center;gap:12px;padding:10px 4px;border-bottom:1px solid #ffffff0a}
+.ws:last-child{border-bottom:0}
+.ws-lead{flex:none;padding:0;border:0;background:none}
+.ws-lead .orb{width:40px;height:40px}
+.ws-txt{flex:1;min-width:0}
+.ws-txt b{display:block;font-size:12.5px;font-weight:500;color:#eef2f6}
+.ws-txt small{display:block;margin-top:2px;font-size:11px;color:var(--mute)}
+.ws-team{display:flex;flex:none}
+.ws-team button{padding:0;border:0;background:none;margin-left:-8px}
+.ws-team .orb{width:28px;height:28px}
+@media(max-width:860px){.ws-team{display:none}.wf-step{min-width:96px}}
+
 /* ---------- responsive ---------- */
 @media(max-width:860px){
  #crumbs,.pill{display:none}
@@ -1079,17 +1110,50 @@ function buildCRM(){
 
 /* ===== War room — mission flow ===== */
 function buildWarRoom(){
- const s=document.createElement('section');s.className='panel-scene';s.setAttribute('aria-label','War Room');
- const step=(id,sub)=>{const a=byId[id];return `<button type="button" data-room="${id}" style="--c:${a.c}">${orb(a)}<strong>${a.name.toUpperCase()}</strong><span>${sub}</span></button>`};
- s.innerHTML=`<img class="bg" src="assets/pegasus-atrium.png" alt="">
- <div class="board" style="align-content:center"><div class="scene-title"><h2 class="serif">WAR ROOM</h2><p>HOW A MISSION MOVES THROUGH PEGASUS</p></div>
- <div class="card flow"><button type="button" disabled style="--c:#dfba80"><span class="orb" style="--c:#dfba80">YOU</span><strong>FOUNDER</strong><span>sets the mission</span></button><i>›</i>
- ${step('simon','strategy & priority')}<i>›</i>${step('marie','dispatch & operations')}<i>›</i>
- <button type="button" data-floor style="--c:#7ddcf3"><span class="orb" style="--c:#7ddcf3">AI</span><strong>SPECIALISTS</strong><span>the employee floor</span></button><i>›</i>
- ${step('gatekeeper','review & compliance')}<i>›</i><button type="button" disabled style="--c:#dfba80"><span class="orb" style="--c:#dfba80">✓</span><strong>FOUNDER</strong><span>final decision</span></button></div>
- <p class="sample" style="text-align:center">PREVIEW OF THE INTENDED FLOW · NOT CONNECTED TO LIVE MISSIONS</p></div>`;
- s.querySelectorAll('[data-room]').forEach(b=>b.onclick=travel('room/'+b.dataset.room));
- s.querySelector('[data-floor]').onclick=travel('floor');
+ const s=document.createElement('section');s.className='dash';s.setAttribute('aria-label','War Room');
+ s.innerHTML=`${dashSide('war')}<div class="dash-main"><p class="sample">Loading missions…</p></div>`;
+ s.querySelectorAll('.dash-side [data-go]').forEach(b=>b.onclick=travel(b.dataset.go));
+ kmceData().then(D=>{
+  const k=D.kpis,c=D.clients[0],iso=new Date().toISOString().slice(0,10),asOf=new Date(D.asOf);
+  const start=new Date(c.campaign.start+'T00:00:00'),end=new Date(c.campaign.end+'T00:00:00');
+  const total=Math.round((end-start)/864e5)+1,day=Math.min(total,Math.max(0,Math.floor((Date.now()-start)/864e5)+1));
+  const next=c.milestones.filter(m=>m.due>=iso).slice(0,4);
+  const founder=(lab,sub)=>`<div class="wf-step founder"><span class="orb" style="--c:#dfba80">◆</span><b>${lab}</b><small>${sub}</small></div>`;
+  const agentStep=(id,sub)=>`<button class="wf-step" type="button" data-room="${id}" style="--c:${byId[id].c}">${orb(byId[id])}<b>${byId[id].name}</b><small>${sub}</small></button>`;
+  const crew=['iris','mark','alice','echo','snake'];
+  s.querySelector('.dash-main').innerHTML=`
+  <div class="dash-head"><div><h2>WAR ROOM</h2><p>Mission execution. Every mission, every owner, every gate.</p></div>
+   <span class="live">LIVE DATA · AS OF ${asOf.toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}</span></div>
+  <div class="card wf" style="--i:0"><h3>CHAIN OF COMMAND <small>how every mission moves</small></h3>
+   <div class="wf-row">${founder('You','set the mission')}<i class="wf-arrow"></i>${agentStep('simon','strategy & priority')}<i class="wf-arrow"></i>${agentStep('marie','dispatch & operations')}<i class="wf-arrow"></i>
+    <button class="wf-step" type="button" data-go="floor" style="--c:#7ddcf3"><span class="wf-crew">${crew.map(id=>orb(byId[id])).join('')}</span><b>Specialists</b><small>the employee floor</small></button><i class="wf-arrow"></i>
+    ${agentStep('gatekeeper','review & compliance')}<i class="wf-arrow"></i>${founder('You','final decision')}</div></div>
+  <div class="kgrid" style="margin-top:16px">
+   <div class="card" style="--i:1"><div class="k-lab">Active missions</div><div class="k-val" data-count="${D.clients.length}">0</div><div class="k-sub">${c.campaign.name}</div></div>
+   <div class="card" style="--i:2"><div class="k-lab">Mission day</div><div class="k-val"><span data-count="${day}">0</span><small style="font-size:14px;color:var(--mute)"> / ${total}</small></div><div class="k-sub">${fmtDay(c.campaign.start)} – ${fmtDay(c.campaign.end)}</div></div>
+   <div class="card" style="--i:3"><div class="k-lab">Awaiting your approval</div><div class="k-val" data-count="${k.tasksAwaitingApproval}">0</div><div class="k-sub">workstreams ready to launch</div></div>
+   <div class="card" style="--i:4"><div class="k-lab">Tasks queued</div><div class="k-val" data-count="${k.tasksQueued}">0</div><div class="k-sub">across the floor</div></div>
+   <div class="card" style="--i:5"><div class="k-lab">Jobs completed</div><div class="k-val" data-count="${k.jobsCompleted}">0</div><div class="k-sub"><b>${k.jobsFailed} failed</b></div></div>
+   <div class="card" style="--i:6"><div class="k-lab">Milestones</div><div class="k-val" data-count="${k.milestonesOpen}">0</div><div class="k-sub">open · ${k.milestonesPaused} paused</div></div>
+  </div>
+  <div class="drow">
+   <div class="card" style="--i:7"><h3>MISSION: ${c.short.toUpperCase()} · ${c.campaign.name.toUpperCase()} <small>${c.workstreams.length} workstreams</small></h3>
+    <div class="mprog"><span style="--p:${(day/total*100).toFixed(1)}%"></span></div>
+    ${c.workstreams.map(w=>`<div class="ws"><button class="ws-lead" type="button" data-room="${w.lead}">${orb(byId[w.lead])}</button><span class="ws-txt"><b>${w.name}</b><small>${byId[w.lead].name} leads${w.support.length?' · with '+w.support.map(x=>byId[x].name).join(', '):''}</small></span><span class="ws-team">${w.support.map(x=>`<button type="button" data-room="${x}" title="${byId[x].name}">${orb(byId[x])}</button>`).join('')}</span><em class="chip wait">◷ Awaiting approval</em></div>`).join('')}
+   </div>
+   <div style="display:grid;gap:16px;align-content:start">
+    <div class="card" style="--i:8"><h3>NEXT GATES</h3><ol class="tl">${next.map((m,i)=>`<li class="${i?'':'today'}"><span class="d">${fmtDay(m.due)}</span><span class="dot"></span><span>${m.label}</span>${m.status==='Paused'?'<em class="chip pause">❚❚ Paused</em>':''}</li>`).join('')}</ol></div>
+    <div class="card" style="--i:9"><h3>AUTONOMY ENGINE</h3><div class="stat-line"><span>Worker runs</span><b>${num(k.workerRuns)}</b></div><div class="stat-line"><span>Jobs completed</span><b>${num(k.jobsCompleted)}</b></div><div class="stat-line"><span>Failed</span><b>${k.jobsFailed}</b></div><div class="stat-line"><span>Huddle reports</span><b>${num(k.huddleReports)}</b></div></div>
+   </div>
+  </div>
+  <p class="src">Source: ${D.source}. Snapshot ${asOf.toLocaleString()}.</p>`;
+  const main=s.querySelector('.dash-main');
+  main.querySelectorAll('[data-room]').forEach(b=>b.onclick=travel('room/'+b.dataset.room));
+  main.querySelectorAll('[data-go]').forEach(b=>b.onclick=travel(b.dataset.go));
+  s.playIn=()=>{s.classList.remove('in');void s.offsetWidth;s.classList.add('in');countUp(main)};
+  if(current==='war-room')s.playIn();
+ });
+ s.onArrive=()=>s.playIn?.();
  return s;
 }
 
