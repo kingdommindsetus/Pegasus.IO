@@ -83,15 +83,19 @@ button{font:inherit;color:inherit;cursor:pointer}button:focus-visible,a:focus-vi
 #s-floor .doors{position:absolute;inset:0;z-index:2;transform:translateZ(0);opacity:0;transition:opacity .8s}
 #s-floor .bg{z-index:0}#s-floor .shade{z-index:1}
 #s-floor.arrived .doors{opacity:1}
-.wall{position:absolute;top:30%;bottom:15%;width:27%}
+.wall{position:absolute;top:53%;bottom:11%;width:29%}
 .wall.left{left:1.5%}.wall.right{right:1.5%}
-.wall-inner{height:100%;display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:1fr;gap:10px}
+.wall-inner{height:100%;display:grid;grid-template-columns:1fr 1fr 1fr;grid-auto-rows:1fr;gap:10px}
 .wall.left .wall-inner{transform:perspective(900px) rotateY(24deg);transform-origin:left center}
 .wall.right .wall-inner{transform:perspective(900px) rotateY(-24deg);transform-origin:right center}
 .door{position:relative;display:flex;align-items:center;gap:10px;min-height:0;padding:8px 10px;border:1px solid color-mix(in srgb,var(--c) 55%,transparent);border-radius:12px;background:linear-gradient(135deg,#0a1220e6,#05090fe6);text-align:left;box-shadow:0 0 18px color-mix(in srgb,var(--c) 22%,transparent),inset 0 0 18px #0008;transition:transform .2s,box-shadow .2s,border-color .2s}
 .door:hover,.door:focus-visible{transform:scale(1.05);border-color:var(--c);box-shadow:0 0 34px color-mix(in srgb,var(--c) 55%,transparent)}
 .orb{flex:none;display:grid;place-items:center;width:38px;height:38px;border-radius:50%;border:1px solid var(--c);background:radial-gradient(circle at 35% 30%,color-mix(in srgb,var(--c) 70%,#fff),color-mix(in srgb,var(--c) 40%,#000) 45%,#05090f 75%);font-size:12px;font-weight:700;letter-spacing:.04em;color:#fff;box-shadow:0 0 14px color-mix(in srgb,var(--c) 60%,transparent)}
 .door strong{display:block;font-size:13px;letter-spacing:.1em}
+.door>span:not(.orb){min-width:0;flex:1}
+.door>span:not(.orb) span,.door strong{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wall .door .orb{width:32px;height:32px;font-size:11px}
+.wall .door{gap:8px;padding:6px 8px}
 .door span{display:block;font-size:10px;color:var(--mute);letter-spacing:.04em;margin-top:2px;line-height:1.25}
 .door .live{position:absolute;top:8px;right:9px;width:7px;height:7px;border-radius:50%;background:#3ee68a;box-shadow:0 0 8px #3ee68a}
 .door .live.next{background:#6b7785;box-shadow:none}
@@ -111,12 +115,19 @@ button{font:inherit;color:inherit;cursor:pointer}button:focus-visible,a:focus-vi
 .stage>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .fx{position:absolute;pointer-events:none;mix-blend-mode:screen}
 .fx-sign{left:30%;top:0;width:36%;height:30%;background:radial-gradient(ellipse at 50% 40%,#ffd99855,transparent 62%);animation:pulse 5s ease-in-out infinite}
-.fx-window{left:38%;top:34%;width:24%;height:24%;background:radial-gradient(ellipse,#ff9a6a30,transparent 65%);animation:pulse 7s ease-in-out infinite}
-.fx-holo{left:40%;top:52%;width:20%;height:30%;background:radial-gradient(ellipse at 50% 55%,#6fd3ff88,#2a7bff33 40%,transparent 68%);animation:holo 3.2s ease-in-out infinite}
-.fx-ring{left:30%;top:72%;width:40%;height:20%;background:radial-gradient(ellipse at 50% 45%,#ffcf7a99,#ffb24633 45%,transparent 70%);animation:pulse 4s ease-in-out infinite}
-.fx-floor{inset:0;clip-path:polygon(36% 59%,64% 59%,100% 96%,100% 100%,0 100%,0 96%)}
-.fx-floor i{position:absolute;left:0;right:0;top:56%;height:7%;background:linear-gradient(transparent,#ffd38a88 40%,#fff2d0bb 50%,#ffd38a88 60%,transparent);opacity:0;animation:sweep 6s cubic-bezier(.45,0,.75,1) infinite}
+.fx-window{left:36%;top:41%;width:24%;height:22%;background:radial-gradient(ellipse,#ff9a6a30,transparent 65%);animation:pulse 7s ease-in-out infinite}
+.fx-holo{left:37%;top:62%;width:20%;height:28%;background:radial-gradient(ellipse at 50% 55%,#6fd3ff88,#2a7bff33 40%,transparent 68%);animation:holo 3.2s ease-in-out infinite}
+.fx-ring{left:28%;top:79%;width:40%;height:18%;background:radial-gradient(ellipse at 50% 45%,#ffcf7a99,#ffb24633 45%,transparent 70%);animation:pulse 4s ease-in-out infinite}
+.fx-floor{inset:0;clip-path:polygon(37% 67%,61% 67%,100% 93%,100% 100%,0 100%,0 95%)}
+.fx-floor i{position:absolute;left:0;right:0;top:66%;height:7%;background:linear-gradient(transparent,#ffd38a88 40%,#fff2d0bb 50%,#ffd38a88 60%,transparent);opacity:0;animation:sweep 6s cubic-bezier(.45,0,.75,1) infinite}
 .fx-floor i:nth-child(2){animation-delay:-3s}
+.fx-orbit{inset:0;width:100%;height:100%}
+.fx-orbit ellipse{fill:none;stroke-width:3;vector-effect:non-scaling-stroke;stroke-linecap:round;stroke-dasharray:16 84;animation:orbit 5.5s linear infinite}
+.fx-orbit .o-cyan{stroke:#8ff3ff;filter:drop-shadow(0 0 4px #4fd8ff) drop-shadow(0 0 12px #2aa8ff)}
+.fx-orbit .o-gold{stroke:#ffe1a0;filter:drop-shadow(0 0 4px #ffcf7a) drop-shadow(0 0 12px #ffb246);animation-delay:-2.75s}
+.fx-orbit .o-wide{stroke-width:2;stroke-dasharray:10 90;opacity:.7;animation-duration:8s;animation-direction:reverse}
+@keyframes orbit{to{stroke-dashoffset:-100}}
+.paused .fx-orbit ellipse{animation-play-state:paused}
 .fx-strips{inset:0;width:100%;height:100%;filter:drop-shadow(0 0 4px #ffcf7a) drop-shadow(0 0 10px #ffb246)}
 .fx-strips line{stroke:#fff6dd;stroke-width:4;vector-effect:non-scaling-stroke;stroke-linecap:round;stroke-dasharray:12 88;stroke-dashoffset:0;animation:run 4.4s linear infinite;opacity:.9}
 .fx.screen{width:3.2%;height:4%;border-radius:3px;background:radial-gradient(#7fd8ff40,transparent 70%);animation:flick 5s steps(1) infinite}
@@ -124,7 +135,7 @@ button{font:inherit;color:inherit;cursor:pointer}button:focus-visible,a:focus-vi
 .motes i{position:absolute;bottom:-2%;width:3px;height:3px;border-radius:50%;background:#ffe2a8;box-shadow:0 0 6px #ffcf7a;opacity:0;animation:mote linear infinite}
 @keyframes pulse{50%{opacity:.45}}
 @keyframes holo{0%,100%{opacity:1;filter:hue-rotate(0)}30%{opacity:.7}33%{opacity:.95}60%{opacity:.75;filter:hue-rotate(-15deg)}}
-@keyframes sweep{0%{top:56%;height:3%;opacity:0}15%{opacity:1}100%{top:100%;height:14%;opacity:0}}
+@keyframes sweep{0%{top:66%;height:3%;opacity:0}15%{opacity:1}100%{top:100%;height:14%;opacity:0}}
 @keyframes run{to{stroke-dashoffset:-100}}
 @keyframes flick{0%,100%{opacity:.9}37%{opacity:.4}41%{opacity:1}73%{opacity:.6}}
 @keyframes mote{0%{transform:translateY(0);opacity:0}15%{opacity:.7}85%{opacity:.5}100%{transform:translateY(-70vh) translateX(2vw);opacity:0}}
@@ -390,8 +401,8 @@ const AGENTS=[
 // flag them here, e.g. simon:{listen:true,talk:true}. Agents without clips stay still and use the voice light alone.
 const CLIPS={};
 // Where each robot's body sits, for the soft mask that keeps the room still while the robot moves.
-const BODY={atlas:[55,60],claire:[48,62],flow:[63,62],ledger:[53,58],midas:[50,55],snake:[47,58],evan:[49,60],tube:[50,60],cammy:[40,58],mark:[49,58],simon:[50,55],marie:[47,58],gatekeeper:[51,62],lucy:[52,60],sofia:[48,62],iris:[50,62],maven:[47,64],booker:[48,62],scout:[54,68],echo:[48,60],alice:[49,60]};
-const HEAD={atlas:[55,40],claire:[47,42],flow:[62,40],ledger:[54,34],midas:[51,28],snake:[48,33],evan:[49,36],tube:[49,37],cammy:[41,37],mark:[48,36],simon:[50,36],marie:[45,40],gatekeeper:[47,45],lucy:[51,38],sofia:[47,38],iris:[48,41],maven:[48,42],booker:[47,40],scout:[53,55],echo:[50,34],alice:[46,34]};
+const BODY={evan:[63,50],atlas:[55,60],claire:[48,62],flow:[63,62],ledger:[53,58],midas:[50,55],snake:[47,58],tube:[50,60],cammy:[40,58],mark:[49,58],simon:[50,55],marie:[47,58],gatekeeper:[51,62],lucy:[52,60],sofia:[48,62],iris:[50,62],maven:[47,64],booker:[48,62],scout:[54,68],echo:[48,60],alice:[49,60]};
+const HEAD={evan:[67,20],atlas:[55,40],claire:[47,42],flow:[62,40],ledger:[54,34],midas:[51,28],snake:[48,33],tube:[49,37],cammy:[41,37],mark:[48,36],simon:[50,36],marie:[45,40],gatekeeper:[47,45],lucy:[51,38],sofia:[47,38],iris:[48,41],maven:[48,42],booker:[47,40],scout:[53,55],echo:[50,34],alice:[46,34]};
 // Rooms still being built go here by name; each gets a placeholder office and an end-of-hall chip.
 const NEXT_WING=[];
 NEXT_WING.forEach(n=>AGENTS.push({id:n.toLowerCase(),name:n,role:'Room in production',dept:'Office build scheduled for the next slice',c:'#7ddcf3',next:true}));
@@ -506,8 +517,9 @@ function buildFloor(){
  s.innerHTML=`<div class="stage" aria-hidden="true"><img src="assets/floor-still.jpg" alt="">
   <span class="fx fx-sign"></span><span class="fx fx-window"></span><span class="fx fx-holo"></span><span class="fx fx-ring"></span>
   <span class="fx fx-floor"><i></i><i></i></span>
-  <svg class="fx fx-strips" viewBox="0 0 100 100" preserveAspectRatio="none">${[[38,60,14,100],[62,60,86,100],[33,59,0,90],[67,59,100,90]].map(([x1,y1,x2,y2],i)=>`<line pathLength="100" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" style="animation-delay:${i*-1.1}s"/>`).join('')}</svg>
-  ${[[9,52],[14,53],[91,51],[96,52],[31,52],[70,51]].map(([x,y],i)=>`<span class="fx screen" style="left:${x}%;top:${y}%;animation-delay:${i*-.7}s"></span>`).join('')}
+  <svg class="fx fx-orbit" viewBox="0 0 100 100" preserveAspectRatio="none"><ellipse class="o-cyan" pathLength="100" cx="48" cy="87" rx="17" ry="6.5"/><ellipse class="o-gold" pathLength="100" cx="48" cy="87" rx="17" ry="6.5"/><ellipse class="o-cyan o-wide" pathLength="100" cx="48" cy="87" rx="26" ry="10"/></svg>
+  <svg class="fx fx-strips" viewBox="0 0 100 100" preserveAspectRatio="none">${[[39,68,8,100],[58,68,94,100],[36,67,0,93],[61,67,100,91]].map(([x1,y1,x2,y2],i)=>`<line pathLength="100" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" style="animation-delay:${i*-1.1}s"/>`).join('')}</svg>
+  ${[[2,59],[8,59],[92,59],[97,59],[18,58],[79,58]].map(([x,y],i)=>`<span class="fx screen" style="left:${x}%;top:${y}%;animation-delay:${i*-.7}s"></span>`).join('')}
   <span class="motes">${Array.from({length:22},(_,i)=>`<i style="left:${(i*37)%100}%;animation-delay:${-(i*1.3)%14}s;animation-duration:${11+(i%5)*2}s"></i>`).join('')}</span>
  </div>
  <div class="shade" style="background:linear-gradient(90deg,#02050b80,transparent 30%,transparent 70%,#02050b80),linear-gradient(0deg,#02050bb0,transparent 26%)"></div>
