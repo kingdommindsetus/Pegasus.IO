@@ -217,24 +217,53 @@
       "status": "Active",
       "agreements": [
         {
-          "title": "90-Day Educator Marketing & Launch Agreement",
-          "total": 3500,
-          "start": "2026-09-18",
-          "end": "2026-12-16",
-          "signed": true
-        },
-        {
           "title": "Platform Ownership & Management Investment",
           "total": 10000,
+          "paid": 10055,
           "start": "2026-09-18",
           "end": "2027-09-17",
-          "signed": true
+          "signed": true,
+          "status": "Paid in full",
+          "note": "Paid in 2025: Stripe $9,055 + Cash App $1,000. $55 over is held for allocation.",
+          "schedule": []
+        },
+        {
+          "title": "90-Day Educator Marketing & Launch Agreement",
+          "total": 3500,
+          "paid": 1800,
+          "start": "2026-09-18",
+          "end": "2026-12-16",
+          "signed": true,
+          "status": "On schedule",
+          "note": "Option A. $179/month platform service starts Dec 17, 2026.",
+          "schedule": [
+            {
+              "due": "2026-09-18",
+              "label": "Paid at signing",
+              "amount": 300,
+              "paid": "2026-09-18"
+            },
+            {
+              "due": "2026-09-25",
+              "label": "Second installment",
+              "amount": 1500,
+              "paid": "2026-09-26"
+            },
+            {
+              "due": "2026-10-25",
+              "label": "Final installment",
+              "amount": 1700,
+              "paid": null
+            }
+          ]
         }
       ],
       "payments": {
         "recorded": 11855,
         "verified": 9055,
-        "entries": 6
+        "entries": 6,
+        "contracted": 13500,
+        "outstanding": 1700
       },
       "event": {
         "title": "Craniofacial Biodentistry & Advanced Airway Integration",
@@ -362,5 +391,39 @@
       ]
     }
   ],
-  "excluded": "44 test checkout links (test emails, never paid, 43 expired) are not counted."
+  "excluded": "44 test checkout links (test emails, never paid, 43 expired) are not counted.",
+  "finance": {
+    "contracted": 13500,
+    "collected": 11855,
+    "outstanding": 1700,
+    "nextDue": {
+      "date": "2026-10-25",
+      "amount": 1700,
+      "label": "Launch agreement, final installment",
+      "client": "dr-tim"
+    },
+    "recurring": {
+      "amount": 179,
+      "starts": "2026-12-17",
+      "label": "Monthly platform service",
+      "client": "dr-tim"
+    },
+    "byMethod": [
+      {
+        "label": "Stripe (card / Link)",
+        "amount": 9055,
+        "entries": 3
+      },
+      {
+        "label": "Cash App",
+        "amount": 2500,
+        "entries": 2
+      },
+      {
+        "label": "At signing (method not recorded)",
+        "amount": 300,
+        "entries": 1
+      }
+    ]
+  }
 }

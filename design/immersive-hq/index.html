@@ -466,6 +466,17 @@ a.cl-row:hover .cl-open{color:var(--gold-hi)}
 .cl-empty{padding:18px 10px;color:var(--mute);font-size:13px}
 @media(max-width:1100px){.cl-row{grid-template-columns:minmax(0,1fr) auto}.cl-row>:not(.cl-who):not(.cl-open){display:none}}
 
+
+/* ---------- payments ---------- */
+.agr{margin-top:14px;padding-top:12px;border-top:1px solid #ffffff10}
+.agr-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;font-size:12.5px;color:#eef2f6}
+.agr .rev-row{margin-top:8px}
+.sched{list-style:none;margin:8px 0 0;padding:0}
+.sched li{display:grid;grid-template-columns:52px minmax(0,1fr) auto auto;gap:8px;align-items:center;padding:5px 0;font-size:11.5px;color:#c9d4de}
+.sched li span:first-child{color:var(--mute);font-variant-numeric:tabular-nums}
+.sched b{color:#fff;font-variant-numeric:tabular-nums}
+.agr-note{display:block;margin-top:6px;font-size:10.5px;color:var(--mute);line-height:1.45}
+
 /* ---------- responsive ---------- */
 @media(max-width:860px){
  #crumbs,.pill{display:none}
@@ -1043,7 +1054,7 @@ function wireConversation(s,a){
 
 /* ===== Real KMCE data (assets/data/kmce-snapshot.json, refreshed from the KMCE database on deploy) ===== */
 let KMCE=null;
-const kmceData=()=>KMCE||(KMCE=fetch('assets/data/kmce-snapshot.json').then(r=>r.json()));
+const kmceData=()=>KMCE||(KMCE=fetch('assets/data/kmce-snapshot.json',{cache:'no-cache'}).then(r=>r.json()));
 const money=n=>'$'+Math.round(n).toLocaleString('en-US');
 const num=n=>Math.round(n).toLocaleString('en-US');
 const fmtDay=d=>new Date(d+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'});
@@ -1081,7 +1092,7 @@ function buildCRM(){
  s.innerHTML=`${dashSide('dash')}<div class="dash-main"><p class="sample">Loading live data…</p></div>`;
  s.querySelectorAll('.dash-side [data-go]').forEach(b=>b.onclick=travel(b.dataset.go));
  kmceData().then(D=>{
-  const k=D.kpis,days=D.daily,asOf=new Date(D.asOf);
+  const k=D.kpis,F=D.finance,days=D.daily,asOf=new Date(D.asOf);
   const ranked=FLOOR.map(a=>({a,m:D.agents[a.id],score:scoreOf(D.agents[a.id])})).sort((x,y)=>y.score-x.score);
   const active=ranked.filter(r=>r.score>0),idle=ranked.filter(r=>!r.score),top=active[0]?.score||1;
   const medals=['#ffd27a','#d9e2ec','#e0a06a'];
@@ -1090,7 +1101,7 @@ function buildCRM(){
   <div class="dash-head"><div><h2>PEGASUS CRM</h2><p>Your AI workforce, your pipeline, your clients. Real numbers from KMCE.</p></div>
    <span class="live">LIVE DATA · AS OF ${asOf.toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}</span></div>
   <div class="kgrid">
-   <div class="card" style="--i:0"><div class="k-lab">Verified revenue</div><div class="k-val" data-count="${k.verifiedRevenue}" data-fmt="money">$0</div><div class="k-sub">${money(k.recordedRevenue)} recorded in total</div>${sparkline([0,0,3,3,6,6,9])}</div>
+   <div class="card" style="--i:0"><div class="k-lab">Collected</div><div class="k-val" data-count="${F.collected}" data-fmt="money">$0</div><div class="k-sub">of ${money(F.contracted)} contracted · <b style="color:#ffd27a">${money(F.outstanding)} due</b></div>${sparkline([0,0,3,3,6,6,9])}</div>
    <div class="card" style="--i:1"><div class="k-lab">Huddle reports filed</div><div class="k-val" data-count="${k.huddleReports}">0</div><div class="k-sub">by the AI team · last ${days.length} days</div>${sparkline(days.map(d=>d.huddles))}</div>
    <div class="card" style="--i:2"><div class="k-lab">Jobs completed</div><div class="k-val" data-count="${k.jobsCompleted}">0</div><div class="k-sub"><b>${k.jobsFailed} failed</b> · ${num(k.workerRuns)} worker runs</div>${sparkline(days.map(d=>d.jobs))}</div>
    <div class="card" style="--i:3"><div class="k-lab">Agent tasks</div><div class="k-val" data-count="${k.tasksQueued+k.tasksAwaitingApproval}">0</div><div class="k-sub">${k.tasksAwaitingApproval} awaiting your approval</div>${sparkline(days.map(d=>d.tasks))}</div>
@@ -1105,15 +1116,20 @@ function buildCRM(){
    </div>
    <div style="display:grid;gap:16px;align-content:start">
     <div class="card" style="--i:7"><h3>DAILY ACTIVITY</h3><div class="seg" role="tablist">${[['runs','Worker runs'],['jobs','Jobs done'],['huddles','Huddle reports'],['tasks','New tasks']].map(([key,l],i)=>`<button type="button" class="${i?'':'on'}" data-key="${key}" data-label="${l}">${l}</button>`).join('')}</div><div class="chart"></div></div>
-    <div class="card" style="--i:8"><h3>REVENUE <small>by verification</small></h3><div class="rev-hero" data-count="${k.verifiedRevenue}" data-fmt="money">$0</div><div class="rev-hero"><small>VERIFIED BY PAYMENT PROCESSOR</small></div>
-     ${D.revenueByVerification.map((r,i)=>`<div class="rev-row${i===2?' muted':''}"><span>${r.label} · ${r.entries} ${r.entries===1?'entry':'entries'}</span><b>${money(r.amount)}</b><span class="lb-bar"><i data-w="${(r.amount/D.revenueByVerification[0].amount*100).toFixed(1)}"></i></span></div>`).join('')}</div>
+    <div class="card" style="--i:8"><h3>MONEY <small>all clients</small></h3><div class="rev-hero" data-count="${F.collected}" data-fmt="money">$0</div><div class="rev-hero"><small>COLLECTED OF ${money(F.contracted)} CONTRACTED</small></div>
+     <div class="rev-row"><span>Collected</span><b>${money(F.collected)}</b><span class="lb-bar"><i data-w="${(F.collected/F.contracted*100).toFixed(1)}"></i></span></div>
+     <div class="rev-row muted"><span>Outstanding</span><b>${money(F.outstanding)}</b><span class="lb-bar"><i data-w="${(F.outstanding/F.contracted*100).toFixed(1)}"></i></span></div>
+     <div class="stat-line" style="margin-top:12px"><span>Next payment · ${fmtDay(F.nextDue.date)}</span><b>${money(F.nextDue.amount)} <em class="chip wait">◷ Due</em></b></div>
+     <div class="stat-line"><span>Recurring from ${fmtDay(F.recurring.starts)}</span><b>${money(F.recurring.amount)}/mo</b></div>
+     <div class="k-lab" style="margin-top:12px">How it was paid</div>
+     ${F.byMethod.map(m=>`<div class="stat-line"><span>${m.label}</span><b>${money(m.amount)}</b></div>`).join('')}</div>
    </div>
   </div>
   <div class="drow three">
    <div class="card" style="--i:9"><h3>AWAITING YOUR APPROVAL <small>${client.workstreams.length} workstreams</small></h3>
     ${client.workstreams.map(w=>`<button class="appr" type="button" data-room="${w.lead}">${orb(byId[w.lead])}<span>${w.name}<small>${byId[w.lead].name} leads · ${client.short}</small></span><em class="chip wait">◷ Approval</em></button>`).join('')}</div>
    <div class="card" style="--i:10"><h3>CLIENTS</h3><button class="client-card" type="button" data-go="client/${client.id}"><span class="orb" style="--c:#dfba80">TA</span><span><b>${client.name}</b><span>${client.credentials} · ${client.track}</span><span>${client.campaign.name}</span></span></button>
-    <div class="stat-line" style="margin-top:10px"><span>Payments recorded</span><b>${money(client.payments.recorded)}</b></div><div class="stat-line"><span>Processor verified</span><b>${money(client.payments.verified)}</b></div><div class="stat-line"><span>Next event</span><b>${client.event.city}, ${client.event.state} · ${client.event.ceHours} CE hrs</b></div></div>
+    <div class="stat-line" style="margin-top:10px"><span>Collected</span><b>${money(client.payments.recorded)} of ${money(client.payments.contracted)}</b></div><div class="stat-line"><span>Outstanding</span><b>${money(client.payments.outstanding)} · due ${fmtDay(D.finance.nextDue.date)}</b></div><div class="stat-line"><span>Next event</span><b>${client.event.city}, ${client.event.state} · ${client.event.ceHours} CE hrs</b></div></div>
    <div class="card" style="--i:11"><h3>AUTONOMY ENGINE</h3>
     <div class="stat-line"><span>Worker runs</span><b>${num(k.workerRuns)}</b></div><div class="stat-line"><span>Jobs completed</span><b>${num(k.jobsCompleted)}</b></div><div class="stat-line"><span>Failed jobs</span><b>${k.jobsFailed}</b></div><div class="stat-line"><span>Huddle reports filed</span><b>${num(k.huddleReports)}</b></div><div class="stat-line"><span>Campaign milestones</span><b>${k.milestonesOpen} open · ${k.milestonesPaused} paused</b></div><div class="stat-line"><span>Active clients</span><b>${k.activeClients}</b></div></div>
   </div>
@@ -1198,7 +1214,7 @@ function buildClientList(){
      <span class="cl-who"><span class="orb" style="--c:#dfba80">${clientInitials(c.name)}</span><span><b>${c.name}</b><small>${c.credentials} · ${c.track}</small></span></span>
      <span class="cl-prog-name">${c.campaign.name}</span>
      <span class="cl-prog"><span class="mprog"><span style="--p:${(day/total*100).toFixed(1)}%"></span></span><small>Day ${day} of ${total}</small></span>
-     <span class="cl-pay"><b>${money(c.payments.recorded)}</b><small>${money(c.payments.verified)} verified</small></span>
+     <span class="cl-pay"><b>${money(c.payments.recorded)}</b><small>${c.payments.outstanding?money(c.payments.outstanding)+' outstanding':'paid in full'}</small></span>
      <span><em class="chip ok">✓ ${c.status}</em></span>
      <span class="cl-open">Open portal →</span></a>`).join('')}
     <p class="cl-empty" hidden>No clients match that search.</p>
@@ -1232,8 +1248,11 @@ function buildClientPortal(id){
    <div class="ring" aria-label="Day ${day} of ${total}"><svg viewBox="0 0 132 132"><defs><linearGradient id="ringGold" x1="0" x2="1"><stop offset="0" stop-color="#9b7a45"/><stop offset="1" stop-color="#ffd998"/></linearGradient></defs><circle class="track" cx="66" cy="66" r="${R}"/><circle class="fill" cx="66" cy="66" r="${R}" stroke-dasharray="${C}" stroke-dashoffset="${C}" data-off="${C*(1-day/total)}"/></svg><div><span><b>${day}</b>OF ${total} DAYS</span></div></div></div>
   <div class="drow three">
    <div class="card" style="--i:1"><h3>YOUR CAMPAIGN</h3><div class="stat-line"><span>${c.campaign.name}</span></div><div class="stat-line"><span>Window</span><b>${fmtDay(c.campaign.start)} – ${fmtDay(c.campaign.end)}</b></div><div class="stat-line"><span>Status</span><em class="chip wait">◷ ${c.campaign.status} · awaiting approval</em></div><div class="stat-line"><span>Workstreams</span><b>${c.workstreams.length}</b></div></div>
-   <div class="card" style="--i:2"><h3>PAYMENTS</h3><div class="rev-hero" data-count="${c.payments.recorded}" data-fmt="money">$0</div><div class="rev-hero"><small>RECORDED · ${c.payments.entries} PAYMENTS</small></div><div class="stat-line" style="margin-top:8px"><span>Processor verified</span><b>${money(c.payments.verified)}</b></div>
-    ${c.agreements.map(a=>`<div class="stat-line"><span>${a.title}</span><b>${money(a.total)} ${a.signed?'✓':''}</b></div>`).join('')}</div>
+   <div class="card" style="--i:2"><h3>PAYMENTS</h3><div class="rev-hero" data-count="${c.payments.recorded}" data-fmt="money">$0</div><div class="rev-hero"><small>PAID OF ${money(c.payments.contracted)} · ${money(c.payments.outstanding)} REMAINING</small></div>
+    ${c.agreements.map(a=>`<div class="agr"><div class="agr-head"><span>${a.title}</span><em class="chip ${a.paid>=a.total?'ok':'wait'}">${a.paid>=a.total?'✓ ':'◷ '}${a.status}</em></div>
+     <div class="rev-row"><span>${money(Math.min(a.paid,a.total))} of ${money(a.total)} paid</span><b>${money(Math.max(0,a.total-a.paid))} left</b><span class="lb-bar"><i data-w="${Math.min(100,a.paid/a.total*100).toFixed(1)}"></i></span></div>
+     ${a.schedule.length?`<ul class="sched">${a.schedule.map(x=>`<li><span>${fmtDay(x.due)}</span><span>${x.label}</span><b>${money(x.amount)}</b>${x.paid?'<em class="chip ok">✓ Paid</em>':'<em class="chip wait">◷ Due</em>'}</li>`).join('')}</ul>`:''}
+     <small class="agr-note">${a.note}</small></div>`).join('')}</div>
    <div class="card" style="--i:3"><h3>UPCOMING EVENT</h3><div class="stat-line"><span><b style="color:var(--gold-hi)">${c.event.title}</b></span></div><div class="stat-line"><span>Where</span><b>${c.event.city}, ${c.event.state}</b></div><div class="stat-line"><span>Format</span><b>${c.event.type} · ${c.event.ceHours} CE hours</b></div><div class="stat-line"><span>Tuition</span><b>${money(c.event.tuition)}</b></div><div class="stat-line"><span>Status</span><em class="chip pause">${c.event.status}</em></div></div>
   </div>
   <div class="drow">
@@ -1247,7 +1266,7 @@ function buildClientPortal(id){
   <p class="src">Client record from the KMCE database. Snapshot ${new Date(D.asOf).toLocaleString()}.</p>`;
   const main=s.querySelector('.dash-main');
   main.querySelectorAll('[data-room]').forEach(b=>b.onclick=travel('room/'+b.dataset.room));
-  s.playIn=()=>{s.classList.remove('in');void s.offsetWidth;s.classList.add('in');countUp(main);const f=main.querySelector('.ring .fill');requestAnimationFrame(()=>requestAnimationFrame(()=>f.style.strokeDashoffset=f.dataset.off))};
+  s.playIn=()=>{s.classList.remove('in');void s.offsetWidth;s.classList.add('in');countUp(main);requestAnimationFrame(()=>main.querySelectorAll('.lb-bar i').forEach(i=>i.style.width=i.dataset.w+'%'));const f=main.querySelector('.ring .fill');requestAnimationFrame(()=>requestAnimationFrame(()=>f.style.strokeDashoffset=f.dataset.off))};
   main.querySelectorAll('[data-go]').forEach(b=>b.onclick=travel(b.dataset.go));
   if(current===s.dataset.key)s.playIn();
  });
