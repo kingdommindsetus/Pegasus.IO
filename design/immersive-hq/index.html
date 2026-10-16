@@ -263,6 +263,131 @@ button{font:inherit;color:inherit;cursor:pointer}button:focus-visible,a:focus-vi
 .scene-title h2{margin:0;font-size:clamp(22px,3.2vw,40px);letter-spacing:.26em;font-weight:500;color:var(--gold-hi)}
 .scene-title p{margin:6px 0 0;font-size:11px;letter-spacing:.24em;color:var(--mute)}
 
+
+/* ---------- Pegasus CRM dashboard + client portal ---------- */
+.dash{position:absolute;inset:0;display:grid;grid-template-columns:236px minmax(0,1fr);color:#e8edf3;background:radial-gradient(1100px 560px at 72% -12%,#16304a 0%,transparent 62%),radial-gradient(900px 520px at -5% 105%,#3a280e66 0%,transparent 60%),#04070d}
+.dash-side{display:flex;flex-direction:column;gap:4px;padding:78px 14px 84px;border-right:1px solid #dfba8022;background:linear-gradient(#060b14f2,#04070df2)}
+.dash-logo{display:flex;align-items:center;gap:12px;margin:0 6px 20px}
+.dash-logo .emb{position:relative;flex:none;width:56px;height:56px;border-radius:50%;overflow:hidden;background:#02050b;box-shadow:0 0 26px #4fc3ff55,inset 0 0 0 1px #dfba8070}
+.dash-logo .emb video{position:absolute;inset:-30%;width:160%;height:160%;object-fit:cover;mix-blend-mode:screen}
+.dash-logo b{display:block;font-family:"Cormorant Garamond",Georgia,serif;font-size:17px;letter-spacing:.26em;font-weight:500;color:var(--gold-hi)}
+.dash-logo span{font-size:9px;letter-spacing:.24em;color:var(--mute)}
+.dash-nav{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border:0;border-radius:10px;background:transparent;color:#b7c3cf;font-size:13px;text-align:left}
+.dash-nav:hover{background:#0f1a29;color:#fff}
+.dash-nav.on{background:linear-gradient(90deg,#dfba8026,transparent);color:var(--gold-hi);box-shadow:inset 2px 0 0 var(--gold)}
+.dash-nav i{width:18px;font-style:normal;text-align:center;opacity:.8}
+.dash-side .foot{margin-top:auto;padding:12px;border:1px solid #ffffff10;border-radius:12px;font-size:11px;color:var(--mute);line-height:1.5}
+.dash-main{overflow:auto;padding:78px 28px 96px;scrollbar-width:thin}
+.dash-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.dash-head h2{margin:0;font-family:"Cormorant Garamond",Georgia,serif;font-size:clamp(26px,3vw,38px);letter-spacing:.18em;font-weight:500;color:#fff}
+.dash-head p{margin:4px 0 0;font-size:12px;color:var(--mute);letter-spacing:.06em}
+.live{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border:1px solid #3ee68a44;border-radius:999px;background:#07150ecc;font-size:11px;letter-spacing:.12em;color:#9ff0c2}
+.live::before{content:'';width:7px;height:7px;border-radius:50%;background:#3ee68a;box-shadow:0 0 0 0 #3ee68a88;animation:livePulse 2s infinite}
+@keyframes livePulse{70%{box-shadow:0 0 0 9px #3ee68a00}100%{box-shadow:0 0 0 0 #3ee68a00}}
+.kgrid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:14px}
+.card{position:relative;border-radius:16px;padding:16px 18px;background:linear-gradient(160deg,#0d1726ee,#070c15ee);border:1px solid #ffffff10;box-shadow:0 18px 40px #0007;overflow:hidden}
+.card::before{content:'';position:absolute;left:0;right:0;top:0;height:1px;background:linear-gradient(90deg,transparent,#dfba8099,transparent)}
+.card::after{content:'';position:absolute;inset:0;background:linear-gradient(110deg,transparent 40%,#ffffff0d 50%,transparent 60%);background-size:250% 100%;background-position:130% 0;pointer-events:none;transition:background-position 1.2s}
+.card:hover::after{background-position:-30% 0}
+.dash.in .card{animation:cardIn .7s cubic-bezier(.2,.75,.2,1) both;animation-delay:calc(var(--i,0)*70ms)}
+@keyframes cardIn{from{opacity:0;transform:translateY(14px) scale(.98)}}
+.card h3{margin:0 0 12px;font-size:11px;letter-spacing:.2em;color:var(--gold-hi);font-weight:600}
+.card h3 small{float:right;font-weight:400;letter-spacing:.06em;color:var(--mute)}
+.k-lab{font-size:10px;letter-spacing:.16em;color:var(--mute);text-transform:uppercase}
+.k-val{margin-top:8px;font-size:clamp(22px,2vw,30px);font-weight:600;color:#fff;font-variant-numeric:tabular-nums;letter-spacing:.01em}
+.k-sub{margin-top:4px;font-size:11.5px;color:#9fb0bf}
+.k-sub b{color:#9ff0c2;font-weight:600}
+.spark{display:block;width:100%;height:34px;margin-top:10px}
+.spark path.line{fill:none;stroke:var(--gold);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:300;stroke-dashoffset:300}
+.dash.in .spark path.line{animation:draw 1.4s .3s ease forwards}
+.spark path.area{fill:url(#sparkFill);opacity:.5}
+@keyframes draw{to{stroke-dashoffset:0}}
+.drow{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:16px;margin-top:16px}
+.drow.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.lb-row{display:grid;grid-template-columns:30px 36px minmax(0,1fr) minmax(70px,1.3fr) 54px;align-items:center;gap:12px;width:100%;padding:9px 8px;border:0;border-radius:10px;background:transparent;color:inherit;text-align:left}
+.lb-row:hover{background:#0f1b2b}
+.lb-rank{font-size:13px;font-weight:600;color:var(--mute);text-align:center;font-variant-numeric:tabular-nums}
+.lb-row.top .lb-rank{width:26px;height:26px;line-height:26px;border-radius:50%;color:#05080f;background:var(--medal);box-shadow:0 0 14px var(--medal)}
+.lb-row .orb{width:34px;height:34px;font-size:11px}
+.lb-name b{display:block;font-size:13px;letter-spacing:.06em}
+.lb-name span{font-size:11px;color:var(--mute)}
+.lb-bar{height:6px;border-radius:4px;background:#ffffff0d;overflow:hidden}
+.lb-bar i{display:block;height:100%;width:0;border-radius:4px;background:linear-gradient(90deg,#9b7a45,var(--gold-hi));box-shadow:0 0 10px #dfba8066;transition:width 1.2s cubic-bezier(.2,.75,.2,1)}
+.lb-score{font-size:15px;font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+.lb-note{margin-top:10px;font-size:11px;color:var(--mute);line-height:1.5}
+.lb-idle{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.lb-idle button{border:1px solid #ffffff14;background:#0b1422;border-radius:999px;padding:4px 10px;font-size:11px;color:#9fb0bf}
+.seg{display:inline-flex;gap:2px;padding:3px;border:1px solid #ffffff12;border-radius:10px;background:#060b13;margin-bottom:10px}
+.seg button{border:0;background:transparent;border-radius:8px;padding:6px 10px;font-size:11px;color:#9fb0bf}
+.seg button.on{background:#1a2638;color:var(--gold-hi)}
+.chart{position:relative}
+.chart svg{display:block;width:100%;height:190px;overflow:visible}
+.chart .grid line{stroke:#ffffff12}
+.chart .grid text,.chart .xl text{fill:#7f8fa0;font-size:10px}
+.chart rect.bar{fill:var(--gold);transition:opacity .2s}
+.chart rect.bar:hover{fill:var(--gold-hi)}
+.chart rect.hit{fill:transparent}
+.tip{position:absolute;pointer-events:none;padding:7px 10px;border:1px solid #dfba8055;border-radius:8px;background:#05080ff2;font-size:11.5px;color:#e8edf3;white-space:nowrap;transform:translate(-50%,-110%);opacity:0;transition:opacity .15s}
+.tip b{color:var(--gold-hi)}
+.rev-hero{font-size:34px;font-weight:600;color:#fff;font-variant-numeric:tabular-nums}
+.rev-hero small{display:block;font-size:11px;font-weight:400;letter-spacing:.14em;color:var(--mute)}
+.rev-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;margin-top:12px;font-size:12px;color:#c9d4de}
+.rev-row .lb-bar{grid-column:1/-1}
+.rev-row.muted .lb-bar i{background:#5b6775;box-shadow:none}
+.appr{display:flex;align-items:center;gap:10px;width:100%;padding:8px;border:0;border-radius:10px;background:transparent;color:inherit;text-align:left}
+.appr:hover{background:#0f1b2b}
+.appr .orb{width:30px;height:30px;font-size:10px}
+.appr span{flex:1;min-width:0;font-size:12px;line-height:1.35}
+.appr span small{display:block;color:var(--mute);font-size:10.5px}
+.chip{flex:none;display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:999px;font-size:10px;letter-spacing:.04em;white-space:nowrap}
+.chip.wait{background:#3a2a0c;color:#ffd27a;border:1px solid #ffd27a33}
+.chip.ok{background:#0c2a1a;color:#9ff0c2;border:1px solid #3ee68a33}
+.chip.pause{background:#1b2230;color:#aab6c3;border:1px solid #ffffff1a}
+.chip.due{background:#3a170f;color:#ffab8f;border:1px solid #ff8a6633}
+.client-card{display:flex;gap:14px;align-items:center;width:100%;padding:14px;border:1px solid #dfba8033;border-radius:14px;background:linear-gradient(120deg,#16120a,#0b111c);color:inherit;text-align:left}
+.client-card:hover{border-color:var(--gold)}
+.client-card .orb{width:46px;height:46px;font-size:14px}
+.client-card b{display:block;font-size:14px;letter-spacing:.04em}
+.client-card span{display:block;font-size:11px;color:var(--mute);margin-top:2px}
+.stat-line{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid #ffffff0a;font-size:12.5px;color:#c9d4de}
+.stat-line:last-child{border-bottom:0}
+.stat-line b{color:#fff;font-variant-numeric:tabular-nums}
+.src{margin-top:18px;font-size:11px;color:var(--mute)}
+/* client portal */
+.portal{grid-template-columns:minmax(0,1fr)}
+.portal .dash-main{padding:78px clamp(16px,4vw,56px) 96px}
+.p-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.p-tabs button{display:inline-flex;align-items:center;gap:8px;border:1px solid #ffffff18;background:#0a111c;border-radius:999px;padding:7px 14px;font-size:12px;color:#c9d4de}
+.p-tabs button.on{border-color:var(--gold);color:var(--gold-hi);background:#17120a}
+.p-tabs button:disabled{opacity:.5}
+.p-hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:center}
+.p-hero h2{margin:0;font-family:"Cormorant Garamond",Georgia,serif;font-size:clamp(28px,3.4vw,46px);font-weight:500;letter-spacing:.06em;color:#fff}
+.p-hero .cred{margin-top:4px;font-size:12px;letter-spacing:.2em;color:var(--gold-hi)}
+.p-hero p{margin:8px 0 0;font-size:13px;color:#aebccb;max-width:640px;line-height:1.5}
+.ring{position:relative;width:132px;height:132px}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:9}
+.ring .track{stroke:#ffffff10}
+.ring .fill{stroke:url(#ringGold);stroke-linecap:round;transition:stroke-dashoffset 1.6s cubic-bezier(.2,.75,.2,1)}
+.ring div{position:absolute;inset:0;display:grid;place-items:center;text-align:center;font-size:11px;color:var(--mute);letter-spacing:.08em}
+.ring div b{display:block;font-size:30px;color:#fff;letter-spacing:0}
+.tl{position:relative;margin:4px 0 0;padding:0;list-style:none}
+.tl li{position:relative;display:grid;grid-template-columns:86px 16px minmax(0,1fr) auto;align-items:center;gap:10px;padding:7px 0;font-size:12.5px;color:#d4dde6}
+.tl li .d{font-size:11px;color:var(--mute);text-align:right;font-variant-numeric:tabular-nums}
+.tl li .dot{width:10px;height:10px;border-radius:50%;background:#2a3646;box-shadow:0 0 0 3px #04070d;justify-self:center}
+.tl li.past .dot{background:var(--gold)}
+.tl li.today{color:var(--gold-hi)}
+.tl li.today .dot{background:#3ee68a;box-shadow:0 0 0 3px #04070d,0 0 12px #3ee68a}
+.tl::before{content:'';position:absolute;left:104px;top:12px;bottom:12px;width:1px;background:#ffffff14}
+.concierge{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.concierge button{padding:14px;border:1px solid #dfba8033;border-radius:12px;background:#0b0f16;color:inherit;text-align:left}
+.concierge button:hover{border-color:var(--gold)}
+.concierge strong{display:block;font-size:13px;color:var(--gold-hi)}
+.concierge span{font-size:11px;color:var(--mute)}
+@media(max-width:1200px){.kgrid{grid-template-columns:repeat(3,minmax(0,1fr))}.drow,.drow.three{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:860px){.dash{grid-template-columns:minmax(0,1fr)}.dash-side{display:none}.dash-main{padding:72px 14px 90px}.kgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.p-hero{grid-template-columns:1fr}.concierge{grid-template-columns:repeat(2,minmax(0,1fr))}.lb-row{grid-template-columns:26px 32px minmax(0,1fr) 44px}.lb-row .lb-bar{display:none}}
+@media(prefers-reduced-motion:reduce){.dash.in .card,.dash.in .spark path.line{animation:none}.spark path.line{stroke-dashoffset:0}.lb-bar i,.ring .fill{transition:none}}
+
 /* ---------- responsive ---------- */
 @media(max-width:860px){
  #crumbs,.pill{display:none}
@@ -297,6 +422,7 @@ button{font:inherit;color:inherit;cursor:pointer}button:focus-visible,a:focus-vi
 </div></div>
 
 <div id="world" aria-live="polite"></div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dfba80" stop-opacity=".45"/><stop offset="1" stop-color="#dfba80" stop-opacity="0"/></linearGradient></defs></svg>
 <div id="warp"></div>
 <div id="doorfx" aria-hidden="true"><div class="leaf l"></div><div class="leaf r"></div><div class="plate"><span class="orb"></span><b class="serif"></b><span></span></div></div>
 
@@ -408,7 +534,7 @@ const SCENES={
  floor:{label:'Employee Floor',depth:1,build:buildFloor},
  crm:{label:'CRM Dashboard',depth:1,build:buildCRM},
  'war-room':{label:'War Room',depth:1,build:buildWarRoom},
- lobby:{label:'Client Lobby',depth:1,build:buildLobby},
+ lobby:{label:'Client Portal',depth:1,build:buildLobby},
 };
 const cache={};let current=null,busy=false,motionPaused=false;
 function sceneInfo(key){if(key.startsWith('room/')){const a=byId[key.slice(5)];return a?{label:a.name,depth:2,parent:a.exec?'atrium':'floor',build:()=>buildRoom(a)}:null}const s=SCENES[key];return s?{parent:'atrium',...s}:null}
@@ -465,7 +591,7 @@ function updateChrome(key){
  document.querySelector('#back-label').textContent=info.parent?sceneInfo(info.parent).label.toUpperCase():'BACK';
  map.querySelectorAll('button').forEach(b=>b.classList.toggle('on',trail.includes(b.dataset.go)||(b.dataset.go==='executive'&&key==='room/simon')));
 }
-[['atrium','Atrium'],['executive','Executive'],['floor','Floor'],['crm','CRM'],['war-room','War Room'],['lobby','Lobby']].forEach(([k,l])=>{const b=document.createElement('button');b.type='button';b.dataset.go=k;b.textContent=l;b.onclick=travel(k);map.append(b)});
+[['atrium','Atrium'],['executive','Executive'],['floor','Floor'],['crm','CRM'],['war-room','War Room'],['lobby','Clients']].forEach(([k,l])=>{const b=document.createElement('button');b.type='button';b.dataset.go=k;b.textContent=l;b.onclick=travel(k);map.append(b)});
 const toastEl=document.querySelector('#toast');let toastT;
 function toast(msg){toastEl.textContent=msg;toastEl.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>toastEl.classList.remove('show'),3200)}
 
@@ -479,9 +605,9 @@ function buildAtrium(){
  <div class="atrium-title"><h1 class="serif">PEGASUS</h1><p>HEADQUARTERS ATRIUM</p></div>
  ${hot('executive','20%','30%','SIMON · EXECUTIVE OFFICE','Strategy · leadership · final approvals',{icon:'♛',c:'#e8c27a'})}
  ${hot('floor','50%','84%','EMPLOYEE FLOOR','Walk the hall · AI team offices',{icon:'⇡',forward:true})}
- ${hot('crm','80%','30%','PEGASUS CRM','Pipeline · tasks · agent activity',{icon:'◎',c:'#7ddcf3'})}
+ ${hot('crm','80%','30%','PEGASUS CRM','Live metrics · AI workforce leaderboard',{icon:'◎',c:'#7ddcf3'})}
  ${hot('war-room','14%','62%','WAR ROOM','Mission execution',{icon:'✦',c:'#ff9a5c'})}
- ${hot('lobby','86%','62%','CLIENT LOBBY','Client portal · concierge',{icon:'⌂',c:'#f0d7a8'})}`;
+ ${hot('lobby','86%','62%','CLIENT PORTAL','Dr. Adams · projects · concierge',{icon:'⌂',c:'#f0d7a8'})}`;
  s.querySelectorAll('[data-go]').forEach(b=>b.onclick=travel(b.dataset.go));
  // two players crossfade so the hologram loop never visibly resets
  const v1=s.querySelector('#holo'),v2=s.querySelector('#holo2');let active=v1,standby=v2,timer;
@@ -836,18 +962,92 @@ function wireConversation(s,a){
  setState('idle');
 }
 
-/* ===== CRM ===== */
+/* ===== Real KMCE data (assets/data/kmce-snapshot.json, refreshed from the KMCE database on deploy) ===== */
+let KMCE=null;
+const kmceData=()=>KMCE||(KMCE=fetch('assets/data/kmce-snapshot.json').then(r=>r.json()));
+const money=n=>'$'+Math.round(n).toLocaleString('en-US');
+const num=n=>Math.round(n).toLocaleString('en-US');
+const fmtDay=d=>new Date(d+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'});
+// Numbers count up when the screen opens.
+function countUp(root){root.querySelectorAll('[data-count]').forEach(el=>{const to=+el.dataset.count,f=el.dataset.fmt==='money'?money:num;
+ if(reduced){el.textContent=f(to);return}const t0=performance.now(),dur=1300;
+ (function step(t){const p=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-p,3);el.textContent=f(to*e);if(p<1)requestAnimationFrame(step)})(t0)})}
+function sparkline(vals){const w=120,h=34,max=Math.max(...vals,1),pts=vals.map((v,i)=>[i/(vals.length-1)*w,h-3-(v/max)*(h-8)]);
+ const d=pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
+ return `<svg class="spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true"><path class="area" d="${d} L${w} ${h} L0 ${h} Z"/><path class="line" pathLength="300" d="${d}"/></svg>`}
+// Leaderboard score: real logged work from KMCE. Shown on screen so it's never a mystery number.
+const SCORE_RULE='Score = completed jobs ×3 + huddle tasks + assigned tasks ×2 + reports filed + leads found ×2';
+const scoreOf=m=>m?m.jobsDone*3+m.huddleTasks+m.tasks*2+m.huddles+m.meetingReports+m.leads*2:0;
+function barChart(el,days,key,label){
+ const W=560,H=190,pad={l:30,r:8,t:10,b:24},max=Math.max(...days.map(d=>d[key]),1),step=Math.pow(10,Math.floor(Math.log10(max))),top=Math.ceil(max/step)*step||1;
+ const bw=(W-pad.l-pad.r)/days.length,ys=[0,top/2,top];
+ const y=v=>pad.t+(H-pad.t-pad.b)*(1-v/top);
+ el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${label} per day"><g class="grid">${ys.map(v=>`<line x1="${pad.l}" x2="${W-pad.r}" y1="${y(v)}" y2="${y(v)}"/><text x="${pad.l-6}" y="${y(v)+3}" text-anchor="end">${num(v)}</text>`).join('')}</g>
+  ${days.map((d,i)=>{const x=pad.l+i*bw+bw*.22,w=bw*.56,h=y(0)-y(d[key]);return `<rect class="bar" x="${x}" y="${y(0)}" width="${w}" height="0" rx="4" data-h="${h}" data-y="${y(d[key])}"/><rect class="hit" x="${pad.l+i*bw}" y="${pad.t}" width="${bw}" height="${H-pad.t-pad.b}" data-i="${i}"/>`}).join('')}
+  <g class="xl">${days.map((d,i)=>`<text x="${pad.l+i*bw+bw/2}" y="${H-6}" text-anchor="middle">${fmtDay(d.day)}</text>`).join('')}</g></svg><div class="tip"></div>`;
+ const tip=el.querySelector('.tip');
+ el.querySelectorAll('rect.bar').forEach((b,i)=>{const go=()=>{b.setAttribute('y',b.dataset.y);b.setAttribute('height',b.dataset.h)};
+  if(reduced)go();else{b.style.transition=`y .9s ${i*60}ms cubic-bezier(.2,.75,.2,1),height .9s ${i*60}ms cubic-bezier(.2,.75,.2,1)`;requestAnimationFrame(()=>requestAnimationFrame(go))}});
+ el.querySelectorAll('rect.hit').forEach(h=>{const d=days[h.dataset.i];
+  h.onmouseenter=()=>{const r=el.getBoundingClientRect(),b=h.getBoundingClientRect();tip.innerHTML=`${fmtDay(d.day)} · <b>${num(d[key])}</b> ${label.toLowerCase()}`;tip.style.left=(b.left-r.left+b.width/2)+'px';const sc=el.querySelector('svg').getBoundingClientRect().height/H;tip.style.top=(Math.min(+el.querySelectorAll('rect.bar')[h.dataset.i].dataset.y,H-pad.b-14)*sc)+'px';tip.style.opacity=1};
+  h.onmouseleave=()=>tip.style.opacity=0});
+}
+const dashSide=(active)=>`<aside class="dash-side"><div class="dash-logo"><span class="emb"><video data-play muted loop playsinline preload="auto" src="assets/pegasus-centerpiece.mp4" aria-hidden="true"></video></span><span><b>PEGASUS</b><span>COMMAND CRM</span></span></div>
+ ${[['dash','◈','Dashboard','crm'],['team','✦','AI Workforce','floor'],['client','⌂','Clients','lobby'],['approvals','✓','Approvals','crm'],['war','⚑','War Room','war-room'],['exec','♛','Executive Office','room/simon']].map(([k,i,l,go])=>`<button class="dash-nav${k===active?' on':''}" type="button" data-go="${go}"><i>${i}</i>${l}</button>`).join('')}
+ <div class="foot">Live data from the KMCE database. Agents' figures are their real logged work.</div></aside>`;
+
+/* ===== CRM dashboard ===== */
 function buildCRM(){
- const s=document.createElement('section');s.className='panel-scene';s.setAttribute('aria-label','Pegasus CRM');
- const activity=[['scout','finds new leads'],['atlas','qualifies and routes them'],['echo','follows up and books calls'],['booker','confirms the meeting'],['gatekeeper','reviews before anything goes out']];
- const agents=[['simon','Executive'],['marie','Operations'],['iris','Intelligence'],['mark','Marketing'],['cammy','Campaigns'],['lucy','Distribution']];
- s.innerHTML=`<img class="bg" src="assets/pegasus-atrium.png" alt="">
- <div class="board"><div class="scene-title"><h2 class="serif">PEGASUS CRM</h2><p>PIPELINE · TASKS · AGENT ACTIVITY</p></div>
- <div class="card kpis"><div class="kpi"><span>LEADS</span><b>Pipeline</b><em>Scout · Atlas · Echo</em></div><div class="kpi"><span>OPPORTUNITIES</span><b>Deals</b><em>Echo · Booker</em></div><div class="kpi"><span>CLIENTS</span><b>Accounts</b><em>Marie · Alice</em></div><div class="kpi"><span>APPROVALS</span><b>Review</b><em>Gatekeeper · Simon</em></div></div>
- <div class="crm-grid"><div class="card funnel"><h3>PIPELINE</h3>${[['New leads',100],['Discovery',84],['Proposal',68],['Negotiation',52],['Closed',38]].map(([l,w])=>`<div style="width:${w}%"><span>${l}</span></div>`).join('')}</div>
- <div class="card"><h3>AI TEAM · TAP TO VISIT</h3>${agents.map(([id,st])=>`<button class="agent-row" type="button" data-room="${id}">${orb(byId[id])}<span>${byId[id].name}<br><small>${byId[id].role}</small></span><em>${st}</em></button>`).join('')}</div></div>
- <div class="card"><h3>HOW A LEAD MOVES · TAP TO VISIT</h3>${activity.map(([id,t])=>`<button class="agent-row" type="button" data-room="${id}">${orb(byId[id])}<span>${byId[id].name} ${t}</span><small>${byId[id].role}</small></button>`).join('')}</div></div>`;
- s.querySelectorAll('[data-room]').forEach(b=>b.onclick=travel('room/'+b.dataset.room));
+ const s=document.createElement('section');s.className='dash';s.setAttribute('aria-label','Pegasus CRM dashboard');
+ s.innerHTML=`${dashSide('dash')}<div class="dash-main"><p class="sample">Loading live data…</p></div>`;
+ s.querySelectorAll('.dash-side [data-go]').forEach(b=>b.onclick=travel(b.dataset.go));
+ kmceData().then(D=>{
+  const k=D.kpis,days=D.daily,asOf=new Date(D.asOf);
+  const ranked=FLOOR.map(a=>({a,m:D.agents[a.id],score:scoreOf(D.agents[a.id])})).sort((x,y)=>y.score-x.score);
+  const active=ranked.filter(r=>r.score>0),idle=ranked.filter(r=>!r.score),top=active[0]?.score||1;
+  const medals=['#ffd27a','#d9e2ec','#e0a06a'];
+  const client=D.clients[0];
+  s.querySelector('.dash-main').innerHTML=`
+  <div class="dash-head"><div><h2>PEGASUS CRM</h2><p>Your AI workforce, your pipeline, your clients. Real numbers from KMCE.</p></div>
+   <span class="live">LIVE DATA · AS OF ${asOf.toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}</span></div>
+  <div class="kgrid">
+   <div class="card" style="--i:0"><div class="k-lab">Verified revenue</div><div class="k-val" data-count="${k.verifiedRevenue}" data-fmt="money">$0</div><div class="k-sub">${money(k.recordedRevenue)} recorded in total</div>${sparkline([0,0,3,3,6,6,9])}</div>
+   <div class="card" style="--i:1"><div class="k-lab">Checkout pipeline</div><div class="k-val" data-count="${k.openCheckoutValue}" data-fmt="money">$0</div><div class="k-sub">${k.openCheckouts} open checkouts</div>${sparkline(days.map(d=>d.checkouts))}</div>
+   <div class="card" style="--i:2"><div class="k-lab">Jobs completed</div><div class="k-val" data-count="${k.jobsCompleted}">0</div><div class="k-sub"><b>${k.jobsFailed} failed</b> · ${num(k.workerRuns)} worker runs</div>${sparkline(days.map(d=>d.jobs))}</div>
+   <div class="card" style="--i:3"><div class="k-lab">Agent tasks</div><div class="k-val" data-count="${k.tasksQueued+k.tasksAwaitingApproval}">0</div><div class="k-sub">${k.tasksAwaitingApproval} awaiting your approval</div>${sparkline(days.map(d=>d.tasks))}</div>
+   <div class="card" style="--i:4"><div class="k-lab">Leads discovered</div><div class="k-val" data-count="${k.leadsDiscovered}">0</div><div class="k-sub">found by Scout</div>${sparkline(days.map(d=>d.leads))}</div>
+   <div class="card" style="--i:5"><div class="k-lab">Provider directory</div><div class="k-val" data-count="${k.providers}">0</div><div class="k-sub">${num(k.offices)} offices mapped</div>${sparkline([1,2,3,4,5,6,7])}</div>
+  </div>
+  <div class="drow">
+   <div class="card" style="--i:6"><h3>AI WORKFORCE LEADERBOARD <small>ranked by logged work</small></h3>
+    ${active.map((r,i)=>`<button class="lb-row${i<3?' top':''}" type="button" data-room="${r.a.id}" style="--medal:${medals[i]||'transparent'}"><span class="lb-rank">${i+1}</span>${orb(r.a)}<span class="lb-name"><b>${r.a.name}</b><span>${r.m.jobsDone?r.m.jobsDone+' jobs · ':''}${r.m.huddleTasks?r.m.huddleTasks+' huddle tasks · ':''}${r.m.tasks?r.m.tasks+' tasks · ':''}${r.m.leads?r.m.leads+' leads · ':''}${r.m.huddles+r.m.meetingReports} reports</span></span><span class="lb-bar"><i data-w="${(r.score/top*100).toFixed(1)}"></i></span><span class="lb-score">${r.score}</span></button>`).join('')}
+    ${idle.length?`<div class="lb-note">No logged work in KMCE yet:</div><div class="lb-idle">${idle.map(r=>`<button type="button" data-room="${r.a.id}">${r.a.name}</button>`).join('')}</div>`:''}
+    <div class="lb-note">${SCORE_RULE}.</div>
+   </div>
+   <div style="display:grid;gap:16px;align-content:start">
+    <div class="card" style="--i:7"><h3>DAILY ACTIVITY</h3><div class="seg" role="tablist">${[['runs','Worker runs'],['jobs','Jobs done'],['huddles','Huddle reports'],['tasks','New tasks']].map(([key,l],i)=>`<button type="button" class="${i?'':'on'}" data-key="${key}" data-label="${l}">${l}</button>`).join('')}</div><div class="chart"></div></div>
+    <div class="card" style="--i:8"><h3>REVENUE <small>by verification</small></h3><div class="rev-hero" data-count="${k.verifiedRevenue}" data-fmt="money">$0</div><div class="rev-hero"><small>VERIFIED BY PAYMENT PROCESSOR</small></div>
+     ${D.revenueByVerification.map((r,i)=>`<div class="rev-row${i===2?' muted':''}"><span>${r.label} · ${r.entries} ${r.entries===1?'entry':'entries'}</span><b>${money(r.amount)}</b><span class="lb-bar"><i data-w="${(r.amount/D.revenueByVerification[0].amount*100).toFixed(1)}"></i></span></div>`).join('')}</div>
+   </div>
+  </div>
+  <div class="drow three">
+   <div class="card" style="--i:9"><h3>AWAITING YOUR APPROVAL <small>${client.workstreams.length} workstreams</small></h3>
+    ${client.workstreams.map(w=>`<button class="appr" type="button" data-room="${w.lead}">${orb(byId[w.lead])}<span>${w.name}<small>${byId[w.lead].name} leads · ${client.short}</small></span><em class="chip wait">◷ Approval</em></button>`).join('')}</div>
+   <div class="card" style="--i:10"><h3>CLIENTS</h3><button class="client-card" type="button" data-go="lobby"><span class="orb" style="--c:#dfba80">TA</span><span><b>${client.name}</b><span>${client.credentials} · ${client.track}</span><span>${client.campaign.name}</span></span></button>
+    <div class="stat-line" style="margin-top:10px"><span>Payments recorded</span><b>${money(client.payments.recorded)}</b></div><div class="stat-line"><span>Processor verified</span><b>${money(client.payments.verified)}</b></div><div class="stat-line"><span>Next event</span><b>${client.event.city}, ${client.event.state} · ${client.event.ceHours} CE hrs</b></div></div>
+   <div class="card" style="--i:11"><h3>AUTONOMY ENGINE</h3>
+    <div class="stat-line"><span>Worker runs</span><b>${num(k.workerRuns)}</b></div><div class="stat-line"><span>Jobs completed</span><b>${num(k.jobsCompleted)}</b></div><div class="stat-line"><span>Failed jobs</span><b>${k.jobsFailed}</b></div><div class="stat-line"><span>Huddle reports filed</span><b>${num(k.huddleReports)}</b></div><div class="stat-line"><span>Campaign milestones</span><b>${k.milestonesOpen} open · ${k.milestonesPaused} paused</b></div><div class="stat-line"><span>Active clients</span><b>${k.activeClients}</b></div></div>
+  </div>
+  <p class="src">Source: ${D.source}. Snapshot ${asOf.toLocaleString()}. Figures update each time the HQ is deployed.</p>`;
+  const main=s.querySelector('.dash-main'),chart=main.querySelector('.chart');
+  main.querySelectorAll('[data-room]').forEach(b=>b.onclick=travel('room/'+b.dataset.room));
+  main.querySelectorAll('[data-go]').forEach(b=>b.onclick=travel(b.dataset.go));
+  main.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{main.querySelectorAll('.seg button').forEach(x=>x.classList.toggle('on',x===b));barChart(chart,days,b.dataset.key,b.dataset.label)});
+  s.playIn=()=>{s.classList.remove('in');void s.offsetWidth;s.classList.add('in');countUp(main);barChart(chart,days,'runs','Worker runs');
+   requestAnimationFrame(()=>main.querySelectorAll('.lb-bar i').forEach(i=>i.style.width=i.dataset.w+'%'))};
+  if(current==='crm')s.playIn();
+ });
+ s.onArrive=()=>s.playIn?.();
  return s;
 }
 
@@ -867,13 +1067,39 @@ function buildWarRoom(){
  return s;
 }
 
-/* ===== Client lobby ===== */
+/* ===== Client portal ===== */
 function buildLobby(){
- const s=document.createElement('section');s.className='panel-scene';s.setAttribute('aria-label','Client Welcome Lobby');
- s.innerHTML=`<img class="bg" src="assets/pegasus-atrium.png" alt="" style="filter:blur(4px) brightness(.45) sepia(.35) saturate(1.2)">
- <div class="board" style="align-content:center"><div class="scene-title"><h2 class="serif">WELCOME</h2><p>PARTNER · BUILD · GROW</p></div>
- <div class="lobby-tiles">${[['My Projects','View progress'],['My Tasks','Action items'],['My Documents','Upload & review'],['My Meetings','Schedule with Booker'],['Messages','Concierge support'],['Approvals','Items waiting']].map(([t,d])=>`<button type="button" data-tile="${t}"><strong>${t}</strong><span>${d}</span></button>`).join('')}</div></div>`;
- s.querySelectorAll('[data-tile]').forEach(b=>b.onclick=()=>b.dataset.tile==='My Meetings'?go('room/booker',{origin:{x:innerWidth/2,y:innerHeight/2}}):toast(`${b.dataset.tile} opens once the client portal is connected.`));
+ const s=document.createElement('section');s.className='dash portal';s.setAttribute('aria-label','Client portal');
+ s.innerHTML=`<div class="dash-main"><p class="sample">Loading client…</p></div>`;
+ kmceData().then(D=>{
+  const c=D.clients[0],today=new Date(),start=new Date(c.campaign.start+'T00:00:00'),end=new Date(c.campaign.end+'T00:00:00');
+  const total=Math.round((end-start)/864e5)+1,day=Math.min(total,Math.max(0,Math.floor((today-start)/864e5)+1)),R=56,C=2*Math.PI*R;
+  const iso=today.toISOString().slice(0,10);
+  s.querySelector('.dash-main').innerHTML=`
+  <div class="p-tabs"><button class="on" type="button">● ${c.name}</button><button type="button" disabled>+ Next client</button></div>
+  <div class="card p-hero" style="--i:0"><div><div class="k-lab">CLIENT PORTAL · WELCOME BACK</div><h2>${c.name}</h2><div class="cred">${c.credentials}</div><p>${c.title}. ${c.track} track · <em class="chip ok">✓ ${c.status}</em></p></div>
+   <div class="ring" aria-label="Day ${day} of ${total}"><svg viewBox="0 0 132 132"><defs><linearGradient id="ringGold" x1="0" x2="1"><stop offset="0" stop-color="#9b7a45"/><stop offset="1" stop-color="#ffd998"/></linearGradient></defs><circle class="track" cx="66" cy="66" r="${R}"/><circle class="fill" cx="66" cy="66" r="${R}" stroke-dasharray="${C}" stroke-dashoffset="${C}" data-off="${C*(1-day/total)}"/></svg><div><span><b>${day}</b>OF ${total} DAYS</span></div></div></div>
+  <div class="drow three">
+   <div class="card" style="--i:1"><h3>YOUR CAMPAIGN</h3><div class="stat-line"><span>${c.campaign.name}</span></div><div class="stat-line"><span>Window</span><b>${fmtDay(c.campaign.start)} – ${fmtDay(c.campaign.end)}</b></div><div class="stat-line"><span>Status</span><em class="chip wait">◷ ${c.campaign.status} · awaiting approval</em></div><div class="stat-line"><span>Workstreams</span><b>${c.workstreams.length}</b></div></div>
+   <div class="card" style="--i:2"><h3>PAYMENTS</h3><div class="rev-hero" data-count="${c.payments.recorded}" data-fmt="money">$0</div><div class="rev-hero"><small>RECORDED · ${c.payments.entries} PAYMENTS</small></div><div class="stat-line" style="margin-top:8px"><span>Processor verified</span><b>${money(c.payments.verified)}</b></div>
+    ${c.agreements.map(a=>`<div class="stat-line"><span>${a.title}</span><b>${money(a.total)} ${a.signed?'✓':''}</b></div>`).join('')}</div>
+   <div class="card" style="--i:3"><h3>UPCOMING EVENT</h3><div class="stat-line"><span><b style="color:var(--gold-hi)">${c.event.title}</b></span></div><div class="stat-line"><span>Where</span><b>${c.event.city}, ${c.event.state}</b></div><div class="stat-line"><span>Format</span><b>${c.event.type} · ${c.event.ceHours} CE hours</b></div><div class="stat-line"><span>Tuition</span><b>${money(c.event.tuition)}</b></div><div class="stat-line"><span>Status</span><em class="chip pause">${c.event.status}</em></div></div>
+  </div>
+  <div class="drow">
+   <div class="card" style="--i:4"><h3>YOUR PEGASUS TEAM <small>tap an agent to visit their office</small></h3>
+    ${c.workstreams.map(w=>`<button class="appr" type="button" data-room="${w.lead}">${orb(byId[w.lead])}<span>${w.name}<small>${byId[w.lead].name} leads${w.support.length?' · with '+w.support.map(x=>byId[x].name).join(', '):''}</small></span><em class="chip wait">◷ Pending</em></button>`).join('')}</div>
+   <div class="card" style="--i:5"><h3>TIMELINE</h3><ol class="tl">
+    ${c.milestones.map(m=>{const past=m.due<iso,open=past&&m.status==='Open'&&!/start/i.test(m.label);return `<li class="${past?'past':''}"><span class="d">${fmtDay(m.due)}</span><span class="dot"></span><span>${m.label}</span>${m.status==='Paused'?'<em class="chip pause">❚❚ Paused</em>':open?'<em class="chip wait">◷ Open</em>':''}</li>`}).join('')}
+    </ol></div>
+  </div>
+  <div class="card" style="--i:6;margin-top:16px"><h3>CONCIERGE</h3><div class="concierge">${[['Book a meeting','with Booker','booker'],['Campaign update','from Marie','marie'],['Performance report','from Snake','snake'],['Landing page','with Alice','alice'],['Podcast & speaking','with Echo','echo'],['Ask the Executive','Simon','simon']].map(([t,d,id])=>`<button type="button" data-room="${id}"><strong>${t}</strong><span>${d}</span></button>`).join('')}</div></div>
+  <p class="src">Client record from the KMCE database. Snapshot ${new Date(D.asOf).toLocaleString()}.</p>`;
+  const main=s.querySelector('.dash-main');
+  main.querySelectorAll('[data-room]').forEach(b=>b.onclick=travel('room/'+b.dataset.room));
+  s.playIn=()=>{s.classList.remove('in');void s.offsetWidth;s.classList.add('in');countUp(main);const f=main.querySelector('.ring .fill');requestAnimationFrame(()=>requestAnimationFrame(()=>f.style.strokeDashoffset=f.dataset.off))};
+  if(current==='lobby')s.playIn();
+ });
+ s.onArrive=()=>s.playIn?.();
  return s;
 }
 

@@ -1,0 +1,1 @@
+Right now I'm moving Team handoffs, SOP library, Calendar sync, and Agent onboarding. Team handoffs is my top priority.
