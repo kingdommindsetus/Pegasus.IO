@@ -311,7 +311,10 @@ const AGENTS=[
   duties:['Market research','Lead discovery','Trends & opportunities','Competitor analysis','Industry insight reports'],
   today:[['2,847','Leads discovered'],['13','Markets watched'],['4','Intel briefs'],['1','Threat flag']],
   missions:[['Competitor map','72%'],['CE market scan','64%'],['Partner targets','41%']]},
- {id:'mark',name:'Mark',role:'Marketing',dept:'Brand Strategy & Strategic Positioning',c:'#ff9a5c'},
+ {id:'mark',name:'Mark',role:'Marketing Direction',dept:'Brand Strategy & Strategic Positioning',c:'#e8b866',office:true,quote:'Strategy. Positioning. Brand. Growth.',
+  duties:['Brand strategy','Positioning','Campaign direction','Growth planning','Audience development'],
+  today:[['1.2M','Brand reach'],['86.4K','Engagements'],['4,320','New audience'],['5','Growth plays']],
+  missions:[['KMCE brand refresh','70%'],['National CE campaign','48%'],['Partner positioning','35%']]},
  {id:'cammy',name:'Cammy',role:'Campaigns',dept:'Creative Campaign Strategy & Launch Mechanics',c:'#ff6fa8'},
  {id:'evan',name:'Evan',role:'Content',dept:'High-Converting Copywriting & Narrative Craft',c:'#9be36d'},
  {id:'tube',name:'Tube',role:'Video',dept:'Viral Video Direction & Short-Form Media',c:'#ff5a5a'},
@@ -354,8 +357,8 @@ const AGENTS=[
 // flag them here, e.g. simon:{listen:true,talk:true}. Agents without clips stay still and use the voice light alone.
 const CLIPS={};
 // Where each robot's body sits, for the soft mask that keeps the room still while the robot moves.
-const BODY={simon:[50,55],marie:[47,58],gatekeeper:[51,62],lucy:[52,60],sofia:[48,62],iris:[50,62],maven:[47,64],booker:[48,62],scout:[54,68],echo:[48,60],alice:[49,60]};
-const HEAD={simon:[50,36],marie:[45,40],gatekeeper:[47,45],lucy:[51,38],sofia:[47,38],iris:[48,41],maven:[48,42],booker:[47,40],scout:[53,55],echo:[50,34],alice:[46,34]};
+const BODY={mark:[49,58],simon:[50,55],marie:[47,58],gatekeeper:[51,62],lucy:[52,60],sofia:[48,62],iris:[50,62],maven:[47,64],booker:[48,62],scout:[54,68],echo:[48,60],alice:[49,60]};
+const HEAD={mark:[48,36],simon:[50,36],marie:[45,40],gatekeeper:[47,45],lucy:[51,38],sofia:[47,38],iris:[48,41],maven:[48,42],booker:[47,40],scout:[53,55],echo:[50,34],alice:[46,34]};
 const NEXT_WING=['Atlas','Claire','Flow','Ledger','Midas'];
 NEXT_WING.forEach(n=>AGENTS.push({id:n.toLowerCase(),name:n,role:'Room in production',dept:'Office build scheduled for the next slice',c:'#7ddcf3',next:true}));
 const byId=Object.fromEntries(AGENTS.map(a=>[a.id,a]));
