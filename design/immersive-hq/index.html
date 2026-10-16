@@ -302,7 +302,7 @@ button{font:inherit;color:inherit;cursor:pointer}button:focus-visible,a:focus-vi
  <button id="back" type="button" aria-label="Go back">← <span id="back-label">BACK</span></button>
  <nav id="crumbs" aria-label="Location"></nav>
  <span class="spacer"></span>
- <span class="pill">PREVIEW · SAMPLE DATA</span>
+ <span class="pill">PREVIEW</span>
  <button id="motion" type="button" aria-pressed="false">Pause motion</button>
 </header>
 <nav id="map" aria-label="Headquarters map"></nav>
@@ -313,88 +313,67 @@ button{font:inherit;color:inherit;cursor:pointer}button:focus-visible,a:focus-vi
 const AGENTS=[
  {id:'simon',name:'Simon',role:'Executive Director',dept:'Executive Strategy & Mission Prioritization',c:'#e8c27a',office:true,quote:'Discern. Direct. Deliver.',exec:true,
   duties:['Strategy & oversight','Final approvals','Performance review','Resource allocation','Executive close'],
-  today:[['3','Approvals waiting'],['5','New leads'],['2','Strategy items'],['1','Executive close']],
-  missions:[['KMCE Launch','85%'],['Phoenix Event','62%'],['Client Onboarding','40%'],['Platform Scale','28%']]},
+  missions:['KMCE Launch','Phoenix Event','Client Onboarding','Platform Scale']},
  {id:'marie',name:'Marie',role:'Operations',dept:'Operational Architecture & Execution Systems',c:'#b784f4',office:true,quote:'Coordinate. Execute. Keep it moving.',
   duties:['Task management','Team coordination','Workflow execution','Project tracking','Daily operations'],
-  today:[['54','Tasks in motion'],['18','Handoffs today'],['26','Completed'],['2','Blocked']],
-  missions:[['Team handoffs','76%'],['SOP library','59%'],['Calendar sync','49%'],['Agent onboarding','80%']]},
+  missions:['Team handoffs','SOP library','Calendar sync','Agent onboarding']},
  {id:'iris',name:'IRIS',role:'Market Intelligence',dept:'OSINT & Competitive Intelligence',c:'#3ee6b0',office:true,quote:'Research. Discover. Analyze.',
   duties:['Market research','Lead discovery','Trends & opportunities','Competitor analysis','Industry insight reports'],
-  today:[['2,847','Leads discovered'],['13','Markets watched'],['4','Intel briefs'],['1','Threat flag']],
-  missions:[['Competitor map','72%'],['CE market scan','64%'],['Partner targets','41%']]},
+  missions:['Competitor map','CE market scan','Partner targets']},
  {id:'mark',name:'Mark',role:'Marketing Direction',dept:'Brand Strategy & Strategic Positioning',c:'#e8b866',office:true,quote:'Strategy. Positioning. Brand. Growth.',
   duties:['Brand strategy','Positioning','Campaign direction','Growth planning','Audience development'],
-  today:[['1.2M','Brand reach'],['86.4K','Engagements'],['4,320','New audience'],['5','Growth plays']],
-  missions:[['KMCE brand refresh','70%'],['National CE campaign','48%'],['Partner positioning','35%']]},
+  missions:['KMCE brand refresh','National CE campaign','Partner positioning']},
  {id:'cammy',name:'Cammy',role:'Campaign Generation',dept:'Creative Campaign Strategy & Launch Mechanics',c:'#ff6fa8',office:true,quote:'Ideas. Campaigns. Execute. Grow.',
   duties:['Campaign strategy','Content ideas','Multi-channel launches','A/B testing','Performance optimization'],
-  today:[['1.3M','Campaign reach'],['86.4K','Engagements'],['22','Ideas in pipeline'],['$124K','Attributed revenue']],
-  missions:[['Phoenix event launch','62%'],['KMCE spring campaign','54%'],['Influencer outreach','31%']]},
+  missions:['Phoenix event launch','KMCE spring campaign','Influencer outreach']},
  {id:'evan',name:'Evan',role:'Content Creation',dept:'High-Converting Copywriting & Narrative Craft',c:'#4f9dff',office:true,quote:'Storytelling. Content. Media. Engage.',
   duties:['Content strategy','Script writing','Brand storytelling','Short & long-form content','Content calendars'],
-  today:[['24','Ideas in pipeline'],['12','Scripts drafted'],['8','In production'],['5','Published']],
-  missions:[['KMCE story series','64%'],['Podcast scripts','58%'],['Course launch copy','37%']]},
+  missions:['KMCE story series','Podcast scripts','Course launch copy']},
  {id:'tube',name:'Tube',role:'Video Production',dept:'Viral Video Direction & Short-Form Media',c:'#ff4d4d',office:true,quote:'Film. Edit. Produce. Distribute.',
   duties:['Video strategy','Filming & production','Editing & post','Short-form content','Thumbnails & YouTube SEO'],
-  today:[['2.4M','Total views'],['98.5K','Engagement'],['12.8K','New subscribers'],['134','Videos published']],
-  missions:[['KMCE podcast teaser','82%'],['Course promo series','56%'],['Shorts batch','40%']]},
+  missions:['KMCE podcast teaser','Course promo series','Shorts batch']},
  {id:'lucy',name:'Lucy',role:'Distribution',dept:'Omni-Channel Distribution & Amplification',c:'#c77dff',office:true,quote:'Publish. Distribute. Amplify.',
   duties:['Multi-platform publishing','Content distribution','Community engagement','Email distribution','Partnership support'],
-  today:[['42','Posts scheduled'],['6','Campaigns live'],['3','Partner drops'],['1','Report due']],
-  missions:[['KMCE outreach','68%'],['YouTube series','52%'],['Email launch','74%'],['Community growth','38%']]},
+  missions:['KMCE outreach','YouTube series','Email launch','Community growth']},
  {id:'snake',name:'Snake',role:'Analytics & Insights',dept:'Attribution Modeling & Performance Analytics',c:'#3ee68a',office:true,quote:'Data. Trends. Performance. Intelligence.',
   duties:['Data analysis','Performance tracking','Trend forecasting','ROI optimization','Predictive modeling'],
-  today:[['1,248','Total leads'],['312','Conversions'],['$87.4K','Revenue tracked'],['+68%','Forecast growth']],
-  missions:[['Attribution model','71%'],['Revenue forecast','63%'],['Funnel dashboard','45%']]},
+  missions:['Attribution model','Revenue forecast','Funnel dashboard']},
  {id:'alice',name:'Alice',role:'Storefront & Conversion',dept:'CRO & Storefront UX Architecture',c:'#ff7ad9',office:true,quote:'Attract. Engage. Convert.',
   duties:['KMCE Shop storefront','Conversion optimization','Customer journey','A/B testing','Product launches'],
-  today:[['$24,850','Shop revenue'],['328','Orders'],['4.8%','Conversion rate'],['2','Tests running']],
-  missions:[['Checkout redesign','66%'],['Bundle launch','48%'],['Upsell flow','30%']]},
+  missions:['Checkout redesign','Bundle launch','Upsell flow']},
  {id:'echo',name:'Echo',role:'Sales & Outreach',dept:'Pipeline Acceleration & Outbound Pursuit',c:'#4ea8ff',office:true,quote:'Find. Engage. Follow up.',
   duties:['Lead outreach','Email & SMS sequences','Pipeline follow-up','Call scheduling','Relationship building'],
-  today:[['2,847','Outreach sent'],['623','Replies'],['112','Meetings booked'],['18%','Reply rate']],
-  missions:[['Dr. Tim outreach','58%'],['Partner sequence','73%'],['Reactivation','35%']]},
+  missions:['Dr. Tim outreach','Partner sequence','Reactivation']},
  {id:'booker',name:'Booker',role:'Scheduling & Appointments',dept:'Calendar Mastery & High-Ticket Closing',c:'#f0b35e',office:true,quote:'Schedule. Confirm. Remind.',
   duties:['Calendar coordination','Appointment booking','Confirmations & reminders','Speaker scheduling','Time-zone handling'],
-  today:[['428','Bookings this month'],['196','Confirmed'],['8','Meetings today'],['96%','Show rate']],
-  missions:[['Phoenix event slots','81%'],['Speaker calendar','62%']]},
+  missions:['Phoenix event slots','Speaker calendar']},
  {id:'scout',name:'Scout',role:'Lead Discovery',dept:'Lead Discovery & Intelligence',c:'#ffc04d',office:true,quote:'Find. Research. Deliver.',
   duties:['Lead generation','Data enrichment','Territory mapping','Competitor analysis','Opportunity pipeline'],
-  today:[['2,267','New leads found'],['486','Enriched'],['89','Qualified'],['12','Territories']],
-  missions:[['Educator leads','69%'],['Event prospects','52%']]},
+  missions:['Educator leads','Event prospects']},
  {id:'maven',name:'Maven',role:'Campaigns & Content',dept:'Campaign & Content Strategy',c:'#b47cff',office:true,quote:'Create. Launch. Grow.',
   duties:['Campaign strategy','Content calendar','Multi-channel launches','Performance reporting','Audience growth'],
-  today:[['1.2M','Reach'],['186K','Engagements'],['14','Posts queued'],['+58%','Growth']],
-  missions:[['KMCE launch campaign','77%'],['Podcast promo','45%']]},
+  missions:['KMCE launch campaign','Podcast promo']},
  {id:'sofia',name:'Sofia',role:'Growth & Digital Presence',dept:'Growth & Digital Presence · KMCE',c:'#ff7fb0',office:true,quote:'Attract. Engage. Build.',
   duties:['Brand presence','SEO & discovery','Audience growth','Reputation management','Founder growth reports'],
-  today:[['24,813','Website visitors'],['1,428','New followers'],['5.8%','Engagement'],['2','Reports ready']],
-  missions:[['KMCE growth','57%'],['Google profile','80%'],['Weekly report','90%']]},
+  missions:['KMCE growth','Google profile','Weekly report']},
  {id:'gatekeeper',name:'Gatekeeper',role:'Approval & Compliance',dept:'Authority, Compliance & Review',c:'#f0c66d',office:true,quote:'Right process. Real progress.',
   duties:['Review & approve content','Verify credentials','Contract & policy review','Risk & audit'],
-  today:[['24','Under review'],['6','Approved'],['1','Needs founder'],['0','Policy flags']],
-  missions:[['CE compliance','98%'],['Doc verification','80%']]},
+  missions:['CE compliance','Doc verification']},
  {id:'atlas',name:'Atlas',role:'Lead Qualification',dept:'Lead Scoring & Qualification',c:'#4ea8ff',office:true,quote:'Qualify. Prioritize. Route.',
   duties:['Lead scoring','Qualification calls','Fit & intent analysis','Routing to sales','Pipeline hygiene'],
-  today:[['486','Leads scored'],['89','Qualified'],['24','Routed to Echo'],['92%','Fit accuracy']],
-  missions:[['Educator lead scoring','68%'],['Event lead triage','51%']]},
+  missions:['Educator lead scoring','Event lead triage']},
  {id:'claire',name:'Claire',role:'Research & Enrichment',dept:'Research, Verification & Data Enrichment',c:'#d98cff',office:true,quote:'Research. Verify. Enrich. Insights.',
   duties:['Company research','Contact enrichment','License & credential checks','Lead background analysis','Decision summaries'],
-  today:[['312','Records enriched'],['48','Companies researched'],['19','Credentials verified'],['6','Briefs ready']],
-  missions:[['Partner research','74%'],['CRM enrichment pass','58%']]},
+  missions:['Partner research','CRM enrichment pass']},
  {id:'flow',name:'Flow',role:'Workflow Automation',dept:'Automation & Systems Architecture',c:'#3ee6b4',office:true,quote:'Connect. Automate. Optimize. Scale.',
   duties:['Build workflows','Event automation','API integrations','Routing & monitoring','Process optimization'],
-  today:[['38','Workflows running'],['1,204','Tasks automated'],['6','Integrations live'],['0','Failures']],
-  missions:[['CRM automations','77%'],['Payment notifications','60%'],['Agent handoffs','44%']]},
+  missions:['CRM automations','Payment notifications','Agent handoffs']},
  {id:'ledger',name:'Ledger',role:'Finance & Operations',dept:'Finance, Accounting & Compliance',c:'#e6b85c',office:true,quote:'Track. Reconcile. Report. Protect.',
   duties:['Revenue tracking','Payment reconciliation','Invoice management','Financial reporting','Compliance support'],
-  today:[['$487K','Total revenue'],['1,248','Payments'],['$124K','Invoices'],['$32K','Expenses']],
-  missions:[['Monthly close','83%'],['CE quota tracking','61%'],['Budget forecast','40%']]},
+  missions:['Monthly close','CE quota tracking','Budget forecast']},
  {id:'midas',name:'Midas',role:'Product & Revenue Architect',dept:'Product, Offers & Revenue Strategy',c:'#ff9a3c',office:true,quote:'Strategy. Offers. Pricing. Growth.',
   duties:['Product development','Offer strategy & pricing','Revenue modeling','Market expansion','Partnership strategy'],
-  today:[['6','Offers in design'],['3','Pricing tests'],['2','New markets'],['$1.2M','Revenue modeled']],
-  missions:[['Live CE events offer','66%'],['Digital courses','52%'],['International expansion','28%']]},
+  missions:['Live CE events offer','Digital courses','International expansion']},
 ];
 // Where each robot's head sits in its office still (percent of the 16:9 frame) — the voice light glows there.
 // Behavior clips per office (clip-kit/README.md). When an agent's clips land in assets/ as <id>-listen.mp4 / <id>-talk.mp4,
@@ -546,8 +525,8 @@ function buildRoom(a){
  const chain=a.id==='simon'?['founder','simon','marie','gatekeeper']:a.id==='marie'?['simon','marie','team','gatekeeper']:a.id==='gatekeeper'?['simon','marie','gatekeeper','founder']:a.id==='sofia'?['founder','sofia','simon','gatekeeper']:['simon','marie',a.id,'gatekeeper'];
  const chainHtml=chain.map(id=>id==='founder'?'<button type="button" disabled>Founder</button>':id==='team'?'<button type="button" data-room="floor">Specialists</button>':`<button type="button" class="${id===a.id?'me':''}" data-room="${id}">${byId[id].name}</button>`).join('<i>›</i>');
  const tabs={
-  overview:`<h3>TODAY</h3><ul>${(a.today||[['—','Office video in production']]).map(([n,l])=>`<li><span>${l}</span><em>${n}</em></li>`).join('')}</ul>
-   <h3>ACTIVE MISSIONS</h3><ul>${(a.missions||[['Room build','next']]).map(([m,p])=>`<li><span>${m}</span><em>${p}</em></li>`).join('')}</ul>`,
+  overview:`<h3>ACTIVE MISSIONS</h3><ul>${(a.missions||['Office being built']).map(m=>`<li><span>${m}</span><em>●</em></li>`).join('')}</ul>
+   <h3>FOCUS</h3><ul>${(a.duties||[a.dept]).slice(0,3).map(d=>`<li><span>${d}</span><em>✓</em></li>`).join('')}</ul>`,
   duties:`<h3>RESPONSIBILITIES</h3><ul>${(a.duties||[a.dept]).map(d=>`<li><span>${d}</span><em>✓</em></li>`).join('')}</ul>`,
   handoffs:`<h3>HANDOFF CHAIN</h3><div class="chain">${chainHtml}</div><p class="status-line">Click a name to walk straight to that office.</p>`,
   states:`<h3>OFFICE STATES · PREVIEW</h3><div class="state">${['listening','working','approval_wait','completed'].map(st=>`<button type="button" data-state="${st}">${st.replace('_',' ')}</button>`).join('')}</div><p class="status-line" data-status>${a.name} is at the desk. Preview only — no live task has been sent.</p>`};
@@ -574,14 +553,15 @@ function buildRoom(a){
    Preview replies come from each agent's own office data. The presentation layer is built so a live
    model (api/chat) can drop in later: swap reply() for a fetch and keep speak() as-is. */
 const pick=arr=>arr[Math.floor(Math.random()*arr.length)];
-function suggestions(a){return a.next?['What will this office do?']:['What are you working on?','Give me today’s numbers','What’s your role?','Hand this to the team']}
+function suggestions(a){return a.next?['What will this office do?']:['What are you working on?','What’s your top priority?','What’s your role?','Hand this to the team']}
 function reply(a,q){
- const t=q.toLowerCase(),today=a.today||[],missions=a.missions||[],duties=a.duties||[a.dept];
+ const t=q.toLowerCase(),missions=a.missions||[],duties=a.duties||[a.dept];
  const list=xs=>xs.length>1?xs.slice(0,-1).join(', ')+', and '+xs.at(-1):xs[0]||'';
  if(a.next)return `My office is still being built. Once it opens, I'll handle ${a.dept.toLowerCase()}.`;
  if(/^(hi|hey|hello|yo|good (morning|afternoon|evening))\b/.test(t))return pick([`Hey. ${a.name} here, ${a.role}. ${a.quote||''} What do you need?`,`Welcome in. I'm ${a.name}. Ask me anything about ${a.role.toLowerCase()}.`]);
- if(/number|today|stat|metric|how (are|is)|report|kpi/.test(t))return `Here's today: ${list(today.map(([n,l])=>`${n} ${l.toLowerCase()}`))}.`;
- if(/work|mission|project|progress|focus|doing/.test(t))return missions.length?`Right now I'm moving ${list(missions.map(([m,p])=>`${m} at ${p}`))}. ${missions[0][0]} is my top priority.`:`I'm focused on ${duties[0].toLowerCase()}.`;
+ if(/number|stat|metric|kpi|revenue|how many|how much/.test(t))return `My live numbers come straight from KMCE once this office is connected, so I won't guess at them. What I can tell you is that ${(missions[0]||duties[0]).toLowerCase()} is where my focus is right now.`;
+ if(/priorit|top|most important/.test(t))return missions.length?`${missions[0]}. That's the one I'm pushing hardest, and it feeds straight into ${duties[0].toLowerCase()}.`:`${duties[0]}.`;
+ if(/work|mission|project|progress|focus|doing/.test(t))return missions.length?`Right now I'm moving ${list(missions)}. ${missions[0]} is my top priority.`:`I'm focused on ${duties[0].toLowerCase()}.`;
  if(/role|who are you|what do you do|responsib|help/.test(t))return `I'm ${a.name}, ${a.role}. I own ${list(duties.slice(0,4).map(d=>d.toLowerCase()))}.`;
  if(/hand|send|approve|delegate|team|assign/.test(t))return a.id==='simon'?`Understood. I'll set the priority and pass it to Marie to dispatch. Gatekeeper reviews before anything goes out.`:a.id==='marie'?`On it. I'll split it across the floor and track every handoff. Gatekeeper gets the final review.`:a.id==='gatekeeper'?`Send it my way. Nothing goes out until it clears review, and anything sensitive comes back to you.`:`Got it. I'll draft my part, Marie routes it, and Gatekeeper signs off before it ships.`;
  return pick([`Noted: "${q}". In the live build I'll pull that straight from the CRM. For now I'm running on preview data.`,`Good question. Once I'm connected to the live CRM I'll answer that with real records. Right now this office is a preview.`]);
@@ -635,14 +615,14 @@ function wireConversation(s,a){
 /* ===== CRM ===== */
 function buildCRM(){
  const s=document.createElement('section');s.className='panel-scene';s.setAttribute('aria-label','Pegasus CRM');
- const activity=[['echo','New lead from website','10m'],['alice','Opportunity moved to Proposal','32m'],['booker','Meeting scheduled','1h'],['iris','Research report completed','2h'],['cammy','Campaign draft ready','3h']];
- const agents=[['simon','Working'],['marie','Complete'],['iris','Working'],['mark','Working'],['cammy','Queued'],['lucy','Working']];
+ const activity=[['scout','finds new leads'],['atlas','qualifies and routes them'],['echo','follows up and books calls'],['booker','confirms the meeting'],['gatekeeper','reviews before anything goes out']];
+ const agents=[['simon','Executive'],['marie','Operations'],['iris','Intelligence'],['mark','Marketing'],['cammy','Campaigns'],['lucy','Distribution']];
  s.innerHTML=`<img class="bg" src="assets/pegasus-atrium.png" alt="">
- <div class="board"><div class="scene-title"><h2 class="serif">PEGASUS CRM</h2><p>PIPELINE · TASKS · AGENT ACTIVITY · <span class="sample">SAMPLE DATA</span></p></div>
- <div class="card kpis"><div class="kpi"><span>LEADS</span><b>124</b><em>↑ 12%</em></div><div class="kpi"><span>OPPORTUNITIES</span><b>$287K</b><em>↑ 18%</em></div><div class="kpi"><span>ACTIVE CLIENTS</span><b>18</b><em>↑ 2%</em></div><div class="kpi"><span>TASKS</span><b>42</b><em>↑ 6%</em></div></div>
- <div class="crm-grid"><div class="card funnel"><h3>PIPELINE</h3>${[['New leads',124,100],['Discovery',86,84],['Proposal',52,68],['Negotiation',28,52],['Closed',18,38]].map(([l,n,w])=>`<div style="width:${w}%"><span>${l}</span><b>${n}</b></div>`).join('')}</div>
- <div class="card"><h3>AI AGENT ACTIVITY · TAP TO VISIT</h3>${agents.map(([id,st])=>`<button class="agent-row" type="button" data-room="${id}">${orb(byId[id])}<span>${byId[id].name}<br><small>${byId[id].role}</small></span><em>${st}</em></button>`).join('')}</div></div>
- <div class="card"><h3>RECENT ACTIVITY</h3>${activity.map(([id,t,ago])=>`<button class="agent-row" type="button" data-room="${id}">${orb(byId[id])}<span>${byId[id].name} — ${t}</span><small>${ago} ago</small></button>`).join('')}</div></div>`;
+ <div class="board"><div class="scene-title"><h2 class="serif">PEGASUS CRM</h2><p>PIPELINE · TASKS · AGENT ACTIVITY</p></div>
+ <div class="card kpis"><div class="kpi"><span>LEADS</span><b>Pipeline</b><em>Scout · Atlas · Echo</em></div><div class="kpi"><span>OPPORTUNITIES</span><b>Deals</b><em>Echo · Booker</em></div><div class="kpi"><span>CLIENTS</span><b>Accounts</b><em>Marie · Alice</em></div><div class="kpi"><span>APPROVALS</span><b>Review</b><em>Gatekeeper · Simon</em></div></div>
+ <div class="crm-grid"><div class="card funnel"><h3>PIPELINE</h3>${[['New leads',100],['Discovery',84],['Proposal',68],['Negotiation',52],['Closed',38]].map(([l,w])=>`<div style="width:${w}%"><span>${l}</span></div>`).join('')}</div>
+ <div class="card"><h3>AI TEAM · TAP TO VISIT</h3>${agents.map(([id,st])=>`<button class="agent-row" type="button" data-room="${id}">${orb(byId[id])}<span>${byId[id].name}<br><small>${byId[id].role}</small></span><em>${st}</em></button>`).join('')}</div></div>
+ <div class="card"><h3>HOW A LEAD MOVES · TAP TO VISIT</h3>${activity.map(([id,t])=>`<button class="agent-row" type="button" data-room="${id}">${orb(byId[id])}<span>${byId[id].name} ${t}</span><small>${byId[id].role}</small></button>`).join('')}</div></div>`;
  s.querySelectorAll('[data-room]').forEach(b=>b.onclick=travel('room/'+b.dataset.room));
  return s;
 }
@@ -655,7 +635,7 @@ function buildWarRoom(){
  <div class="board" style="align-content:center"><div class="scene-title"><h2 class="serif">WAR ROOM</h2><p>HOW A MISSION MOVES THROUGH PEGASUS</p></div>
  <div class="card flow"><button type="button" disabled style="--c:#dfba80"><span class="orb" style="--c:#dfba80">YOU</span><strong>FOUNDER</strong><span>sets the mission</span></button><i>›</i>
  ${step('simon','strategy & priority')}<i>›</i>${step('marie','dispatch & operations')}<i>›</i>
- <button type="button" data-floor style="--c:#7ddcf3"><span class="orb" style="--c:#7ddcf3">12</span><strong>SPECIALISTS</strong><span>the employee floor</span></button><i>›</i>
+ <button type="button" data-floor style="--c:#7ddcf3"><span class="orb" style="--c:#7ddcf3">AI</span><strong>SPECIALISTS</strong><span>the employee floor</span></button><i>›</i>
  ${step('gatekeeper','review & compliance')}<i>›</i><button type="button" disabled style="--c:#dfba80"><span class="orb" style="--c:#dfba80">✓</span><strong>FOUNDER</strong><span>final decision</span></button></div>
  <p class="sample" style="text-align:center">PREVIEW OF THE INTENDED FLOW · NOT CONNECTED TO LIVE MISSIONS</p></div>`;
  s.querySelectorAll('[data-room]').forEach(b=>b.onclick=travel('room/'+b.dataset.room));
