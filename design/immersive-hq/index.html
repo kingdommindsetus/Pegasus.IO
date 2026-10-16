@@ -445,6 +445,27 @@ button.wf-step:hover{transform:translateY(-3px);border-color:var(--c);box-shadow
 .ws-team .orb{width:28px;height:28px}
 @media(max-width:860px){.ws-team{display:none}.wf-step{min-width:96px}}
 
+
+/* ---------- client list ---------- */
+.cl-tools{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.cl-search{flex:1;min-width:0;padding:11px 14px;border:1px solid #ffffff18;border-radius:10px;background:#060b13;color:#e8edf3;font:inherit;font-size:13px;outline:none}
+.cl-search:focus{border-color:var(--gold)}
+.cl-count{font-size:11px;color:var(--mute);letter-spacing:.08em}
+.cl-row{display:grid;grid-template-columns:minmax(220px,2fr) minmax(160px,1.6fr) minmax(120px,1fr) minmax(110px,.9fr) 90px 110px;align-items:center;gap:14px;padding:12px 10px;border-bottom:1px solid #ffffff0a;color:inherit;text-decoration:none;border-radius:10px}
+a.cl-row:hover,a.cl-row:focus-visible{background:linear-gradient(90deg,#dfba8018,transparent);outline:none}
+a.cl-row:hover .cl-open{color:var(--gold-hi)}
+.cl-headrow{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--mute);padding-top:4px;padding-bottom:8px}
+.cl-who{display:flex;align-items:center;gap:12px;min-width:0}
+.cl-who .orb{width:42px;height:42px;flex:none;font-size:13px}
+.cl-who b{display:block;font-size:14px;color:#fff;letter-spacing:.03em}
+.cl-who small,.cl-pay small,.cl-prog small{display:block;margin-top:2px;font-size:11px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cl-prog-name{font-size:12.5px;color:#c9d4de}
+.cl-prog .mprog{margin:0 0 4px}
+.cl-pay b{font-size:14px;color:#fff;font-variant-numeric:tabular-nums}
+.cl-open{font-size:12px;color:#9fb0bf;text-align:right;letter-spacing:.04em}
+.cl-empty{padding:18px 10px;color:var(--mute);font-size:13px}
+@media(max-width:1100px){.cl-row{grid-template-columns:minmax(0,1fr) auto}.cl-row>:not(.cl-who):not(.cl-open){display:none}}
+
 /* ---------- responsive ---------- */
 @media(max-width:860px){
  #crumbs,.pill{display:none}
@@ -592,10 +613,10 @@ const SCENES={
  floor:{label:'Employee Floor',depth:1,build:buildFloor},
  crm:{label:'CRM Dashboard',depth:1,build:buildCRM},
  'war-room':{label:'War Room',depth:1,build:buildWarRoom},
- lobby:{label:'Client Portal',depth:1,build:buildLobby},
+ lobby:{label:'Clients',depth:1,build:buildClientList},
 };
 const cache={};let current=null,busy=false,motionPaused=false;
-function sceneInfo(key){if(key.startsWith('room/')){const a=byId[key.slice(5)];return a?{label:a.name,depth:2,parent:a.exec?'atrium':'floor',build:()=>buildRoom(a)}:null}const s=SCENES[key];return s?{parent:'atrium',...s}:null}
+function sceneInfo(key){if(key.startsWith('client/'))return {label:'Client portal',depth:2,parent:'lobby',build:()=>buildClientPortal(key.slice(7))};if(key.startsWith('room/')){const a=byId[key.slice(5)];return a?{label:a.name,depth:2,parent:a.exec?'atrium':'floor',build:()=>buildRoom(a)}:null}const s=SCENES[key];return s?{parent:'atrium',...s}:null}
 function getScene(key){if(!cache[key]){const el=sceneInfo(key).build();el.classList.add('scene');el.dataset.key=key;world.append(el);cache[key]=el}return cache[key]}
 
 /* ===== Travel — the "pull you through" camera move ===== */
@@ -665,7 +686,7 @@ function buildAtrium(){
  ${hot('floor','50%','84%','EMPLOYEE FLOOR','Walk the hall · AI team offices',{icon:'⇡',forward:true})}
  ${hot('crm','80%','30%','PEGASUS CRM','Live metrics · AI workforce leaderboard',{icon:'◎',c:'#7ddcf3'})}
  ${hot('war-room','14%','62%','WAR ROOM','Mission execution',{icon:'✦',c:'#ff9a5c'})}
- ${hot('lobby','86%','62%','CLIENT PORTAL','Dr. Adams · projects · concierge',{icon:'⌂',c:'#f0d7a8'})}`;
+ ${hot('lobby','86%','62%','CLIENTS','Client portals · projects · concierge',{icon:'⌂',c:'#f0d7a8'})}`;
  s.querySelectorAll('[data-go]').forEach(b=>b.onclick=travel(b.dataset.go));
  // two players crossfade so the hologram loop never visibly resets
  const v1=s.querySelector('#holo'),v2=s.querySelector('#holo2');let active=v1,standby=v2,timer;
@@ -1090,7 +1111,7 @@ function buildCRM(){
   <div class="drow three">
    <div class="card" style="--i:9"><h3>AWAITING YOUR APPROVAL <small>${client.workstreams.length} workstreams</small></h3>
     ${client.workstreams.map(w=>`<button class="appr" type="button" data-room="${w.lead}">${orb(byId[w.lead])}<span>${w.name}<small>${byId[w.lead].name} leads · ${client.short}</small></span><em class="chip wait">◷ Approval</em></button>`).join('')}</div>
-   <div class="card" style="--i:10"><h3>CLIENTS</h3><button class="client-card" type="button" data-go="lobby"><span class="orb" style="--c:#dfba80">TA</span><span><b>${client.name}</b><span>${client.credentials} · ${client.track}</span><span>${client.campaign.name}</span></span></button>
+   <div class="card" style="--i:10"><h3>CLIENTS</h3><button class="client-card" type="button" data-go="client/${client.id}"><span class="orb" style="--c:#dfba80">TA</span><span><b>${client.name}</b><span>${client.credentials} · ${client.track}</span><span>${client.campaign.name}</span></span></button>
     <div class="stat-line" style="margin-top:10px"><span>Payments recorded</span><b>${money(client.payments.recorded)}</b></div><div class="stat-line"><span>Processor verified</span><b>${money(client.payments.verified)}</b></div><div class="stat-line"><span>Next event</span><b>${client.event.city}, ${client.event.state} · ${client.event.ceHours} CE hrs</b></div></div>
    <div class="card" style="--i:11"><h3>AUTONOMY ENGINE</h3>
     <div class="stat-line"><span>Worker runs</span><b>${num(k.workerRuns)}</b></div><div class="stat-line"><span>Jobs completed</span><b>${num(k.jobsCompleted)}</b></div><div class="stat-line"><span>Failed jobs</span><b>${k.jobsFailed}</b></div><div class="stat-line"><span>Huddle reports filed</span><b>${num(k.huddleReports)}</b></div><div class="stat-line"><span>Campaign milestones</span><b>${k.milestonesOpen} open · ${k.milestonesPaused} paused</b></div><div class="stat-line"><span>Active clients</span><b>${k.activeClients}</b></div></div>
@@ -1157,16 +1178,55 @@ function buildWarRoom(){
  return s;
 }
 
+/* ===== Clients: searchable list; each name opens that client's portal ===== */
+function clientInitials(n){return n.replace(/^Dr\.?\s+/i,'').split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase()}
+function buildClientList(){
+ const s=document.createElement('section');s.className='dash';s.setAttribute('aria-label','Clients');
+ s.innerHTML=`${dashSide('client')}<div class="dash-main"><p class="sample">Loading clients…</p></div>`;
+ s.querySelectorAll('.dash-side [data-go]').forEach(b=>b.onclick=travel(b.dataset.go));
+ kmceData().then(D=>{
+  const today=Date.now();
+  const rows=D.clients.map(c=>{const st=new Date(c.campaign.start+'T00:00:00'),en=new Date(c.campaign.end+'T00:00:00'),total=Math.round((en-st)/864e5)+1,day=Math.min(total,Math.max(0,Math.floor((today-st)/864e5)+1));return {c,day,total}});
+  s.querySelector('.dash-main').innerHTML=`
+  <div class="dash-head"><div><h2>CLIENTS</h2><p>Every client, one click from their portal.</p></div><span class="live">${D.clients.length} ACTIVE ${D.clients.length===1?'CLIENT':'CLIENTS'}</span></div>
+  <div class="card" style="--i:0">
+   <div class="cl-tools"><input class="cl-search" type="search" placeholder="Search clients by name, specialty, or program…" aria-label="Search clients"><span class="cl-count"></span></div>
+   <div class="cl-table" role="table">
+    <div class="cl-row cl-headrow" role="row"><span>Client</span><span>Program</span><span>Progress</span><span>Payments</span><span>Status</span><span></span></div>
+    ${rows.map(({c,day,total})=>`<a class="cl-row" role="row" href="#/client/${c.id}" data-go="client/${c.id}" data-search="${(c.name+' '+c.credentials+' '+c.track+' '+c.campaign.name+' '+c.title).toLowerCase().replace(/"/g,'')}">
+     <span class="cl-who"><span class="orb" style="--c:#dfba80">${clientInitials(c.name)}</span><span><b>${c.name}</b><small>${c.credentials} · ${c.track}</small></span></span>
+     <span class="cl-prog-name">${c.campaign.name}</span>
+     <span class="cl-prog"><span class="mprog"><span style="--p:${(day/total*100).toFixed(1)}%"></span></span><small>Day ${day} of ${total}</small></span>
+     <span class="cl-pay"><b>${money(c.payments.recorded)}</b><small>${money(c.payments.verified)} verified</small></span>
+     <span><em class="chip ok">✓ ${c.status}</em></span>
+     <span class="cl-open">Open portal →</span></a>`).join('')}
+    <p class="cl-empty" hidden>No clients match that search.</p>
+   </div>
+   <p class="lb-note">New clients appear here automatically as they're added in KMCE.</p>
+  </div>`;
+  const main=s.querySelector('.dash-main'),search=main.querySelector('.cl-search'),count=main.querySelector('.cl-count'),items=[...main.querySelectorAll('a.cl-row')];
+  const filter=()=>{const q=search.value.trim().toLowerCase();let n=0;items.forEach(r=>{const hit=!q||r.dataset.search.includes(q);r.hidden=!hit;n+=hit});count.textContent=`${n} of ${items.length}`;main.querySelector('.cl-empty').hidden=n>0};
+  search.addEventListener('input',filter);filter();
+  items.forEach(a=>a.onclick=e=>{e.preventDefault();travel(a.dataset.go)(e)});
+  s.playIn=()=>{s.classList.remove('in');void s.offsetWidth;s.classList.add('in')};
+  if(current==='lobby')s.playIn();
+ });
+ s.onArrive=()=>s.playIn?.();
+ return s;
+}
+
 /* ===== Client portal ===== */
-function buildLobby(){
+function buildClientPortal(id){
  const s=document.createElement('section');s.className='dash portal';s.setAttribute('aria-label','Client portal');
  s.innerHTML=`<div class="dash-main"><p class="sample">Loading client…</p></div>`;
  kmceData().then(D=>{
-  const c=D.clients[0],today=new Date(),start=new Date(c.campaign.start+'T00:00:00'),end=new Date(c.campaign.end+'T00:00:00');
+  const c=D.clients.find(x=>x.id===id);
+  if(!c){s.querySelector('.dash-main').innerHTML='<p class="sample">That client is not in KMCE yet.</p>';return}
+  const today=new Date(),start=new Date(c.campaign.start+'T00:00:00'),end=new Date(c.campaign.end+'T00:00:00');
   const total=Math.round((end-start)/864e5)+1,day=Math.min(total,Math.max(0,Math.floor((today-start)/864e5)+1)),R=56,C=2*Math.PI*R;
   const iso=today.toISOString().slice(0,10);
   s.querySelector('.dash-main').innerHTML=`
-  <div class="p-tabs"><button class="on" type="button">● ${c.name}</button><button type="button" disabled>+ Next client</button></div>
+  <div class="p-tabs"><button type="button" data-go="lobby">← All clients</button><button class="on" type="button">● ${c.name}</button></div>
   <div class="card p-hero" style="--i:0"><div><div class="k-lab">CLIENT PORTAL · WELCOME BACK</div><h2>${c.name}</h2><div class="cred">${c.credentials}</div><p>${c.title}. ${c.track} track · <em class="chip ok">✓ ${c.status}</em></p></div>
    <div class="ring" aria-label="Day ${day} of ${total}"><svg viewBox="0 0 132 132"><defs><linearGradient id="ringGold" x1="0" x2="1"><stop offset="0" stop-color="#9b7a45"/><stop offset="1" stop-color="#ffd998"/></linearGradient></defs><circle class="track" cx="66" cy="66" r="${R}"/><circle class="fill" cx="66" cy="66" r="${R}" stroke-dasharray="${C}" stroke-dashoffset="${C}" data-off="${C*(1-day/total)}"/></svg><div><span><b>${day}</b>OF ${total} DAYS</span></div></div></div>
   <div class="drow three">
@@ -1187,7 +1247,8 @@ function buildLobby(){
   const main=s.querySelector('.dash-main');
   main.querySelectorAll('[data-room]').forEach(b=>b.onclick=travel('room/'+b.dataset.room));
   s.playIn=()=>{s.classList.remove('in');void s.offsetWidth;s.classList.add('in');countUp(main);const f=main.querySelector('.ring .fill');requestAnimationFrame(()=>requestAnimationFrame(()=>f.style.strokeDashoffset=f.dataset.off))};
-  if(current==='lobby')s.playIn();
+  main.querySelectorAll('[data-go]').forEach(b=>b.onclick=travel(b.dataset.go));
+  if(current===s.dataset.key)s.playIn();
  });
  s.onArrive=()=>s.playIn?.();
  return s;
