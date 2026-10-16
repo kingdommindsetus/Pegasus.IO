@@ -131,9 +131,19 @@ button{font:inherit;color:inherit;cursor:pointer}button:focus-visible,a:focus-vi
 .fx-window{left:36%;top:41%;width:24%;height:22%;background:radial-gradient(ellipse,#ff9a6a30,transparent 65%);animation:pulse 7s ease-in-out infinite}
 .fx-holo{left:37%;top:62%;width:20%;height:28%;background:radial-gradient(ellipse at 50% 55%,#6fd3ff88,#2a7bff33 40%,transparent 68%);animation:holo 3.2s ease-in-out infinite}
 .fx-ring{left:28%;top:79%;width:40%;height:18%;background:radial-gradient(ellipse at 50% 45%,#ffcf7a99,#ffb24633 45%,transparent 70%);animation:pulse 4s ease-in-out infinite}
-.fx-floor{inset:0;clip-path:polygon(37% 67%,61% 67%,100% 93%,100% 100%,0 100%,0 95%)}
-.fx-floor i{position:absolute;left:0;right:0;top:66%;height:7%;background:linear-gradient(transparent,#ffd38a88 40%,#fff2d0bb 50%,#ffd38a88 60%,transparent);opacity:0;animation:sweep 6s cubic-bezier(.45,0,.75,1) infinite}
-.fx-floor i:nth-child(2){animation-delay:-3s}
+/* LED baseboards traced on the floor's own light lines: a slow breath plus one soft pulse gliding to the far end */
+.led{inset:0;width:100%;height:100%}
+.led line{fill:none;stroke-linecap:round;vector-effect:non-scaling-stroke}
+.led-base line{stroke:#ffe7bd;stroke-width:2.2;filter:drop-shadow(0 0 3px #ffcf7a) drop-shadow(0 0 10px #ffb246);animation:ledBreath 9s ease-in-out infinite}
+.led-flow line{stroke:#fff8ea;stroke-width:3.4;stroke-dasharray:16 400;stroke-dashoffset:16;filter:drop-shadow(0 0 4px #fff1cf) drop-shadow(0 0 14px #ffc970);animation:ledGlide 9s cubic-bezier(.45,.05,.35,1) infinite}
+@keyframes ledBreath{0%,100%{opacity:.38}50%{opacity:.72}}
+@keyframes ledGlide{0%{stroke-dashoffset:16;opacity:0}12%{opacity:.95}78%{opacity:.6}100%{stroke-dashoffset:-100;opacity:0}}
+/* the city window: sunset clouds drift behind the towers, slow enough to feel rather than notice */
+.fx-sky{position:absolute;left:37.4%;top:45.6%;width:21%;height:16.4%;overflow:hidden;pointer-events:none;mix-blend-mode:screen;-webkit-mask:url(assets/floor-sky-mask.png) 0 0/100% 100%;mask:url(assets/floor-sky-mask.png) 0 0/100% 100%}
+.fx-sky i{position:absolute;left:0;width:400%;background:url(assets/floor-clouds.png) 0 0/25% 100% repeat-x;animation:drift 150s linear infinite}
+.fx-sky .c1{top:-6%;height:62%;opacity:.55}
+.fx-sky .c2{top:22%;height:44%;opacity:.32;animation-duration:230s;animation-delay:-80s}
+@keyframes drift{to{transform:translateX(-25%)}}
 .fx-orbit{inset:0;width:100%;height:100%}
 .fx-orbit ellipse{fill:none;stroke-width:3;vector-effect:non-scaling-stroke;stroke-linecap:round;stroke-dasharray:16 84;animation:orbit 5.5s linear infinite}
 .fx-orbit .o-cyan{stroke:#8ff3ff;filter:drop-shadow(0 0 4px #4fd8ff) drop-shadow(0 0 12px #2aa8ff)}
@@ -148,12 +158,11 @@ button{font:inherit;color:inherit;cursor:pointer}button:focus-visible,a:focus-vi
 .motes i{position:absolute;bottom:-2%;width:3px;height:3px;border-radius:50%;background:#ffe2a8;box-shadow:0 0 6px #ffcf7a;opacity:0;animation:mote linear infinite}
 @keyframes pulse{50%{opacity:.45}}
 @keyframes holo{0%,100%{opacity:1;filter:hue-rotate(0)}30%{opacity:.7}33%{opacity:.95}60%{opacity:.75;filter:hue-rotate(-15deg)}}
-@keyframes sweep{0%{top:66%;height:3%;opacity:0}15%{opacity:1}100%{top:100%;height:14%;opacity:0}}
 @keyframes run{to{stroke-dashoffset:-100}}
 @keyframes flick{0%,100%{opacity:.9}37%{opacity:.4}41%{opacity:1}73%{opacity:.6}}
 @keyframes mote{0%{transform:translateY(0);opacity:0}15%{opacity:.7}85%{opacity:.5}100%{transform:translateY(-70vh) translateX(2vw);opacity:0}}
-.paused .fx,.paused .fx *,.paused .motes i{animation-play-state:paused}
-@media(prefers-reduced-motion:reduce){.fx,.fx *,.motes i{animation:none!important}}
+.paused .fx,.paused .fx *,.paused .motes i,.paused .fx-sky i{animation-play-state:paused}
+@media(prefers-reduced-motion:reduce){.fx,.fx *,.motes i,.fx-sky i{animation:none!important}}
 
 /* ---------- agent rooms ---------- */
 .room .shade{background:linear-gradient(90deg,#02050bcc 0%,#02050b55 22%,transparent 46%,transparent 62%,#02050bb0 100%),linear-gradient(0deg,#02050bd9,transparent 32%)}
@@ -411,20 +420,33 @@ button{font:inherit;color:inherit;cursor:pointer}button:focus-visible,a:focus-vi
 .appr .orb{width:38px;height:38px}
 .lb-row .orb{width:36px;height:36px}
 /* ---------- employee floor roster (panel-style directory) ---------- */
-.roster{position:absolute;left:clamp(12px,1.6vw,28px);top:74px;bottom:76px;width:min(300px,30vw);display:flex;flex-direction:column;border:1px solid #dfba8033;border-radius:16px;background:linear-gradient(180deg,#070c15e8,#05080fe0);backdrop-filter:blur(10px);box-shadow:0 20px 50px #000a;overflow:hidden;opacity:0;transform:translateX(-16px);transition:opacity .6s,transform .6s cubic-bezier(.2,.75,.2,1)}
+/* ---------- AI team hub (employee floor directory) ---------- */
+.roster{position:absolute;left:clamp(12px,1.6vw,28px);top:72px;bottom:74px;width:min(340px,31vw);display:flex;flex-direction:column;border-radius:20px;
+ background:linear-gradient(160deg,#ffffff1f,#ffffff08 38%,#ffffff05),linear-gradient(180deg,#18202ecc,#0c111bd9);
+ border:1px solid #ffffff22;box-shadow:inset 0 1px 0 #ffffff30,inset 0 0 0 1px #dfba8018,0 30px 70px #000b,0 0 60px #dfba8014;
+ backdrop-filter:blur(22px) saturate(1.5);-webkit-backdrop-filter:blur(22px) saturate(1.5);overflow:hidden;opacity:0;transform:translateX(-16px);transition:opacity .6s,transform .6s cubic-bezier(.2,.75,.2,1)}
+.roster::before{content:'';position:absolute;left:18px;right:18px;top:0;height:1px;background:linear-gradient(90deg,transparent,#ffe3ab,transparent);opacity:.8}
 #s-floor.arrived .roster{opacity:1;transform:none}
-.roster-head{display:flex;align-items:baseline;justify-content:space-between;padding:14px 16px 10px;border-bottom:1px solid #ffffff10}
-.roster-head b{font-size:11px;letter-spacing:.24em;color:var(--gold-hi);font-weight:600}
-.roster-head span{font-size:10.5px;color:#9ff0c2;letter-spacing:.06em}
-.roster-list{flex:1;overflow:auto;padding:6px;scrollbar-width:thin}
-.r-item{display:flex;align-items:center;gap:12px;width:100%;padding:5px 10px;border:0;border-radius:10px;background:transparent;color:inherit;text-align:left;transition:background .2s}
-.r-item:hover,.r-item:focus-visible{background:linear-gradient(90deg,color-mix(in srgb,var(--c) 22%,transparent),transparent);outline:none}
-.r-item .orb{width:34px;height:34px;flex:none}
+.roster-head{padding:18px 18px 12px}
+.roster-head b{display:block;font-family:"Cormorant Garamond",Georgia,serif;font-size:22px;font-weight:500;letter-spacing:.14em;color:#fff3dc;text-shadow:0 0 18px #ffcf7a55}
+.roster-head span{display:flex;align-items:center;gap:8px;margin-top:6px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#cfe9dc}
+.roster-head span::before{content:'';width:7px;height:7px;border-radius:50%;background:#3ee68a;box-shadow:0 0 0 3px #3ee68a2a,0 0 10px #3ee68a;animation:live 2.6s ease-in-out infinite}
+@keyframes live{50%{box-shadow:0 0 0 6px #3ee68a00,0 0 14px #3ee68a}}
+.roster-list{flex:1;overflow:auto;padding:4px 12px 14px;display:flex;flex-direction:column;gap:6px;scrollbar-width:thin;scrollbar-color:#dfba8055 transparent}
+.r-item{position:relative;display:flex;align-items:center;gap:13px;width:100%;padding:8px 12px 8px 8px;border:1px solid #ffffff12;border-radius:14px;background:linear-gradient(90deg,color-mix(in srgb,var(--c) 14%,#ffffff0a),#ffffff06);color:inherit;text-align:left;cursor:pointer;transition:transform .25s cubic-bezier(.2,.75,.2,1),border-color .25s,background .25s,box-shadow .25s}
+.r-item:hover,.r-item:focus-visible{transform:translateX(4px);border-color:color-mix(in srgb,var(--c) 70%,transparent);background:linear-gradient(90deg,color-mix(in srgb,var(--c) 30%,transparent),#ffffff0c);box-shadow:0 8px 26px color-mix(in srgb,var(--c) 28%,transparent);outline:none}
+.r-item .orb{position:relative;width:46px;height:46px;flex:none;border:1.5px solid var(--c);box-shadow:0 0 0 3px #0b1018,0 0 16px color-mix(in srgb,var(--c) 70%,transparent)}
+.r-item .orb img{filter:brightness(1.18) contrast(1.06) saturate(1.1)}
 .r-txt{flex:1;min-width:0}
-.r-txt b{display:block;font-size:13px;letter-spacing:.06em;color:#f2f5f8;font-weight:600}
-.r-txt small{display:block;margin-top:1px;font-size:11px;color:#93a3b3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.r-dot{flex:none;width:8px;height:8px;border-radius:50%;background:#3ee68a;box-shadow:0 0 8px #3ee68a}
-.r-sep{margin:6px 10px 2px;font-size:9.5px;letter-spacing:.22em;color:var(--mute)}
+.r-txt b{display:block;font-size:14.5px;letter-spacing:.05em;color:#fff;font-weight:600}
+.r-txt small{display:block;margin-top:2px;font-size:11.5px;color:color-mix(in srgb,var(--c) 45%,#e6edf3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.r-dot{flex:none;display:flex;align-items:center;gap:6px;font-style:normal;font-size:10px;letter-spacing:.12em;color:#9ff0c2;text-transform:uppercase}
+.r-dot::before{content:'';width:7px;height:7px;border-radius:50%;background:#3ee68a;box-shadow:0 0 8px #3ee68a}
+.r-item:hover .r-dot,.r-item:focus-visible .r-dot{color:#fff}
+.r-item:hover .r-dot::after,.r-item:focus-visible .r-dot::after{content:'→';font-size:13px;letter-spacing:0}
+.r-sep{display:flex;align-items:center;gap:10px;margin:10px 4px 2px;font-size:10px;letter-spacing:.26em;color:#e8cf9f;font-weight:600}
+.r-sep::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,#dfba8055,transparent)}
+.paused .roster-head span::before{animation-play-state:paused}
 @media(max-width:860px){.roster{left:12px;right:12px;width:auto;top:auto;bottom:70px;height:46vh}}
 
 
@@ -782,18 +804,22 @@ function buildAtrium(){
 
 /* ===== Employee floor — the corridor walk ===== */
 function door(a){return `<button class="door${a.exec?' exec':''}" type="button" data-room="${a.id}" style="--c:${a.c}" aria-label="Enter ${a.name}'s office">${orb(a)}<span><strong>${a.name.toUpperCase()}</strong><span>${a.role}</span></span><i class="live${a.office?'':' next'}" title="${a.office?'Office ready':'Office video coming'}"></i></button>`}
-function rosterItem(a){return `<button class="r-item" type="button" data-room="${a.id}" style="--c:${a.c}" aria-label="Enter ${a.name}'s office">${orb(a)}<span class="r-txt"><b>${a.name}</b><small>${a.role}</small></span><i class="r-dot" aria-hidden="true"></i></button>`}
+function rosterItem(a){return `<button class="r-item" type="button" data-room="${a.id}" style="--c:${a.c}" aria-label="Enter ${a.name}'s office">${orb(a)}<span class="r-txt"><b>${a.name}</b><small>${a.role}</small></span><i class="r-dot" aria-hidden="true">Online</i></button>`}
 function buildFloor(){
  const s=document.createElement('section');s.id='s-floor';s.setAttribute('aria-label','Employee Floor');
  const half=Math.ceil(FLOOR.length/2),left=FLOOR.slice(0,half),right=FLOOR.slice(half);
  s.innerHTML=`<div class="stage" aria-hidden="true"><img src="assets/floor-still.jpg" alt="">
   <span class="fx fx-sign"></span><span class="fx fx-window"></span><span class="fx fx-holo"></span><span class="fx fx-ring"></span>
-  <span class="fx fx-floor"><i></i><i></i></span>
+  <span class="fx-sky" aria-hidden="true"><i class="c1"></i><i class="c2"></i></span>
+  <svg class="fx led" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+   <g class="led-base"><line x1="0" y1="95.8" x2="36" y2="68.6"/><line x1="100" y1="97.3" x2="62" y2="70.3"/></g>
+   <g class="led-flow"><line pathLength="100" x1="0" y1="95.8" x2="36" y2="68.6"/><line pathLength="100" x1="100" y1="97.3" x2="62" y2="70.3"/></g>
+  </svg>
   ${[[2,59],[8,59],[92,59],[97,59],[18,58],[79,58]].map(([x,y],i)=>`<span class="fx screen" style="left:${x}%;top:${y}%;animation-delay:${i*-.7}s"></span>`).join('')}
   <span class="motes">${Array.from({length:22},(_,i)=>`<i style="left:${(i*37)%100}%;animation-delay:${-(i*1.3)%14}s;animation-duration:${11+(i%5)*2}s"></i>`).join('')}</span>
  </div>
  <div class="shade" style="background:linear-gradient(90deg,#02050b80,transparent 30%,transparent 70%,#02050b80),linear-gradient(0deg,#02050bb0,transparent 26%)"></div>
- <aside class="roster" aria-label="AI team directory"><div class="roster-head"><b>AI TEAM</b><span>● ${FLOOR.length} offices open</span></div><div class="roster-list">
+ <aside class="roster" aria-label="AI team directory"><div class="roster-head"><b>AI TEAM HUB</b><span>${FLOOR.length} agents online · tap to enter</span></div><div class="roster-list">
   <div class="r-sep">EXECUTIVE</div>${FLOOR.filter(a=>a.exec).map(rosterItem).join('')}
   <div class="r-sep">LEADERSHIP & REVIEW</div>${FLOOR.filter(a=>['marie','gatekeeper'].includes(a.id)).map(rosterItem).join('')}
   <div class="r-sep">SPECIALISTS</div>${FLOOR.filter(a=>!a.exec&&!['marie','gatekeeper'].includes(a.id)).map(rosterItem).join('')}
