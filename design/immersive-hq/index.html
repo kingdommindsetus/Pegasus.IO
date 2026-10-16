@@ -811,7 +811,7 @@ function buildRoom(a){
  // Offices are sharp stills: AI video slowly morphs the robot and the screens, so motion comes from light instead.
  const [hx,hy]=HEAD[a.id]||[50,40];
  const [mx,my]=BODY[a.id]||[50,60],clip=k=>CLIPS[a.id]?.[k]?`<video class="clip clip-${k}" muted loop playsinline preload="auto" src="assets/${a.id}-${k}.mp4" aria-hidden="true"></video>`:'';
- const visual=a.office?`<div class="stage" style="--hx:${hx}%;--hy:${hy}%;--mx:${mx}%;--my:${my}%"><img class="still" src="assets/${a.id}-still.jpg" alt="${a.name} at the desk">${clip('listen')}${clip('talk')}<span class="shine"></span><span class="eye"></span></div><div class="aura"></div>`
+ const visual=a.office?`<div class="stage" style="--hx:${hx}%;--hy:${hy}%;--mx:${mx}%;--my:${my}%"><img class="still" src="assets/${a.id}-still.jpg?v=2" alt="${a.name} at the desk">${clip('listen')}${clip('talk')}<span class="shine"></span><span class="eye"></span></div><div class="aura"></div>`
   :`<div class="gen"><img src="assets/floor-still.jpg" alt=""><span class="orb big" style="--c:${a.c}">${initials(a.name)}</span></div>`;
  const chain=a.id==='simon'?['founder','simon','marie','gatekeeper']:a.id==='marie'?['simon','marie','team','gatekeeper']:a.id==='gatekeeper'?['simon','marie','gatekeeper','founder']:a.id==='sofia'?['founder','sofia','simon','gatekeeper']:['simon','marie',a.id,'gatekeeper'];
  const chainHtml=chain.map(id=>id==='founder'?'<button type="button" disabled>Founder</button>':id==='team'?'<button type="button" data-room="floor">Specialists</button>':`<button type="button" class="${id===a.id?'me':''}" data-room="${id}">${byId[id].name}</button>`).join('<i>›</i>');
