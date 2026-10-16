@@ -11,6 +11,8 @@ Open `index.html` in this folder with the verified media files below, or serve t
 ## Verified authorized media
 - `assets/pegasus-centerpiece.mp4` — user-supplied rotating neon Pegasus loading video (1920x1080, approximately 10s)
 - `assets/pegasus-atrium.png` — approved atrium backdrop (do not replace official logo or hologram branding)
+- `assets/marie-working.mp4` — user-supplied purple Marie operations/dispatcher clip; `assets/marie-poster.jpg` is a frame from that clip
+- `assets/gatekeeper-working.mp4` — user-supplied gold Gatekeeper approval/compliance clip; `assets/gatekeeper-poster.jpg` is a frame from that clip
 
 Do **not** use unapproved generated logos. The HTML gracefully falls back to typographic PEGASUS branding when an asset is unavailable.
 
@@ -39,7 +41,9 @@ These are design contracts; engineering must map to authenticated routes and enf
 
 ## Office interaction shell
 
-The current design slice exposes a safe presentation contract: destination clicks open an accessible mock transition dialog; the `Founder HQ` dialog offers a keyboard-accessible Sofia mock entry; the new `OFFICE · STEP INSIDE` tab opens a mapped 21-agent hallway with reusable office bubbles; and staged shells exist for Sofia, Simon, and Gatekeeper. The hallway labels the remaining rooms as next slices instead of implying live agents. Office event controls preview states without invoking runtime behavior. This is intentionally not a live route, auth flow, agent integration, microphone flow, report query, or voice integration.
+The current design slice exposes a safe presentation contract: destination clicks open an accessible mock transition dialog; the `Founder HQ` dialog offers a keyboard-accessible Sofia mock entry; the `OFFICE · STEP INSIDE` tab opens a mapped 21-agent hallway with reusable office bubbles; and staged shells exist for Sofia, Simon, Marie, and Gatekeeper. The hallway labels the remaining rooms as next slices instead of implying live agents. Office event controls preview states without invoking runtime behavior. This is intentionally not a live route, auth flow, agent integration, microphone flow, report query, or voice integration.
+
+Marie and Gatekeeper use separate single-video room visuals with clip-derived still posters for loading. Their supplied MP4 streams are remuxed with the playback index at the front; the video and audio streams are not re-encoded. Any dashboard counts, approval labels, or status indicators embedded in the supplied artwork are fictional and do not represent CRM records or authorization.
 
 Sofia’s KMCE identity is intentionally gesture-first: the active room composition uses the supplied working and circuit motion clips, crops away facial detail, and labels the channel as `NO FACE SIGNAL`. The supplied posters remain preserved as source references but are not used as the active identity layer. This does not prove that Sofia is connected to the KMCE CRM, a microphone, a report source, Simon, Gatekeeper, or partner agents.
 

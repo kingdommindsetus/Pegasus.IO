@@ -1,61 +1,635 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PEGASUS.IO | Headquarters concept</title>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Pegasus HQ</title>
+<meta name="description" content="Pegasus.io immersive headquarters: walk through the atrium, the employee floor, and each AI agent's office.">
 <style>
-:root{color-scheme:dark;--gold:#dfba80;--cyan:#7ddcf3;--ink:#080e18}*{box-sizing:border-box}body{margin:0;color:#f5ebda;background:var(--ink);font-family:Inter,system-ui,Segoe UI,sans-serif}button{cursor:pointer;font:inherit}button:focus-visible{outline:3px solid var(--cyan);outline-offset:3px}
-header{padding:15px 4%;display:flex;gap:15px;justify-content:space-between;align-items:center;background:#080f1b;border-bottom:1px solid #725536}h1{font-size:clamp(18px,3vw,28px);margin:0;letter-spacing:.19em;color:var(--gold)}.muted{color:#a6bbca;font-size:11px;letter-spacing:.1em}
-#intro{position:fixed;inset:0;z-index:9;background:#030912;display:grid;place-items:center;text-align:center;transition:opacity .5s,visibility .5s}#intro.done{opacity:0;visibility:hidden;pointer-events:none}#intro video{max-width:75vw;width:420px;aspect-ratio:16/9;object-fit:cover;mask-image:radial-gradient(ellipse,#000 30%,transparent 76%)}#intro button{margin:15px;border:1px solid var(--gold);background:#131f2e;color:var(--gold);border-radius:18px;padding:8px 18px}
-#scene{min-height:620px;height:min(77svh,850px);position:relative;isolation:isolate;overflow:hidden;background:radial-gradient(ellipse at 50% 36%,#1c4d67,#12253c 28%,#080d19 77%);display:grid;place-items:center}#scene::before{content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(#070b1690,#101e2c35 35%,#020913cf),repeating-linear-gradient(90deg,transparent 0 14%,#d3a36c21 14.1% 14.25%,transparent 14.3% 27%)}#scene::after{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at center,transparent 35%,#02050bb8 100%)}#scene .backdrop{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;opacity:.8}#hologram,#hologram-secondary{position:absolute;width:min(52vw,560px);mix-blend-mode:screen;mask-image:radial-gradient(ellipse,#000 25%,transparent 73%);opacity:.9;pointer-events:none;transition:opacity 900ms ease}#hologram-secondary{opacity:0}#center-text{position:absolute;top:69%;font-size:clamp(15px,2.6vw,26px);color:var(--gold);letter-spacing:.2em;text-align:center;text-shadow:0 4px 15px #000}.media-status{position:absolute;top:18px;left:4%;right:4%;display:flex;justify-content:center;pointer-events:none}.media-status span{padding:6px 10px;border:1px solid #668ca088;border-radius:99px;background:#07121fcc;color:#b9c7d3;font-size:10px;letter-spacing:.1em}
-.transition{position:fixed;inset:0;z-index:8;display:grid;place-items:center;background:#030912f5;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .28s,visibility .28s}.transition.open{opacity:1;visibility:visible;pointer-events:auto}.transition-card{width:min(420px,88vw);padding:28px;border:1px solid #9c7c54;border-radius:18px;background:#0b1827ef;box-shadow:0 0 60px #1b739055;text-align:center}.transition-card h2{margin:0;color:var(--gold);letter-spacing:.12em}.transition-card p{color:#b9c7d3}.transition-card button{border:1px solid var(--cyan);background:#102a3a;color:#d0eaf4;border-radius:9px;padding:10px 18px}.office{display:none;padding:20px 4% 28px;background:linear-gradient(120deg,#0a1522,#101f2d);border-top:1px solid #725536}.office.open{display:block}.office-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:16px;max-width:1100px;margin:auto}.office-card{border:1px solid #3a7193;border-radius:14px;padding:18px;background:#07121fe8}.office h2{margin:0;color:var(--gold);letter-spacing:.12em}.office h3{margin:0 0 8px;color:#d0eaf4}.office p{color:#b9c7d3}.event-list{display:grid;gap:8px}.event{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:10px;border-radius:8px;background:#102336;color:#dbeaf0}.event button{border:1px solid #668ca0;background:#132f43;color:#d0eaf4;border-radius:6px;padding:5px 9px}.event-state{font-size:10px;letter-spacing:.08em;color:var(--cyan)}
-.command-deck{display:none;padding:20px 4% 28px;background:linear-gradient(120deg,#081522,#0d2030);border-top:1px solid #725536}.command-deck.open{display:block}.deck-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:1100px;margin:14px auto 0}.deck-card{border:1px solid #3a7193;border-radius:12px;padding:15px;background:#07121fe8}.deck-card strong{display:block;color:var(--gold);font-size:13px;letter-spacing:.08em}.deck-card span{display:block;margin-top:7px;color:#b9c7d3;font-size:12px}.deck-card em{display:block;margin-top:12px;color:var(--cyan);font-size:10px;font-style:normal;letter-spacing:.1em}.deck-heading{max-width:1100px;margin:auto}.deck-heading h2{margin:0;color:var(--gold);letter-spacing:.12em}.deck-heading p{color:#b9c7d3;font-size:12px}
-.mission-flow{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-top:18px}.flow-step{position:relative;padding:12px 8px;border:1px solid #3a7193;border-radius:9px;background:#0c2030;text-align:center}.flow-step:not(:last-child)::after{content:'›';position:absolute;right:-9px;top:22px;color:var(--gold);font-size:20px;z-index:1}.flow-step strong{display:block;color:#d0eaf4;font-size:11px}.flow-step span{display:block;margin-top:6px;color:#8fb2c0;font-size:10px}.flow-step em{display:block;margin-top:8px;color:var(--cyan);font-size:9px;font-style:normal;letter-spacing:.08em}.voice-console{margin-top:16px;padding:13px;border:1px solid #725536;border-radius:10px;background:#0b1725}.voice-console strong{color:var(--gold);font-size:11px;letter-spacing:.1em}.voice-console p{margin:8px 0;color:#b9c7d3;font-size:12px}.voice-console button{border:1px solid var(--cyan);background:#102a3a;color:#d0eaf4;border-radius:7px;padding:7px 10px}
-.sofia-visual{position:relative;height:300px;margin:0 0 16px;overflow:hidden;border:1px solid #ff6fa8;border-radius:12px;background:#160d18;box-shadow:0 0 28px #ff6fa833}.sofia-visual video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 82%;filter:saturate(1.2) contrast(1.06)}.sofia-visual video:first-child{opacity:.8}.sofia-visual video:nth-child(2){mix-blend-mode:screen;opacity:.34;object-position:center 78%}.sofia-visual::before{content:'GESTURE CHANNEL  ·  NO FACE SIGNAL';position:absolute;z-index:1;top:14px;right:14px;padding:7px 9px;border:1px solid #ff9ac277;border-radius:999px;background:#090910b8;color:#ffb8d2;font-size:9px;letter-spacing:.13em}.sofia-visual::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,#090910c4 0%,transparent 54%,#180b1870),linear-gradient(0deg,#090910ee 0%,transparent 48%,#09091055 100%)}.sofia-label{position:absolute;z-index:1;left:16px;bottom:14px;color:#fff;font-size:clamp(18px,3vw,28px);font-weight:700;letter-spacing:.13em;text-shadow:0 2px 14px #000}.sofia-label span{display:block;margin-top:5px;color:#ff9ac2;font-size:10px;letter-spacing:.18em}
-nav{position:absolute;left:4%;right:4%;bottom:20px;display:grid;grid-template-columns:repeat(4,1fr);gap:9px}nav a,.shortcuts a{border:1px solid #997744;background:#081421e8;color:#f1dbb8;border-radius:9px;padding:15px 7px;text-decoration:none;text-align:center;font-size:13px}nav a:hover,.shortcuts a:hover{background:#233c50}.shortcuts{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;padding:12px 4%}.shortcuts a{border-color:#3a7193;color:#d0eaf4;padding:12px}.note{font-size:11px;color:#b9c7d3;padding:0 4% 15px}#pause{border:1px solid #9c7c54;background:#1b2635;color:var(--gold);padding:8px;border-radius:7px}
-@media(max-width:640px){header .muted{display:none}nav,.shortcuts{grid-template-columns:repeat(2,1fr)}#scene{height:720px}#hologram{width:88vw}#center-text{top:62%;font-size:17px}nav{bottom:15px}nav a{padding:12px 5px}}
-@media(max-width:640px){.deck-grid{grid-template-columns:repeat(2,1fr)}.office-grid{grid-template-columns:1fr}}
-@media(prefers-reduced-motion:reduce){#intro{display:none}#hologram{display:none}*{transition:none!important;animation:none!important}}
-.office-grid{grid-template-columns:minmax(0,1.7fr) minmax(300px,1fr);gap:20px;max-width:1320px}.office-card{padding:22px;border-radius:16px;box-shadow:0 18px 50px #02081266}.sofia-visual{height:clamp(360px,34vw,500px);margin-bottom:20px;border-radius:16px;box-shadow:0 0 38px #ff6fa855,inset 0 0 44px #ff6fa822}.event-list{gap:12px}.event{padding:16px}.event button{padding:8px 13px}
-@media(max-width:640px){.office-grid{grid-template-columns:1fr}.sofia-visual{height:360px}}
-.simon-visual{position:relative;height:clamp(300px,30vw,440px);overflow:hidden;border:1px solid #71d8ff;border-radius:16px;background:#071421;box-shadow:0 0 38px #71d8ff44}.simon-visual video,.simon-visual img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.simon-visual video{opacity:.38;mix-blend-mode:screen}.simon-visual::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,#06101ddd,transparent 58%),linear-gradient(0deg,#06101dee,transparent 50%)}.simon-label{position:absolute;z-index:1;left:18px;bottom:18px;color:#fff;font-size:clamp(20px,3vw,32px);font-weight:700;letter-spacing:.13em;text-shadow:0 2px 14px #000}.simon-label span{display:block;margin-top:6px;color:#8fe5ff;font-size:10px;letter-spacing:.18em}
-.simon-visual video{opacity:.9;mix-blend-mode:normal}
-.gatekeeper-visual{position:relative;height:clamp(340px,32vw,480px);overflow:hidden;border:1px solid #f0c66d;border-radius:16px;background:#12100b;box-shadow:0 0 42px #f0c66d44}.gatekeeper-visual video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 50%}.gatekeeper-visual::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,#090b10cc,transparent 60%),linear-gradient(0deg,#090b10ee,transparent 52%)}.gatekeeper-label{position:absolute;z-index:1;left:18px;bottom:18px;color:#fff;font-size:clamp(20px,3vw,32px);font-weight:700;letter-spacing:.12em;text-shadow:0 2px 14px #000}.gatekeeper-label span{display:block;margin-top:6px;color:#f0c66d;font-size:10px;letter-spacing:.18em}
-.hallway{display:none;padding:28px 4% 44px;background:radial-gradient(circle at 50% 0,#1d3c55,#07111d 62%);border-top:1px solid #6aa9c4}.hallway.open{display:block}.hallway-head{max-width:1180px;margin:0 auto 22px}.hallway-head h2{margin:0;color:var(--gold);letter-spacing:.13em}.hallway-head p{color:#b9c7d3}.agent-grid{display:grid;grid-template-columns:repeat(7,minmax(90px,1fr));gap:16px;max-width:1180px;margin:auto}.agent-bubble{min-height:126px;border:1px solid #3a7193;border-radius:18px;background:linear-gradient(145deg,#10273a,#07121f);color:#dbeaf0;padding:12px 8px;cursor:pointer;box-shadow:0 0 20px #0b6a8a22;transition:transform .18s,border-color .18s,box-shadow .18s}.agent-bubble:hover,.agent-bubble:focus-visible{transform:translateY(-4px);border-color:#ff9ac2;box-shadow:0 0 28px #ff6fa855;outline:none}.agent-orb{display:grid;place-items:center;width:54px;height:54px;margin:0 auto 9px;border:1px solid #8fe5ff;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffb4d2,#7d3d86 34%,#07121f 70%);color:#fff;font-size:17px;font-weight:700;box-shadow:0 0 20px #ff6fa866}.agent-bubble strong{display:block;text-align:center;font-size:13px;letter-spacing:.08em}.agent-bubble span{display:block;margin-top:5px;text-align:center;color:#8fe5ff;font-size:9px;letter-spacing:.1em}.hallway-status{max-width:1180px;margin:20px auto 0;padding:14px 16px;border:1px solid #725536;border-radius:12px;background:#07121fe8;color:#f1dbb8}.hallway-status em{color:#8fe5ff;font-style:normal}@media(max-width:780px){.agent-grid{grid-template-columns:repeat(3,minmax(88px,1fr))}}
-.luxury-map{padding:28px 4% 34px;background:linear-gradient(135deg,#070b11,#17130c 48%,#070b11);border-top:1px solid #9c7c54;border-bottom:1px solid #3e3020}.luxury-map-head{max-width:1180px;margin:auto 0 20px}.luxury-map-head h2{margin:0;color:#f1dbb8;letter-spacing:.13em}.luxury-map-head p{margin:7px 0 0;color:#9bb0bd}.luxury-map-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;max-width:1180px;margin:auto}.luxury-destination{min-height:132px;padding:16px;border:1px solid #80683f;border-radius:12px;background:linear-gradient(145deg,#1b1c20,#0b1017);color:#f1dbb8;text-align:left;cursor:pointer;box-shadow:inset 0 0 22px #c6933522,0 10px 24px #02040866;transition:transform .18s,border-color .18s}.luxury-destination:hover,.luxury-destination:focus-visible{transform:translateY(-4px);border-color:#ffcf7a;outline:none}.luxury-destination strong{display:block;font-size:12px;letter-spacing:.12em}.luxury-destination span{display:block;margin-top:10px;color:#9bb0bd;font-size:11px;line-height:1.4}.luxury-destination em{display:block;margin-top:12px;color:#d6a963;font-size:9px;letter-spacing:.14em;font-style:normal}@media(max-width:860px){.luxury-map-grid{grid-template-columns:repeat(2,1fr)}}
+:root{color-scheme:dark;--gold:#dfba80;--gold-hi:#ffd998;--cyan:#7ddcf3;--ink:#04070d;--glass:#07101cd0;--line:#9c7c5488;--txt:#f5ebda;--mute:#a6bbca}
+*{box-sizing:border-box}html,body{height:100%}body{margin:0;overflow:hidden;background:var(--ink);color:var(--txt);font-family:Inter,system-ui,"Segoe UI",sans-serif}
+button{font:inherit;color:inherit;cursor:pointer}button:focus-visible,a:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+.serif{font-family:"Cormorant Garamond","Playfair Display",Georgia,serif}
+
+/* ---------- world + scenes ---------- */
+#world{position:fixed;inset:0;overflow:hidden;background:#020409}
+.scene{position:absolute;inset:0;opacity:0;visibility:hidden;transform-origin:var(--ox,50%) var(--oy,50%);will-change:transform,opacity,filter}
+.scene.active{opacity:1;visibility:visible}
+.scene.exit-fwd{animation:exitFwd .95s cubic-bezier(.55,0,.35,1) forwards}
+.scene.enter-fwd{animation:enterFwd 1s cubic-bezier(.2,.75,.2,1) both}
+.scene.exit-back{animation:exitBack .8s cubic-bezier(.5,0,.4,1) forwards}
+.scene.enter-back{animation:enterBack .9s cubic-bezier(.2,.75,.2,1) both}
+@keyframes exitFwd{0%{transform:scale(1);opacity:1;filter:none}100%{transform:scale(2.6);opacity:0;filter:blur(10px) brightness(1.5)}}
+@keyframes enterFwd{0%{transform:scale(1.35);opacity:0;filter:blur(12px) brightness(1.4)}100%{transform:none;opacity:1;filter:none}}
+@keyframes exitBack{to{transform:scale(.72);opacity:0;filter:blur(6px)}}
+@keyframes enterBack{0%{transform:scale(1.7);opacity:0;filter:blur(10px)}100%{transform:none;opacity:1;filter:none}}
+.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.shade{position:absolute;inset:0;pointer-events:none}
+
+/* warp streaks during forward travel */
+#warp{position:fixed;inset:0;z-index:20;pointer-events:none;opacity:0;background:repeating-conic-gradient(from 0deg at var(--ox,50%) var(--oy,50%),#ffffff00 0deg 3deg,#cfe9ff1c 3.4deg 3.8deg,#ffffff00 4.2deg 9deg),radial-gradient(circle at var(--ox,50%) var(--oy,50%),#fff4dc55,transparent 40%);mix-blend-mode:screen}
+#warp.on{animation:warp .95s ease-out}
+@keyframes warp{0%{opacity:0;transform:scale(.6)}35%{opacity:1}100%{opacity:0;transform:scale(1.8)}}
+
+/* ---------- chrome ---------- */
+#chrome{position:fixed;z-index:15;top:0;left:0;right:0;display:flex;align-items:center;gap:12px;padding:14px max(16px,2.5vw);background:linear-gradient(#02050bdd,transparent);pointer-events:none}
+#chrome>*{pointer-events:auto}
+.brand{font-size:15px;letter-spacing:.32em;color:var(--gold);font-weight:600;white-space:nowrap}
+#back{display:none;align-items:center;gap:8px;border:1px solid var(--line);background:var(--glass);backdrop-filter:blur(10px);border-radius:999px;padding:8px 14px;font-size:12px;letter-spacing:.12em}
+#back.show{display:inline-flex}
+#crumbs{display:flex;gap:8px;align-items:center;font-size:11px;letter-spacing:.16em;color:var(--mute);text-transform:uppercase;overflow:hidden;white-space:nowrap}
+#crumbs b{color:var(--gold-hi);font-weight:600}
+.spacer{flex:1}
+.pill{border:1px solid #668ca088;border-radius:999px;background:#07121fcc;color:#b9c7d3;font-size:10px;letter-spacing:.14em;padding:6px 10px;white-space:nowrap}
+#motion{border:1px solid var(--line);background:var(--glass);border-radius:999px;padding:7px 12px;font-size:11px;color:var(--gold)}
+
+/* minimap */
+#map{position:fixed;z-index:15;left:max(16px,2.5vw);bottom:16px;display:flex;gap:6px;padding:6px;border:1px solid var(--line);border-radius:14px;background:var(--glass);backdrop-filter:blur(10px)}
+#map button{border:0;background:transparent;border-radius:9px;padding:8px 10px;font-size:10px;letter-spacing:.14em;color:var(--mute);text-transform:uppercase}
+#map button.on{background:#1d2a3a;color:var(--gold-hi);box-shadow:inset 0 0 0 1px #dfba8066}
+
+#toast{position:fixed;z-index:30;left:50%;bottom:76px;transform:translate(-50%,20px);opacity:0;transition:.3s;padding:11px 16px;border:1px solid var(--line);border-radius:12px;background:#07101cf0;font-size:12px;color:#d9e6ee;max-width:min(520px,90vw);text-align:center;pointer-events:none}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* ---------- intro ---------- */
+#intro{position:fixed;inset:0;z-index:40;background:#02050b;display:grid;place-items:center;text-align:center;transition:opacity .7s,visibility .7s}
+#intro.done{opacity:0;visibility:hidden;pointer-events:none}
+#intro video{width:min(520px,80vw);aspect-ratio:16/9;object-fit:cover;mask-image:radial-gradient(ellipse,#000 30%,transparent 74%)}
+#intro h2{margin:6px 0 4px;letter-spacing:.4em;color:var(--gold);font-weight:500}
+#intro p{margin:0;color:var(--mute);font-size:11px;letter-spacing:.3em}
+#enter{margin-top:22px;border:1px solid var(--gold);background:#131f2e;color:var(--gold-hi);border-radius:999px;padding:11px 26px;letter-spacing:.2em;font-size:12px}
+
+/* ---------- hotspots (street-view style markers) ---------- */
+.hot{position:absolute;left:var(--x);top:var(--y);transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:8px;border:0;background:none;padding:0;z-index:2}
+.hot .ring{position:relative;width:46px;height:46px;border-radius:50%;border:2px solid var(--c,var(--gold-hi));background:radial-gradient(circle,#ffffff30,#0000 62%);box-shadow:0 0 22px var(--c,var(--gold))}
+.hot .ring::before,.hot .ring::after{content:'';position:absolute;inset:-2px;border-radius:50%;border:2px solid var(--c,var(--gold-hi));animation:ping 2.4s ease-out infinite}
+.hot .ring::after{animation-delay:1.2s}
+.hot .ring i{position:absolute;inset:0;display:grid;place-items:center;font-style:normal;font-size:18px;color:#fff}
+@keyframes ping{0%{transform:scale(1);opacity:.8}100%{transform:scale(2.3);opacity:0}}
+.hot .tag{padding:8px 12px;border:1px solid #dfba8099;border-radius:10px;background:#050b14d9;backdrop-filter:blur(8px);text-align:center;white-space:nowrap;transition:transform .2s,border-color .2s}
+.hot .tag strong{display:block;font-size:12px;letter-spacing:.16em;color:var(--gold-hi)}
+.hot .tag span{display:block;margin-top:3px;font-size:10px;color:var(--mute);letter-spacing:.08em}
+.hot:hover .tag,.hot:focus-visible .tag{transform:translateY(-3px);border-color:var(--gold-hi)}
+.hot.forward .ring{width:62px;height:62px}
+.hot.forward .ring i{font-size:26px}
+
+/* ---------- atrium ---------- */
+#s-atrium .bg{filter:saturate(1.08)}
+#holo,#holo2{position:absolute;left:50%;top:41%;transform:translate(-50%,-50%);width:min(46vw,620px);mix-blend-mode:screen;mask-image:radial-gradient(ellipse,#000 25%,transparent 72%);opacity:.92;transition:opacity .9s;pointer-events:none}
+#holo2{opacity:0}
+.atrium-title{position:absolute;left:50%;top:66%;transform:translate(-50%,-50%);text-align:center;pointer-events:none}
+.atrium-title h1{margin:0;font-size:clamp(28px,5.4vw,72px);letter-spacing:.32em;font-weight:500;color:var(--gold-hi);text-shadow:0 0 30px #dfba8077,0 4px 18px #000}
+.atrium-title p{margin:6px 0 0;font-size:11px;letter-spacing:.42em;color:#d6c3a2}
+.stats{position:absolute;left:50%;bottom:78px;transform:translateX(-50%);display:flex;gap:2px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--glass);backdrop-filter:blur(10px)}
+.stats div{padding:10px 18px;text-align:center}.stats b{display:block;font-size:20px;color:var(--gold-hi);font-weight:500}.stats span{font-size:9px;letter-spacing:.14em;color:var(--mute);text-transform:uppercase}
+
+/* ---------- employee floor ---------- */
+#s-floor .doors{position:absolute;inset:0;z-index:2;transform:translateZ(0);opacity:0;transition:opacity .8s}
+#s-floor .bg{z-index:0}#s-floor .shade{z-index:1}
+#s-floor.arrived .doors{opacity:1}
+.wall{position:absolute;top:30%;bottom:15%;width:27%}
+.wall.left{left:1.5%}.wall.right{right:1.5%}
+.wall-inner{height:100%;display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:1fr;gap:10px}
+.wall.left .wall-inner{transform:perspective(900px) rotateY(24deg);transform-origin:left center}
+.wall.right .wall-inner{transform:perspective(900px) rotateY(-24deg);transform-origin:right center}
+.door{position:relative;display:flex;align-items:center;gap:10px;min-height:0;padding:8px 10px;border:1px solid color-mix(in srgb,var(--c) 55%,transparent);border-radius:12px;background:linear-gradient(135deg,#0a1220e6,#05090fe6);text-align:left;box-shadow:0 0 18px color-mix(in srgb,var(--c) 22%,transparent),inset 0 0 18px #0008;transition:transform .2s,box-shadow .2s,border-color .2s}
+.door:hover,.door:focus-visible{transform:scale(1.05);border-color:var(--c);box-shadow:0 0 34px color-mix(in srgb,var(--c) 55%,transparent)}
+.orb{flex:none;display:grid;place-items:center;width:38px;height:38px;border-radius:50%;border:1px solid var(--c);background:radial-gradient(circle at 35% 30%,color-mix(in srgb,var(--c) 70%,#fff),color-mix(in srgb,var(--c) 40%,#000) 45%,#05090f 75%);font-size:12px;font-weight:700;letter-spacing:.04em;color:#fff;box-shadow:0 0 14px color-mix(in srgb,var(--c) 60%,transparent)}
+.door strong{display:block;font-size:13px;letter-spacing:.1em}
+.door span{display:block;font-size:10px;color:var(--mute);letter-spacing:.04em;margin-top:2px;line-height:1.25}
+.door .live{position:absolute;top:8px;right:9px;width:7px;height:7px;border-radius:50%;background:#3ee68a;box-shadow:0 0 8px #3ee68a}
+.door .live.next{background:#6b7785;box-shadow:none}
+.door.exec{grid-column:1/-1}
+.endhall{position:absolute;left:50%;top:40%;transform:translateX(-50%);width:min(34%,420px);text-align:center}
+.endhall h2,.endhall p{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.endhall h2{margin:0 0 4px;font-size:12px;letter-spacing:.3em;color:var(--gold-hi);font-weight:500}
+.endhall p{margin:0 0 10px;font-size:10px;letter-spacing:.12em;color:var(--mute)}
+.endhall .mini{display:flex;flex-wrap:wrap;justify-content:center;gap:6px}
+.endhall .mini button{border:1px solid #7ddcf355;background:#06101ccc;border-radius:999px;padding:5px 10px;font-size:10px;letter-spacing:.12em;color:#cfe7f1}
+.endhall .mini button:hover{border-color:var(--cyan)}
+.floor-hint{position:absolute;left:50%;bottom:78px;transform:translateX(-50%);font-size:10px;letter-spacing:.3em;color:#d6c3a2;text-shadow:0 2px 8px #000}
+
+/* still hallway that feels alive: the camera never moves, only the light does */
+.stage{position:absolute;left:var(--sx,0);top:var(--sy,0);width:var(--sw,100vw);height:var(--sh,100vh);overflow:hidden;transform:translateZ(0);backface-visibility:hidden;contain:strict}
+.stage>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.fx{position:absolute;pointer-events:none;mix-blend-mode:screen}
+.fx-sign{left:30%;top:0;width:36%;height:30%;background:radial-gradient(ellipse at 50% 40%,#ffd99855,transparent 62%);animation:pulse 5s ease-in-out infinite}
+.fx-window{left:38%;top:34%;width:24%;height:24%;background:radial-gradient(ellipse,#ff9a6a30,transparent 65%);animation:pulse 7s ease-in-out infinite}
+.fx-holo{left:40%;top:52%;width:20%;height:30%;background:radial-gradient(ellipse at 50% 55%,#6fd3ff88,#2a7bff33 40%,transparent 68%);animation:holo 3.2s ease-in-out infinite}
+.fx-ring{left:30%;top:72%;width:40%;height:20%;background:radial-gradient(ellipse at 50% 45%,#ffcf7a99,#ffb24633 45%,transparent 70%);animation:pulse 4s ease-in-out infinite}
+.fx-floor{inset:0;clip-path:polygon(36% 59%,64% 59%,100% 96%,100% 100%,0 100%,0 96%)}
+.fx-floor i{position:absolute;left:0;right:0;top:56%;height:7%;background:linear-gradient(transparent,#ffd38a88 40%,#fff2d0bb 50%,#ffd38a88 60%,transparent);opacity:0;animation:sweep 6s cubic-bezier(.45,0,.75,1) infinite}
+.fx-floor i:nth-child(2){animation-delay:-3s}
+.fx-strips{inset:0;width:100%;height:100%;filter:drop-shadow(0 0 4px #ffcf7a) drop-shadow(0 0 10px #ffb246)}
+.fx-strips line{stroke:#fff6dd;stroke-width:4;vector-effect:non-scaling-stroke;stroke-linecap:round;stroke-dasharray:12 88;stroke-dashoffset:0;animation:run 4.4s linear infinite;opacity:.9}
+.fx.screen{width:3.2%;height:4%;border-radius:3px;background:radial-gradient(#7fd8ff40,transparent 70%);animation:flick 5s steps(1) infinite}
+.motes{position:absolute;inset:0;pointer-events:none}
+.motes i{position:absolute;bottom:-2%;width:3px;height:3px;border-radius:50%;background:#ffe2a8;box-shadow:0 0 6px #ffcf7a;opacity:0;animation:mote linear infinite}
+@keyframes pulse{50%{opacity:.45}}
+@keyframes holo{0%,100%{opacity:1;filter:hue-rotate(0)}30%{opacity:.7}33%{opacity:.95}60%{opacity:.75;filter:hue-rotate(-15deg)}}
+@keyframes sweep{0%{top:56%;height:3%;opacity:0}15%{opacity:1}100%{top:100%;height:14%;opacity:0}}
+@keyframes run{to{stroke-dashoffset:-100}}
+@keyframes flick{0%,100%{opacity:.9}37%{opacity:.4}41%{opacity:1}73%{opacity:.6}}
+@keyframes mote{0%{transform:translateY(0);opacity:0}15%{opacity:.7}85%{opacity:.5}100%{transform:translateY(-70vh) translateX(2vw);opacity:0}}
+.paused .fx,.paused .fx *,.paused .motes i{animation-play-state:paused}
+@media(prefers-reduced-motion:reduce){.fx,.fx *,.motes i{animation:none!important}}
+
+/* ---------- agent rooms ---------- */
+.room .shade{background:linear-gradient(90deg,#02050bcc 0%,#02050b55 22%,transparent 46%,transparent 62%,#02050bb0 100%),linear-gradient(0deg,#02050bd9,transparent 32%)}
+.room .gen{position:absolute;inset:0;background:radial-gradient(circle at 50% 44%,color-mix(in srgb,var(--c) 30%,transparent),transparent 46%),#03060c}
+.room .gen img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(14px) brightness(.45) saturate(1.2);inset:-5%;width:110%;height:110%;transform:translateZ(0)}
+.room .gen .big{position:absolute;left:42%;top:46%;transform:translate(-50%,-50%);width:min(30vw,280px);height:min(30vw,280px);font-size:clamp(40px,6vw,76px);animation:float 6s ease-in-out infinite}
+@keyframes float{50%{transform:translate(-50%,-54%)}}
+.rail{position:absolute;left:max(16px,2.5vw);top:84px;display:flex;flex-direction:column;gap:4px;padding:8px;border:1px solid var(--line);border-radius:14px;background:var(--glass);backdrop-filter:blur(10px)}
+.rail button{border:0;background:transparent;border-radius:9px;padding:9px 14px;text-align:left;font-size:12px;letter-spacing:.08em;color:#c9d4dc}
+.rail button.on{background:#1d2a3a;color:var(--gold-hi);box-shadow:inset 2px 0 0 var(--c)}
+.hud{position:absolute;right:max(16px,2.5vw);top:84px;bottom:84px;width:min(380px,36vw);display:flex;flex-direction:column;gap:12px;overflow:auto;padding:20px;border:1px solid color-mix(in srgb,var(--c) 45%,transparent);border-radius:18px;background:#050a12d6;backdrop-filter:blur(14px);box-shadow:0 0 50px color-mix(in srgb,var(--c) 18%,transparent)}
+.hud .eyebrow{font-size:10px;letter-spacing:.24em;color:var(--c)}
+.hud h2{margin:0;font-size:clamp(26px,3vw,40px);letter-spacing:.2em;font-weight:500;color:#fff}
+.hud .role{font-size:12px;letter-spacing:.14em;color:var(--gold-hi);text-transform:uppercase}
+.hud blockquote{margin:4px 0 0;font-size:18px;font-style:italic;color:#e9dcc6}
+.hud h3{margin:6px 0 0;font-size:10px;letter-spacing:.24em;color:var(--mute);font-weight:500}
+.hud ul{margin:0;padding:0;list-style:none;display:grid;gap:6px}
+.hud li{display:flex;justify-content:space-between;gap:10px;padding:9px 11px;border-radius:9px;background:#0d1826;font-size:12px;color:#dbe6ee}
+.hud li em{font-style:normal;font-size:10px;letter-spacing:.1em;color:var(--c)}
+.chain{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.chain button{border:1px solid #ffffff22;background:#0d1826;border-radius:999px;padding:6px 10px;font-size:11px;color:#dbe6ee}
+.chain button.me{border-color:var(--c);color:#fff;box-shadow:0 0 12px color-mix(in srgb,var(--c) 40%,transparent)}
+.chain i{font-style:normal;color:var(--gold)}
+.state{display:flex;gap:8px;flex-wrap:wrap}
+.state button{border:1px solid color-mix(in srgb,var(--c) 50%,transparent);background:#0d1826;border-radius:8px;padding:8px 11px;font-size:11px}
+.status-line{font-size:12px;color:#b9c7d3;padding:10px 12px;border-left:2px solid var(--c);background:#0a1420}
+.room-name{position:absolute;left:max(16px,2.5vw);bottom:84px;pointer-events:none}
+.room-name b{display:block;font-size:clamp(34px,5vw,64px);letter-spacing:.24em;font-weight:500;color:#fff;text-shadow:0 0 30px color-mix(in srgb,var(--c) 70%,transparent),0 4px 16px #000}
+.room-name span{font-size:11px;letter-spacing:.3em;color:var(--c)}
+.next-door{position:absolute;top:50%;transform:translateY(-50%);border:1px solid var(--line);background:var(--glass);border-radius:50%;width:44px;height:44px;font-size:18px;color:var(--gold-hi)}
+.next-door.prev{left:calc(max(16px,2.5vw) + 170px)}.next-door.nxt{right:calc(max(16px,2.5vw) + min(380px,36vw) + 14px)}
+
+/* ---------- office door: you're pulled up to the glass doors, they part, you're inside ---------- */
+#doorfx{position:fixed;inset:0;z-index:19;display:flex;pointer-events:none;visibility:hidden}
+#doorfx.on{visibility:visible;animation:doorStage 1.5s ease forwards}
+#doorfx .leaf{flex:1;position:relative;background:linear-gradient(100deg,#060b14f2,#0d1726e8 45%,#060b14f2),repeating-linear-gradient(90deg,transparent 0 46px,#ffffff08 46px 47px);box-shadow:inset 0 0 120px #000}
+#doorfx .leaf.l{border-right:2px solid var(--c);box-shadow:inset -30px 0 60px color-mix(in srgb,var(--c) 25%,transparent)}
+#doorfx .leaf.r{border-left:2px solid var(--c);box-shadow:inset 30px 0 60px color-mix(in srgb,var(--c) 25%,transparent)}
+#doorfx .leaf::after{content:'';position:absolute;top:44%;width:6px;height:120px;border-radius:3px;background:linear-gradient(var(--gold-hi),#8a6a3a)}
+#doorfx .leaf.l::after{right:26px}#doorfx .leaf.r::after{left:26px}
+#doorfx.on .leaf.l{animation:leafL 1.5s cubic-bezier(.75,0,.2,1) forwards}
+#doorfx.on .leaf.r{animation:leafR 1.5s cubic-bezier(.75,0,.2,1) forwards}
+#doorfx .plate{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+#doorfx.on .plate{animation:plate 1.5s ease forwards}
+#doorfx .plate .orb{width:86px;height:86px;font-size:24px;box-shadow:0 0 60px var(--c)}
+#doorfx .plate b{font-size:clamp(30px,5vw,58px);letter-spacing:.3em;font-weight:500;color:#fff;text-shadow:0 0 30px var(--c)}
+#doorfx .plate>span:last-child{font-size:11px;letter-spacing:.32em;color:var(--c)}
+@keyframes doorStage{0%{opacity:0;transform:scale(1.25)}14%{opacity:1;transform:scale(1)}100%{opacity:1}}
+@keyframes leafL{0%,48%{transform:none}100%{transform:translateX(-102%)}}
+@keyframes leafR{0%,48%{transform:none}100%{transform:translateX(102%)}}
+@keyframes plate{0%{opacity:0;transform:translate(-50%,-40%)}16%,40%{opacity:1;transform:translate(-50%,-50%)}56%,100%{opacity:0;transform:translate(-50%,-50%) scale(1.3)}}
+.scene.enter-door{animation:enterFwd 1.1s cubic-bezier(.2,.75,.2,1) .55s both}
+
+/* ---------- office stage: still room, living robot ---------- */
+.room .stage{position:absolute;left:var(--sx,0);top:var(--sy,0);width:var(--sw,100vw);height:var(--sh,100vh);overflow:hidden;transform:translateZ(0);backface-visibility:hidden;contain:strict}
+.room .stage .still{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.room .stage .clip{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .45s ease;-webkit-mask-image:radial-gradient(ellipse 25% 46% at var(--mx) var(--my),#000 52%,transparent 100%);mask-image:radial-gradient(ellipse 25% 46% at var(--mx) var(--my),#000 52%,transparent 100%)}
+.room.listening .clip-listen,.room.speaking .clip-talk{opacity:1}
+.room.listening .eye{opacity:.62;animation-duration:2.4s}
+.room.listening .vorb{animation:listenPulse 1.3s ease-in-out infinite}
+@keyframes listenPulse{50%{box-shadow:0 0 26px var(--c);transform:scale(1.12)}}
+.room .stage .eye{position:absolute;left:var(--hx);top:var(--hy);width:12%;height:20%;transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;mix-blend-mode:screen;background:radial-gradient(closest-side,color-mix(in srgb,var(--c) 70%,#fff),color-mix(in srgb,var(--c) 35%,transparent) 45%,transparent);opacity:calc(.28 + var(--amp,0)*.7);animation:eye 4.2s ease-in-out infinite}
+@keyframes eye{50%{filter:brightness(1.35)}}
+.room.speaking .eye{animation-duration:1.1s}
+.paused .room .eye{animation-play-state:paused}
+.room .stage .shine{position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;background:linear-gradient(105deg,transparent 40%,#ffffff14 47%,#ffffff22 50%,#ffffff14 53%,transparent 60%);background-size:300% 100%;animation:shine 9s ease-in-out infinite}
+@keyframes shine{0%,20%{background-position:120% 0}70%,100%{background-position:-20% 0}}
+.paused .room .shine{animation-play-state:paused}
+
+/* ---------- talk-back: the agent has no mouth, so light, motion and captions carry the voice ---------- */
+.room.speaking .stage{animation:breathe 1.8s ease-in-out infinite}
+@keyframes breathe{50%{filter:brightness(1.12) saturate(1.15)}}
+.room .aura{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 45% 46%,color-mix(in srgb,var(--c) calc(var(--amp,0)*38%),transparent),transparent 55%);mix-blend-mode:screen;transition:background .12s}
+.convo{position:absolute;left:max(16px,2.5vw);right:calc(max(16px,2.5vw) + min(380px,36vw) + 18px);bottom:72px;display:flex;flex-direction:column;align-items:center;gap:12px}
+.caption:empty{display:none}
+.caption{max-width:760px;min-height:1.5em;margin:0;padding:12px 18px;border-radius:14px;background:#02050bc4;backdrop-filter:blur(8px);border:1px solid color-mix(in srgb,var(--c) 30%,transparent);text-align:center;font-size:clamp(16px,1.6vw,22px);line-height:1.45;color:#fff;text-shadow:0 2px 14px #000,0 0 2px #000}
+.caption .w{opacity:.25;transition:opacity .18s}.caption .w.on{opacity:1}
+.caption .you{display:block;margin-bottom:6px;font-size:12px;letter-spacing:.08em;color:var(--mute)}
+.composer{display:flex;align-items:center;gap:10px;width:min(640px,100%);padding:8px 8px 8px 10px;border:1px solid color-mix(in srgb,var(--c) 55%,transparent);border-radius:999px;background:#050a12e0;backdrop-filter:blur(14px);box-shadow:0 0 40px color-mix(in srgb,var(--c) 20%,transparent)}
+.vorb{position:relative;flex:none;width:34px;height:34px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,var(--c) 40%,#05090f 80%);box-shadow:0 0 calc(10px + var(--amp,0)*30px) var(--c);transform:scale(calc(1 + var(--amp,0)*.25));transition:transform .1s,box-shadow .1s}
+.vorb::after{content:'';position:absolute;inset:-6px;border-radius:50%;border:1px solid var(--c);opacity:calc(.2 + var(--amp,0)*.8);transform:scale(calc(1 + var(--amp,0)*.6))}
+.composer input{flex:1;min-width:0;border:0;background:transparent;color:#fff;font:inherit;font-size:14px;outline:none}
+.composer input::placeholder{color:#8a99a6}
+.composer button{flex:none;border:1px solid #ffffff22;background:#0f1c2b;border-radius:999px;height:36px;min-width:36px;padding:0 12px;font-size:13px}
+.composer button.send{background:var(--c);color:#05090f;border-color:transparent;font-weight:600}
+.composer button.mic.live{background:#e5484d;border-color:transparent}
+.composer button[aria-pressed=false]{opacity:.5}
+.suggest{display:flex;flex-wrap:wrap;justify-content:center;gap:6px}
+.suggest button{border:1px solid #ffffff1f;background:#07101cb3;border-radius:999px;padding:5px 11px;font-size:11px;color:#cfdbe3}
+.suggest button:hover{border-color:var(--c)}
+.room .room-name{display:none}
+
+/* ---------- panels (CRM, war room, lobby) ---------- */
+.panel-scene .bg{inset:-3%;width:106%;height:106%;filter:blur(6px) brightness(.38) saturate(1.1);transform:translateZ(0)}
+.board{position:absolute;inset:84px max(16px,2.5vw) 84px;display:grid;gap:12px;overflow:auto}
+.card{border:1px solid #7ddcf333;border-radius:14px;background:#06101bdd;backdrop-filter:blur(10px);padding:16px}
+.card h3{margin:0 0 10px;font-size:11px;letter-spacing:.2em;color:var(--gold-hi);font-weight:500}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.kpi b{display:block;font-size:26px;font-weight:500}.kpi span{font-size:10px;letter-spacing:.14em;color:var(--mute)}.kpi em{display:block;margin-top:4px;font-style:normal;font-size:11px;color:#3ee68a}
+.crm-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:12px}
+.funnel div{height:30px;margin:0 auto 6px;border-radius:6px;background:linear-gradient(90deg,#1f6fd1,#2a8cf0);display:flex;justify-content:space-between;align-items:center;padding:0 12px;font-size:11px}
+.agent-row{display:flex;align-items:center;gap:10px;width:100%;padding:8px;border:0;border-radius:9px;background:transparent;text-align:left}
+.agent-row:hover{background:#0f1d2e}
+.agent-row .orb{width:30px;height:30px;font-size:10px}
+.agent-row span{flex:1;font-size:12px}.agent-row small{color:var(--mute);font-size:11px}
+.agent-row em{font-style:normal;font-size:10px;letter-spacing:.08em;padding:3px 8px;border-radius:999px;background:#13324a;color:#8fe5ff}
+.sample{font-size:10px;letter-spacing:.14em;color:var(--mute)}
+.flow{display:flex;align-items:stretch;justify-content:center;gap:10px;flex-wrap:wrap;padding:20px 0}
+.flow button{min-width:130px;padding:16px 14px;border:1px solid color-mix(in srgb,var(--c,#dfba80) 60%,transparent);border-radius:14px;background:#06101bdd;text-align:center}
+.flow button .orb{margin:0 auto 8px}
+.flow button strong{display:block;font-size:13px;letter-spacing:.12em}.flow button span{display:block;margin-top:4px;font-size:10px;color:var(--mute)}
+.flow i{align-self:center;font-style:normal;font-size:22px;color:var(--gold)}
+.lobby-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:900px;margin:auto;width:100%}
+.lobby-tiles button{padding:22px;border:1px solid #dfba8066;border-radius:14px;background:#0b0d12dd;text-align:left}
+.lobby-tiles strong{display:block;font-size:14px;letter-spacing:.1em;color:var(--gold-hi)}.lobby-tiles span{font-size:11px;color:var(--mute)}
+.scene-title{text-align:center}
+.scene-title h2{margin:0;font-size:clamp(22px,3.2vw,40px);letter-spacing:.26em;font-weight:500;color:var(--gold-hi)}
+.scene-title p{margin:6px 0 0;font-size:11px;letter-spacing:.24em;color:var(--mute)}
+
+/* ---------- responsive ---------- */
+@media(max-width:860px){
+ #crumbs,.pill{display:none}
+ .wall{position:static;width:auto;perspective:none}
+ #s-floor .doors{display:flex;flex-direction:column;justify-content:flex-end;padding:76px 16px 76px;gap:10px;overflow:auto}
+ .wall-inner{transform:none!important;grid-template-columns:1fr 1fr}
+ .endhall{position:static;transform:none;width:auto}
+ .door{min-height:56px}
+ .rail{display:none}
+ .hud{left:16px;right:16px;width:auto;top:auto;bottom:76px;max-height:46vh}
+ .room-name{top:76px;bottom:auto}
+ .next-door{display:none}
+ .kpis{grid-template-columns:repeat(2,1fr)}.crm-grid{grid-template-columns:1fr}.lobby-tiles{grid-template-columns:repeat(2,1fr)}
+ .stats{display:none}
+ .hot .tag span{display:none}
+ #map button{padding:8px 7px;font-size:9px}
+ .convo{left:16px;right:16px;bottom:66px}
+ .suggest{display:none}
+ .hud{top:130px;bottom:auto;max-height:30vh}
+ .caption{font-size:15px}
+ .floor-hint{display:none}
+ .endhall{padding:6px 0;background:#02050bb3;border-radius:12px}
+}
+@media(max-height:760px){.stats{display:none}}
+@media(prefers-reduced-motion:reduce){.scene,#warp{animation:none!important}.hot .ring::before,.hot .ring::after,.gen .big{animation:none}}
 </style></head>
 <body>
-<div id="intro" aria-label="Entering Pegasus Headquarters"><div><video id="intro-video" autoplay muted playsinline preload="metadata" src="assets/pegasus-centerpiece.mp4"></video><h2>PEGASUS.IO</h2><p class="muted">ENTERING HEADQUARTERS</p><button id="skip">Skip intro →</button></div></div>
-<header><h1>PEGASUS.IO</h1><span class="muted">HEADQUARTERS · STAGING DESIGN</span><button id="pause" aria-pressed="false">Pause motion</button></header>
-<main><section id="scene" aria-label="Headquarters atrium"><img class="backdrop" src="assets/pegasus-atrium.png" alt="" onerror="this.hidden=true"><video id="hologram" autoplay muted playsinline preload="metadata" src="assets/pegasus-centerpiece.mp4" aria-label="Rotating Pegasus centerpiece"></video><video id="hologram-secondary" muted playsinline preload="metadata" src="assets/pegasus-centerpiece.mp4" aria-hidden="true"></video><div class="media-status" aria-live="polite"><span id="media-status">DESIGN PREVIEW · MEDIA LOADING</span></div><div id="center-text" role="button" tabindex="0" aria-expanded="false" aria-controls="command-deck">THE LIVING HEADQUARTERS</div>
-<nav aria-label="Headquarters destinations"><a id="hq-founder" href="/hq/founder" data-destination="Founder HQ">Founder HQ</a><a id="hq-war-room" href="/hq/war-room" data-destination="War Room">War Room</a><a id="hq-employees" href="/hq/employees" data-destination="Employee Floor">Employee Floor</a><a id="hq-clients" href="/portal" data-destination="Client Portal">Client Portal</a></nav></section>
-<div class="shortcuts" aria-label="Direct CRM access"><a id="quick-approvals" href="/crm/approvals" data-destination="Approvals">Approvals</a><a id="quick-leads" href="/crm/leads" data-destination="Leads">Leads</a><a id="quick-accounts" href="/crm/accounts" data-destination="Accounts">Accounts</a><a id="quick-tasks" href="/crm/tasks" data-destination="Tasks">Tasks</a></div>
-<section id="command-deck" class="command-deck" aria-labelledby="deck-title"><div class="deck-heading"><p class="muted">PEGASUS.IO · COMMAND DECK · MOCK PRESENTATION</p><h2 id="deck-title">THE CRM, AS A LIVING SYSTEM</h2><p>This visual layer shows how the headquarters, people, work, and decisions can come together. It does not claim live records or task execution.</p></div><div class="deck-grid"><div class="deck-card"><strong>PEOPLE</strong><span>Faculty, employees, clients</span><em>IDENTITY · MOCK</em></div><div class="deck-card"><strong>WORK</strong><span>Missions, tasks, handoffs</span><em>ORCHESTRATION · MOCK</em></div><div class="deck-card"><strong>DECISIONS</strong><span>Approvals and review gates</span><em>GOVERNANCE · MOCK</em></div><div class="deck-card"><strong>MEMORY</strong><span>Evidence and durable context</span><em>MEMORY · MOCK</em></div></div></section>
-<section id="sofia-office" class="office" aria-labelledby="sofia-title"><div class="office-grid"><div class="office-card"><div class="sofia-visual"><img src="assets/sofia-avatar.jpg" alt="Sofia, a faceless robot operating a digital growth office"><video autoplay muted loop playsinline preload="metadata" poster="assets/sofia-avatar.jpg" src="assets/sofia-office.mp4" aria-label="Sofia office motion preview"></video><div class="sofia-label">SOFIA<span>GROWTH &amp; DIGITAL PRESENCE · KMCE</span></div></div><p class="muted">OFFICE INTERACTION SHELL · MOCK ONLY</p><h2 id="sofia-title">SOFIA · INTELLIGENCE OFFICE</h2><p id="office-message">Sofia is standing by. Select a mock event to preview the office state.</p><div class="voice-console"><strong>VOICE-FIRST REQUEST PREVIEW</strong><p id="request-preview">“Sofia, show me my reports.”</p><button id="preview-request" type="button">Preview spoken request</button></div><div class="mission-flow" aria-label="Mock delegation path"><div class="flow-step"><strong>Founder</strong><span>spoken request</span><em>MOCK</em></div><div class="flow-step"><strong>Sofia</strong><span>interprets intent</span><em>MOCK</em></div><div class="flow-step"><strong>Simon</strong><span>strategy review</span><em>MOCK</em></div><div class="flow-step"><strong>Gatekeeper</strong><span>authority check</span><em>MOCK</em></div><div class="flow-step"><strong>Partners</strong><span>delegated work</span><em>MOCK</em></div></div><p class="note">This flow demonstrates the intended experience only. It does not listen, dispatch, query reports, or invoke any live agent.</p><button id="close-office" type="button">Return to atrium</button></div><div class="office-card"><h3>Event states</h3><div class="event-list" role="list"><div class="event" role="listitem"><span>Listen for directive <span class="event-state">MOCK</span></span><button type="button" data-event="listening">Preview</button></div><div class="event" role="listitem"><span>Review incoming brief <span class="event-state">MOCK</span></span><button type="button" data-event="working">Preview</button></div><div class="event" role="listitem"><span>Await founder approval <span class="event-state">MOCK</span></span><button type="button" data-event="approval_wait">Preview</button></div><div class="event" role="listitem"><span>Complete handoff <span class="event-state">MOCK</span></span><button type="button" data-event="completed">Preview</button></div></div></div></div></section>
-<p class="note">Static design prototype. Routes require the actual Pegasus auth/CRM implementation. No live status or task execution is shown.</p></main>
-<div id="transition" class="transition" role="dialog" aria-modal="true" aria-labelledby="transition-title"><div class="transition-card"><h2 id="transition-title">OPENING OFFICE</h2><p id="transition-message">Preparing a mock design transition.</p><button id="open-sofia" type="button" hidden>Open Sofia mock</button> <button id="cancel-transition" type="button">Cancel</button></div></div>
+<div id="intro" role="dialog" aria-label="Entering Pegasus Headquarters"><div>
+ <video id="intro-video" muted playsinline preload="auto" src="assets/pegasus-centerpiece.mp4"></video>
+ <h2>PEGASUS</h2><p>AUTONOMY · INTELLIGENCE · IMPACT</p>
+ <button id="enter" type="button">ENTER HEADQUARTERS</button>
+</div></div>
+
+<div id="world" aria-live="polite"></div>
+<div id="warp"></div>
+<div id="doorfx" aria-hidden="true"><div class="leaf l"></div><div class="leaf r"></div><div class="plate"><span class="orb"></span><b class="serif"></b><span></span></div></div>
+
+<header id="chrome">
+ <span class="brand">PEGASUS</span>
+ <button id="back" type="button" aria-label="Go back">← <span id="back-label">BACK</span></button>
+ <nav id="crumbs" aria-label="Location"></nav>
+ <span class="spacer"></span>
+ <span class="pill">PREVIEW · SAMPLE DATA</span>
+ <button id="motion" type="button" aria-pressed="false">Pause motion</button>
+</header>
+<nav id="map" aria-label="Headquarters map"></nav>
+<div id="toast" role="status"></div>
+
 <script>
-const intro=document.querySelector('#intro'),introVideo=document.querySelector('#intro-video'),video=document.querySelector('#hologram'),secondary=document.querySelector('#hologram-secondary'),pause=document.querySelector('#pause'),reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;let t,activeVideo=video,standbyVideo=secondary,loopTimer;
-function finish(){clearTimeout(t);intro.classList.add('done');introVideo.pause()}
-document.querySelector('#skip').onclick=finish;
-function scheduleLoop(){clearTimeout(loopTimer);if(reduced||!activeVideo.duration||!Number.isFinite(activeVideo.duration))return;loopTimer=setTimeout(()=>{standbyVideo.currentTime=0;standbyVideo.play().catch(()=>{});standbyVideo.style.opacity='.9';activeVideo.style.opacity='0';setTimeout(()=>{activeVideo.pause();activeVideo.currentTime=0;const oldActive=activeVideo;activeVideo=standbyVideo;standbyVideo=oldActive;activeVideo.style.opacity='.9';standbyVideo.style.opacity='0';scheduleLoop()},900)},Math.max(400,activeVideo.duration*1000-1100))}
-if(reduced){finish();video.pause();secondary.pause()}else{t=setTimeout(finish,2800);introVideo.play().catch(finish);video.play().catch(()=>{});video.addEventListener('loadedmetadata',scheduleLoop,{once:true})}
-pause.onclick=()=>{if(activeVideo.paused){activeVideo.play().catch(()=>{});standbyVideo.pause();pause.textContent='Pause motion';pause.setAttribute('aria-pressed','false');scheduleLoop()}else{activeVideo.pause();standbyVideo.pause();clearTimeout(loopTimer);pause.textContent='Resume motion';pause.setAttribute('aria-pressed','true')}}
-const mediaStatus=document.querySelector('#media-status');
-video.addEventListener('loadeddata',()=>{mediaStatus.textContent='DESIGN PREVIEW · HOLOGRAM LOOP READY'});
-video.addEventListener('error',()=>{mediaStatus.textContent='DESIGN PREVIEW · HOLOGRAM MEDIA PENDING'});
-const transition=document.querySelector('#transition'),transitionMessage=document.querySelector('#transition-message'),cancelTransition=document.querySelector('#cancel-transition'),openSofia=document.querySelector('#open-sofia'),office=document.querySelector('#sofia-office'),officeMessage=document.querySelector('#office-message'),deck=document.querySelector('#command-deck');let lastFocus;
-function closeTransition(){transition.classList.remove('open');openSofia.hidden=true;lastFocus?.focus()}
-document.querySelectorAll('[data-destination]').forEach(link=>link.addEventListener('click',event=>{event.preventDefault();lastFocus=event.currentTarget;const destination=event.currentTarget.dataset.destination;transitionMessage.textContent=`Mock transition ready for ${destination}. Live routing is not connected.`;openSofia.hidden=destination!=='Founder HQ';transition.classList.add('open');(openSofia.hidden?cancelTransition:openSofia).focus()}));
-cancelTransition.onclick=closeTransition;
-transition.addEventListener('keydown',event=>{if(event.key==='Escape')closeTransition()});
-openSofia.onclick=()=>{closeTransition();office.classList.add('open');office.scrollIntoView({behavior:reduced?'auto':'smooth',block:'start'});document.querySelector('#close-office').focus()};
-document.querySelectorAll('[data-event]').forEach(button=>button.addEventListener('click',()=>{const state=button.dataset.event;officeMessage.textContent=`Mock event state: ${state}. No agent, task, voice, or backend event was invoked.`}));
-document.querySelector('#preview-request').onclick=()=>{document.querySelector('#request-preview').textContent='“Sofia, show me my reports.” · mock request staged for interpretation';officeMessage.textContent='Mock voice request staged. No microphone, transcript, report query, or delegation was invoked.'};
-document.querySelector('#close-office').onclick=()=>{office.classList.remove('open');document.querySelector('#hq-founder').focus()};
-function toggleDeck(){const isOpen=deck.classList.toggle('open');document.querySelector('#center-text').setAttribute('aria-expanded',String(isOpen));if(isOpen)deck.scrollIntoView({behavior:reduced?'auto':'smooth',block:'start'})}
-document.querySelector('#center-text').addEventListener('click',toggleDeck);document.querySelector('#center-text').addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleDeck()}});
-const sofiaVisual=document.querySelector('.sofia-visual');if(sofiaVisual){sofiaVisual.innerHTML='<video autoplay muted loop playsinline preload="metadata" src="assets/sofia-working.mp4" aria-label="Sofia gesture-only work motion preview"></video><div class="sofia-label">SOFIA<span>GESTURE-ONLY OPERATOR · KMCE</span></div>'}
-const simonOffice=document.createElement('section');simonOffice.id='simon-office';simonOffice.className='office';simonOffice.setAttribute('aria-labelledby','simon-title');simonOffice.innerHTML=`<div class="office-grid"><div class="office-card"><div class="simon-visual"><video autoplay muted loop playsinline preload="auto" poster="assets/simon-executive-poster.jpg" src="assets/simon-executive-working.mp4" aria-label="Captain Simon executive office motion preview"></video><div class="simon-label">SIMON<span>CAPTAIN · STRATEGY &amp; REVIEW · MOCK</span></div></div><p class="muted">OFFICE INTERACTION SHELL · MOCK ONLY</p><h2 id="simon-title">SIMON · STRATEGY OFFICE</h2><p id="simon-message">Simon is ready to review a staged brief. No live mission has been received.</p><div class="mission-flow" aria-label="Mock strategy path"><div class="flow-step"><strong>Sofia</strong><span>incoming brief</span><em>MOCK</em></div><div class="flow-step"><strong>Simon</strong><span>strategy review</span><em>MOCK</em></div><div class="flow-step"><strong>Gatekeeper</strong><span>authority check</span><em>MOCK</em></div></div><p class="note">This is a visual handoff contract only. It does not read a CRM brief, call another agent, or approve work.</p><button id="close-simon" type="button">Return to Sofia</button></div><div class="office-card"><h3>Strategy states</h3><div class="event-list"><div class="event"><span>Receive Sofia brief <span class="event-state">MOCK</span></span><button type="button" data-simon-event="received">Preview</button></div><div class="event"><span>Draft recommendation <span class="event-state">MOCK</span></span><button type="button" data-simon-event="reviewing">Preview</button></div><div class="event"><span>Send to Gatekeeper <span class="event-state">MOCK</span></span><button type="button" data-simon-event="handoff">Preview</button></div></div></div></div>`;document.body.append(simonOffice);const openSimonButton=document.createElement('button');openSimonButton.id='open-simon';openSimonButton.type='button';openSimonButton.textContent='Open Simon strategy room';document.querySelector('#close-office').insertAdjacentElement('beforebegin',openSimonButton);openSimonButton.onclick=()=>{office.classList.remove('open');simonOffice.classList.add('open');simonOffice.scrollIntoView({behavior:reduced?'auto':'smooth',block:'start'});document.querySelector('#close-simon').focus()};document.querySelector('#close-simon').onclick=()=>{simonOffice.classList.remove('open');office.classList.add('open');office.scrollIntoView({behavior:reduced?'auto':'smooth',block:'start'});openSimonButton.focus()};document.querySelectorAll('[data-simon-event]').forEach(button=>button.addEventListener('click',()=>{document.querySelector('#simon-message').textContent=`Mock Simon state: ${button.dataset.simonEvent}. No brief, agent, or approval event was invoked.`}));
-const gatekeeperOffice=document.createElement('section');gatekeeperOffice.id='gatekeeper-office';gatekeeperOffice.className='office';gatekeeperOffice.setAttribute('aria-labelledby','gatekeeper-title');gatekeeperOffice.innerHTML=`<div class="office-grid"><div class="office-card"><div class="gatekeeper-visual"><video autoplay muted loop playsinline preload="metadata" src="assets/gatekeeper-working.mp4" aria-label="Gatekeeper authority review motion preview"></video><div class="gatekeeper-label">GATEKEEPER<span>AUTHORITY &amp; COMPLIANCE · MOCK</span></div></div><p class="muted">OFFICE INTERACTION SHELL · MOCK ONLY</p><h2 id="gatekeeper-title">GATEKEEPER · REVIEW CHAMBER</h2><p id="gatekeeper-message">Gatekeeper is standing by for a staged review decision. No live approval has been requested.</p><div class="mission-flow" aria-label="Mock authority path"><div class="flow-step"><strong>Simon</strong><span>recommendation</span><em>MOCK</em></div><div class="flow-step"><strong>Gatekeeper</strong><span>authority review</span><em>MOCK</em></div><div class="flow-step"><strong>Founder</strong><span>final decision</span><em>MOCK</em></div></div><p class="note">This is a presentation contract only. It does not make a compliance decision, authorize a course, or connect to a live approval system.</p><button id="close-gatekeeper" type="button">Return to Simon</button></div><div class="office-card"><h3>Review states</h3><div class="event-list"><div class="event"><span>Receive recommendation <span class="event-state">MOCK</span></span><button type="button" data-gatekeeper-event="received">Preview</button></div><div class="event"><span>Check authority boundary <span class="event-state">MOCK</span></span><button type="button" data-gatekeeper-event="checking">Preview</button></div><div class="event"><span>Request founder decision <span class="event-state">MOCK</span></span><button type="button" data-gatekeeper-event="founder_wait">Preview</button></div></div></div></div>`;document.body.append(gatekeeperOffice);const openGatekeeperButton=document.createElement('button');openGatekeeperButton.id='open-gatekeeper';openGatekeeperButton.type='button';openGatekeeperButton.textContent='Open Gatekeeper review chamber';document.querySelector('#close-simon').insertAdjacentElement('beforebegin',openGatekeeperButton);openGatekeeperButton.onclick=()=>{simonOffice.classList.remove('open');gatekeeperOffice.classList.add('open');gatekeeperOffice.scrollIntoView({behavior:reduced?'auto':'smooth',block:'start'});document.querySelector('#close-gatekeeper').focus()};document.querySelector('#close-gatekeeper').onclick=()=>{gatekeeperOffice.classList.remove('open');simonOffice.classList.add('open');simonOffice.scrollIntoView({behavior:reduced?'auto':'smooth',block:'start'});openGatekeeperButton.focus()};document.querySelectorAll('[data-gatekeeper-event]').forEach(button=>button.addEventListener('click',()=>{document.querySelector('#gatekeeper-message').textContent=`Mock Gatekeeper state: ${button.dataset.gatekeeperEvent}. No approval, compliance, or backend event was invoked.`}));
-const agentNames=['Alice','Atlas','Booker','Cammy','Claire','Echo','Evan','Flow','Gatekeeper','Iris','Ledger','Lucy','Marie','Mark','Maven','Midas','Scout','Simon','Snake','Sofia','Tube'];const builtRooms={Sofia:office,Simon:simonOffice,Gatekeeper:gatekeeperOffice};const hallway=document.createElement('section');hallway.id='office-hallway';hallway.className='hallway';hallway.setAttribute('aria-labelledby','hallway-title');hallway.innerHTML='<div class="hallway-head"><p class="muted">PEGASUS.IO · OFFICE HALLWAY · MOCK STAGING</p><h2 id="hallway-title">STEP INSIDE THE AGENT FLOOR</h2><p>Each bubble is an office door. Enter a built room or stage the next room without pretending an agent is connected.</p></div><div class="agent-grid" role="list"></div><div class="hallway-status" aria-live="polite">SELECT AN OFFICE · <em id="hallway-message">21 agent rooms mapped · 3 shells staged · 0 live connections claimed</em></div>';document.body.append(hallway);const agentGrid=hallway.querySelector('.agent-grid');agentNames.forEach(name=>{const button=document.createElement('button');button.type='button';button.className='agent-bubble';button.setAttribute('role','listitem');button.setAttribute('aria-label',`Open ${name} office`);const initials=name.slice(0,2).toUpperCase();button.innerHTML=`<span class="agent-orb">${initials}</span><strong>${name}</strong><span>${builtRooms[name]?'ROOM SHELL READY':'ROOM NEXT'}</span>`;button.onclick=()=>{const target=builtRooms[name];document.querySelectorAll('.office.open').forEach(room=>room.classList.remove('open'));if(target){target.classList.add('open');target.scrollIntoView({behavior:reduced?'auto':'smooth',block:'start'});hallway.querySelector('#hallway-message').textContent=`${name} room shell opened · mock-only interaction · no live agent connection`;}else{hallway.querySelector('#hallway-message').textContent=`${name} office mapped for the next design slice · no room behavior claimed yet`;}};agentGrid.append(button)});const officeTab=document.createElement('a');officeTab.href='#office-hallway';officeTab.id='office-tab';officeTab.textContent='OFFICE · STEP INSIDE';officeTab.addEventListener('click',event=>{event.preventDefault();document.querySelectorAll('.office.open').forEach(room=>room.classList.remove('open'));hallway.classList.add('open');hallway.scrollIntoView({behavior:reduced?'auto':'smooth',block:'start'});});document.querySelector('.shortcuts').prepend(officeTab);
-const luxuryMap=document.createElement('section');luxuryMap.className='luxury-map';luxuryMap.setAttribute('aria-labelledby','luxury-map-title');luxuryMap.innerHTML='<div class="luxury-map-head"><p class="muted">PEGASUS.IO · IMMERSIVE COMMAND CENTER</p><h2 id="luxury-map-title">THE HQ, AS A LIVING SYSTEM</h2><p>Animated atrium first. Rooms, people, work, and client pathways stay visible without human avatars or fake live status.</p></div><div class="luxury-map-grid"><button class="luxury-destination" type="button" data-luxury-destination="atrium"><strong>01 · HEADQUARTERS ATRIUM</strong><span>Main entrance · navigation hub · animated Pegasus centerpiece</span><em>ENTER ATRIUM</em></button><button class="luxury-destination" type="button" data-luxury-destination="simon"><strong>02 · SIMON EXECUTIVE OFFICE</strong><span>Strategy · review · mock executive handoff</span><em>STEP INTO OFFICE</em></button><button class="luxury-destination" type="button" data-luxury-destination="employees"><strong>03 · EMPLOYEE FLOOR</strong><span>21 AI agent offices · hallway bubbles · room-by-room build</span><em>OPEN OFFICE HALLWAY</em></button><button class="luxury-destination" type="button" data-luxury-destination="crm"><strong>04 · PEGASUS CRM</strong><span>People · work · decisions · memory as one visual system</span><em>VIEW CRM LAYER</em></button><button class="luxury-destination" type="button" data-luxury-destination="lobby"><strong>05 · CLIENT WELCOME LOBBY</strong><span>Client workspace · projects · approvals · concierge shell</span><em>MOCK DESTINATION</em></button></div>';document.querySelector('#scene').insertAdjacentElement('afterend',luxuryMap);luxuryMap.querySelectorAll('[data-luxury-destination]').forEach(button=>button.addEventListener('click',()=>{const destination=button.dataset.luxuryDestination;if(destination==='employees'){hallway.classList.add('open');hallway.scrollIntoView({behavior:reduced?'auto':'smooth',block:'start'});}else if(destination==='simon'){simonOffice.classList.add('open');simonOffice.scrollIntoView({behavior:reduced?'auto':'smooth',block:'start'});}else if(destination==='atrium'){document.querySelector('#scene').scrollIntoView({behavior:reduced?'auto':'smooth',block:'start'});}else{transitionMessage.textContent=`Mock destination ready for ${button.querySelector('strong').textContent}. Live routing is not connected.`;openSofia.hidden=true;transition.classList.add('open');cancelTransition.focus();}}));
-const simonVideo=simonOffice.querySelector('video');const simonPlayback=new MutationObserver(()=>{if(simonOffice.classList.contains('open')){simonVideo.play().catch(()=>{});}else{simonVideo.pause()}});simonPlayback.observe(simonOffice,{attributes:true,attributeFilter:['class']});
-</script></body></html>
+/* ===== Roster — order matches the Employee Floor reference ===== */
+const AGENTS=[
+ {id:'simon',name:'Simon',role:'Executive Director',dept:'Executive Strategy & Mission Prioritization',c:'#e8c27a',office:true,quote:'Discern. Direct. Deliver.',exec:true,
+  duties:['Strategy & oversight','Final approvals','Performance review','Resource allocation','Executive close'],
+  today:[['3','Approvals waiting'],['5','New leads'],['2','Strategy items'],['1','Executive close']],
+  missions:[['KMCE Launch','85%'],['Phoenix Event','62%'],['Client Onboarding','40%'],['Platform Scale','28%']]},
+ {id:'marie',name:'Marie',role:'Operations',dept:'Operational Architecture & Execution Systems',c:'#b784f4',office:true,quote:'Coordinate. Execute. Keep it moving.',
+  duties:['Task management','Team coordination','Workflow execution','Project tracking','Daily operations'],
+  today:[['54','Tasks in motion'],['18','Handoffs today'],['26','Completed'],['2','Blocked']],
+  missions:[['Team handoffs','76%'],['SOP library','59%'],['Calendar sync','49%'],['Agent onboarding','80%']]},
+ {id:'iris',name:'IRIS',role:'Market Intelligence',dept:'OSINT & Competitive Intelligence',c:'#3ee6b0',office:true,quote:'Research. Discover. Analyze.',
+  duties:['Market research','Lead discovery','Trends & opportunities','Competitor analysis','Industry insight reports'],
+  today:[['2,847','Leads discovered'],['13','Markets watched'],['4','Intel briefs'],['1','Threat flag']],
+  missions:[['Competitor map','72%'],['CE market scan','64%'],['Partner targets','41%']]},
+ {id:'mark',name:'Mark',role:'Marketing',dept:'Brand Strategy & Strategic Positioning',c:'#ff9a5c'},
+ {id:'cammy',name:'Cammy',role:'Campaigns',dept:'Creative Campaign Strategy & Launch Mechanics',c:'#ff6fa8'},
+ {id:'evan',name:'Evan',role:'Content',dept:'High-Converting Copywriting & Narrative Craft',c:'#9be36d'},
+ {id:'tube',name:'Tube',role:'Video',dept:'Viral Video Direction & Short-Form Media',c:'#ff5a5a'},
+ {id:'lucy',name:'Lucy',role:'Distribution',dept:'Omni-Channel Distribution & Amplification',c:'#c77dff',office:true,quote:'Publish. Distribute. Amplify.',
+  duties:['Multi-platform publishing','Content distribution','Community engagement','Email distribution','Partnership support'],
+  today:[['42','Posts scheduled'],['6','Campaigns live'],['3','Partner drops'],['1','Report due']],
+  missions:[['KMCE outreach','68%'],['YouTube series','52%'],['Email launch','74%'],['Community growth','38%']]},
+ {id:'snake',name:'Snake',role:'Analytics',dept:'Attribution Modeling & Performance Analytics',c:'#3ee6a0'},
+ {id:'alice',name:'Alice',role:'Storefront & Conversion',dept:'CRO & Storefront UX Architecture',c:'#ff7ad9',office:true,quote:'Attract. Engage. Convert.',
+  duties:['KMCE Shop storefront','Conversion optimization','Customer journey','A/B testing','Product launches'],
+  today:[['$24,850','Shop revenue'],['328','Orders'],['4.8%','Conversion rate'],['2','Tests running']],
+  missions:[['Checkout redesign','66%'],['Bundle launch','48%'],['Upsell flow','30%']]},
+ {id:'echo',name:'Echo',role:'Sales & Outreach',dept:'Pipeline Acceleration & Outbound Pursuit',c:'#4ea8ff',office:true,quote:'Find. Engage. Follow up.',
+  duties:['Lead outreach','Email & SMS sequences','Pipeline follow-up','Call scheduling','Relationship building'],
+  today:[['2,847','Outreach sent'],['623','Replies'],['112','Meetings booked'],['18%','Reply rate']],
+  missions:[['Dr. Tim outreach','58%'],['Partner sequence','73%'],['Reactivation','35%']]},
+ {id:'booker',name:'Booker',role:'Scheduling & Appointments',dept:'Calendar Mastery & High-Ticket Closing',c:'#f0b35e',office:true,quote:'Schedule. Confirm. Remind.',
+  duties:['Calendar coordination','Appointment booking','Confirmations & reminders','Speaker scheduling','Time-zone handling'],
+  today:[['428','Bookings this month'],['196','Confirmed'],['8','Meetings today'],['96%','Show rate']],
+  missions:[['Phoenix event slots','81%'],['Speaker calendar','62%']]},
+ {id:'scout',name:'Scout',role:'Lead Discovery',dept:'Lead Discovery & Intelligence',c:'#ffc04d',office:true,quote:'Find. Research. Deliver.',
+  duties:['Lead generation','Data enrichment','Territory mapping','Competitor analysis','Opportunity pipeline'],
+  today:[['2,267','New leads found'],['486','Enriched'],['89','Qualified'],['12','Territories']],
+  missions:[['Educator leads','69%'],['Event prospects','52%']]},
+ {id:'maven',name:'Maven',role:'Campaigns & Content',dept:'Campaign & Content Strategy',c:'#b47cff',office:true,quote:'Create. Launch. Grow.',
+  duties:['Campaign strategy','Content calendar','Multi-channel launches','Performance reporting','Audience growth'],
+  today:[['1.2M','Reach'],['186K','Engagements'],['14','Posts queued'],['+58%','Growth']],
+  missions:[['KMCE launch campaign','77%'],['Podcast promo','45%']]},
+ {id:'sofia',name:'Sofia',role:'Growth & Digital Presence',dept:'Growth & Digital Presence · KMCE',c:'#ff7fb0',office:true,quote:'Attract. Engage. Build.',
+  duties:['Brand presence','SEO & discovery','Audience growth','Reputation management','Founder growth reports'],
+  today:[['24,813','Website visitors'],['1,428','New followers'],['5.8%','Engagement'],['2','Reports ready']],
+  missions:[['KMCE growth','57%'],['Google profile','80%'],['Weekly report','90%']]},
+ {id:'gatekeeper',name:'Gatekeeper',role:'Approval & Compliance',dept:'Authority, Compliance & Review',c:'#f0c66d',office:true,quote:'Right process. Real progress.',
+  duties:['Review & approve content','Verify credentials','Contract & policy review','Risk & audit'],
+  today:[['24','Under review'],['6','Approved'],['1','Needs founder'],['0','Policy flags']],
+  missions:[['CE compliance','98%'],['Doc verification','80%']]},
+];
+// Where each robot's head sits in its office still (percent of the 16:9 frame) — the voice light glows there.
+// Behavior clips per office (clip-kit/README.md). When an agent's clips land in assets/ as <id>-listen.mp4 / <id>-talk.mp4,
+// flag them here, e.g. simon:{listen:true,talk:true}. Agents without clips stay still and use the voice light alone.
+const CLIPS={};
+// Where each robot's body sits, for the soft mask that keeps the room still while the robot moves.
+const BODY={simon:[50,55],marie:[47,58],gatekeeper:[51,62],lucy:[52,60],sofia:[48,62],iris:[50,62],maven:[47,64],booker:[48,62],scout:[54,68],echo:[48,60],alice:[49,60]};
+const HEAD={simon:[50,36],marie:[45,40],gatekeeper:[47,45],lucy:[51,38],sofia:[47,38],iris:[48,41],maven:[48,42],booker:[47,40],scout:[53,55],echo:[50,34],alice:[46,34]};
+const NEXT_WING=['Atlas','Claire','Flow','Ledger','Midas'];
+NEXT_WING.forEach(n=>AGENTS.push({id:n.toLowerCase(),name:n,role:'Room in production',dept:'Office build scheduled for the next slice',c:'#7ddcf3',next:true}));
+const byId=Object.fromEntries(AGENTS.map(a=>[a.id,a]));
+const FLOOR=AGENTS.filter(a=>!a.next); // 16 offices on the floor
+const initials=n=>n.slice(0,2).toUpperCase();
+const orb=a=>`<span class="orb" style="--c:${a.c}">${initials(a.name)}</span>`;
+
+/* ===== Background stage =====
+   Every background is a 16:9 box that covers the screen. Size and offset are rounded to whole pixels:
+   at fractional positions the browser re-rounds on every hover repaint, which made backgrounds jitter as the mouse moved. */
+function sizeStage(){const W=innerWidth,H=innerHeight,w=Math.ceil(Math.max(W,H*16/9)),h=Math.ceil(w*9/16),r=document.documentElement.style;
+ r.setProperty('--sw',w+'px');r.setProperty('--sh',h+'px');r.setProperty('--sx',Math.floor((W-w)/2)+'px');r.setProperty('--sy',Math.floor((H-h)/2)+'px')}
+sizeStage();addEventListener('resize',sizeStage);
+
+/* ===== Scene registry ===== */
+const world=document.querySelector('#world'),reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const SCENES={
+ atrium:{label:'Atrium',depth:0,build:buildAtrium},
+ executive:{label:'Executive Office',depth:1,alias:'room/simon'},
+ floor:{label:'Employee Floor',depth:1,build:buildFloor},
+ crm:{label:'CRM Dashboard',depth:1,build:buildCRM},
+ 'war-room':{label:'War Room',depth:1,build:buildWarRoom},
+ lobby:{label:'Client Lobby',depth:1,build:buildLobby},
+};
+const cache={};let current=null,busy=false,motionPaused=false;
+function sceneInfo(key){if(key.startsWith('room/')){const a=byId[key.slice(5)];return a?{label:a.name,depth:2,parent:a.exec?'atrium':'floor',build:()=>buildRoom(a)}:null}const s=SCENES[key];return s?{parent:'atrium',...s}:null}
+function getScene(key){if(!cache[key]){const el=sceneInfo(key).build();el.classList.add('scene');el.dataset.key=key;world.append(el);cache[key]=el}return cache[key]}
+
+/* ===== Travel — the "pull you through" camera move ===== */
+const warp=document.querySelector('#warp');
+function go(key,{origin,dir}={}){
+ if(SCENES[key]?.alias)key=SCENES[key].alias;
+ const info=sceneInfo(key);if(!info||key===current||busy)return;
+ const from=current&&cache[current],to=getScene(key);
+ const fwd=dir?dir==='fwd':!current||info.depth>=sceneInfo(current).depth;
+ const ox=origin?origin.x/innerWidth*100:50,oy=origin?origin.y/innerHeight*100:50;
+ [from,to,warp].forEach(el=>el&&(el.style.setProperty('--ox',ox+'%'),el.style.setProperty('--oy',oy+'%')));
+ current=key;updateChrome(key);
+ if(location.hash!=='#/'+key)history.pushState(null,'','#/'+key);
+ if(reduced||!from){from&&from.classList.remove('active');to.classList.add('active');arrive(to,fwd);sleep(from);return}
+ busy=true;
+ const agent=fwd&&key.startsWith('room/')&&byId[key.slice(5)];
+ const enter=agent?'enter-door':fwd?'enter-fwd':'enter-back';
+ from.classList.add(fwd?'exit-fwd':'exit-back');
+ to.classList.add('active',enter);
+ if(fwd){warp.classList.remove('on');void warp.offsetWidth;warp.classList.add('on')}
+ if(agent)openDoor(agent);
+ arrive(to,fwd);
+ setTimeout(()=>{from.classList.remove('active','exit-fwd','exit-back');to.classList.remove(enter);sleep(from);busy=false},agent?1650:1000);
+}
+const doorfx=document.querySelector('#doorfx');
+function openDoor(a){
+ doorfx.style.setProperty('--c',a.c);
+ const o=doorfx.querySelector('.orb');o.style.setProperty('--c',a.c);o.textContent=initials(a.name);
+ doorfx.querySelector('b').textContent=a.name.toUpperCase();doorfx.querySelector('.plate>span:last-child').textContent=a.role.toUpperCase();
+ doorfx.classList.remove('on');void doorfx.offsetWidth;doorfx.classList.add('on');
+ clearTimeout(openDoor.t);openDoor.t=setTimeout(()=>doorfx.classList.remove('on'),1550);
+}
+function arrive(el,fwd){
+ el.querySelectorAll('video[data-play]').forEach(v=>{if(!motionPaused)v.play().catch(()=>{})});
+ el.onArrive&&el.onArrive(fwd);
+ const h=el.querySelector('h1,h2');h&&(h.tabIndex=-1,h.focus({preventScroll:true}));
+}
+function sleep(el){if(!el)return;el.onLeave&&el.onLeave();el.querySelectorAll('video').forEach(v=>v.pause())}
+const travel=key=>e=>{const r=e.currentTarget.getBoundingClientRect();go(key,{origin:{x:r.left+r.width/2,y:r.top+r.height/2}})};
+addEventListener('popstate',()=>{const k=location.hash.replace(/^#\//,'')||'atrium';if(sceneInfo(k))go(k)});
+addEventListener('keydown',e=>{if(e.key==='Escape'&&current&&current!=='atrium'){goBack()}});
+
+/* ===== Chrome: back, breadcrumbs, map ===== */
+const backBtn=document.querySelector('#back'),crumbs=document.querySelector('#crumbs'),map=document.querySelector('#map');
+function goBack(){const p=sceneInfo(current).parent;if(p)go(p,{dir:'back'})}
+backBtn.onclick=goBack;
+function updateChrome(key){
+ const info=sceneInfo(key),trail=[];let k=key;while(k){trail.unshift(k);k=k==='atrium'?null:sceneInfo(k).parent}
+ crumbs.innerHTML=trail.map((t,i)=>i===trail.length-1?`<b>${sceneInfo(t).label}</b>`:`<span>${sceneInfo(t).label}</span> ›`).join(' ');
+ backBtn.classList.toggle('show',key!=='atrium');
+ document.querySelector('#back-label').textContent=info.parent?sceneInfo(info.parent).label.toUpperCase():'BACK';
+ map.querySelectorAll('button').forEach(b=>b.classList.toggle('on',trail.includes(b.dataset.go)||(b.dataset.go==='executive'&&key==='room/simon')));
+}
+[['atrium','Atrium'],['executive','Executive'],['floor','Floor'],['crm','CRM'],['war-room','War Room'],['lobby','Lobby']].forEach(([k,l])=>{const b=document.createElement('button');b.type='button';b.dataset.go=k;b.textContent=l;b.onclick=travel(k);map.append(b)});
+const toastEl=document.querySelector('#toast');let toastT;
+function toast(msg){toastEl.textContent=msg;toastEl.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>toastEl.classList.remove('show'),3200)}
+
+/* ===== Atrium ===== */
+function hot(key,x,y,title,sub,{icon='↗',c,forward}={}){return `<button class="hot${forward?' forward':''}" type="button" data-go="${key}" style="--x:${x};--y:${y};${c?`--c:${c}`:''}"><span class="ring"><i>${icon}</i></span><span class="tag"><strong>${title}</strong><span>${sub}</span></span></button>`}
+function buildAtrium(){
+ const s=document.createElement('section');s.id='s-atrium';s.setAttribute('aria-label','Pegasus Headquarters Atrium');
+ s.innerHTML=`<img class="bg" src="assets/pegasus-atrium.png" alt="">
+ <video id="holo" muted playsinline preload="auto" src="assets/pegasus-centerpiece.mp4" aria-hidden="true"></video><video id="holo2" muted playsinline preload="auto" src="assets/pegasus-centerpiece.mp4" aria-hidden="true"></video>
+ <div class="shade" style="background:radial-gradient(ellipse at 50% 45%,transparent 35%,#02050bcc 100%)"></div>
+ <div class="atrium-title"><h1 class="serif">PEGASUS</h1><p>HEADQUARTERS ATRIUM</p></div>
+ ${hot('executive','20%','30%','SIMON · EXECUTIVE OFFICE','Strategy · leadership · final approvals',{icon:'♛',c:'#e8c27a'})}
+ ${hot('floor','50%','84%','EMPLOYEE FLOOR','Walk the hall · AI team offices',{icon:'⇡',forward:true})}
+ ${hot('crm','80%','30%','PEGASUS CRM','Pipeline · tasks · agent activity',{icon:'◎',c:'#7ddcf3'})}
+ ${hot('war-room','14%','62%','WAR ROOM','Mission execution',{icon:'✦',c:'#ff9a5c'})}
+ ${hot('lobby','86%','62%','CLIENT LOBBY','Client portal · concierge',{icon:'⌂',c:'#f0d7a8'})}`;
+ s.querySelectorAll('[data-go]').forEach(b=>b.onclick=travel(b.dataset.go));
+ // two players crossfade so the hologram loop never visibly resets
+ const v1=s.querySelector('#holo'),v2=s.querySelector('#holo2');let active=v1,standby=v2,timer;
+ function schedule(){clearTimeout(timer);if(reduced||motionPaused||!active.duration)return;timer=setTimeout(()=>{standby.currentTime=0;standby.play().catch(()=>{});standby.style.opacity='.92';active.style.opacity='0';setTimeout(()=>{active.pause();[active,standby]=[standby,active];schedule()},900)},Math.max(400,active.duration*1000-1100))}
+ v1.dataset.play='';v1.addEventListener('loadedmetadata',schedule);v1.addEventListener('play',schedule);
+ s.pauseLoop=()=>{clearTimeout(timer);v1.pause();v2.pause()};
+ return s;
+}
+
+/* ===== Employee floor — the corridor walk ===== */
+function door(a){return `<button class="door${a.exec?' exec':''}" type="button" data-room="${a.id}" style="--c:${a.c}" aria-label="Enter ${a.name}'s office">${orb(a)}<span><strong>${a.name.toUpperCase()}</strong><span>${a.role}</span></span><i class="live${a.office?'':' next'}" title="${a.office?'Office ready':'Office video coming'}"></i></button>`}
+function buildFloor(){
+ const s=document.createElement('section');s.id='s-floor';s.setAttribute('aria-label','Employee Floor');
+ const left=FLOOR.slice(0,8),right=FLOOR.slice(8);
+ s.innerHTML=`<div class="stage" aria-hidden="true"><img src="assets/floor-still.jpg" alt="">
+  <span class="fx fx-sign"></span><span class="fx fx-window"></span><span class="fx fx-holo"></span><span class="fx fx-ring"></span>
+  <span class="fx fx-floor"><i></i><i></i></span>
+  <svg class="fx fx-strips" viewBox="0 0 100 100" preserveAspectRatio="none">${[[38,60,14,100],[62,60,86,100],[33,59,0,90],[67,59,100,90]].map(([x1,y1,x2,y2],i)=>`<line pathLength="100" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" style="animation-delay:${i*-1.1}s"/>`).join('')}</svg>
+  ${[[9,52],[14,53],[91,51],[96,52],[31,52],[70,51]].map(([x,y],i)=>`<span class="fx screen" style="left:${x}%;top:${y}%;animation-delay:${i*-.7}s"></span>`).join('')}
+  <span class="motes">${Array.from({length:22},(_,i)=>`<i style="left:${(i*37)%100}%;animation-delay:${-(i*1.3)%14}s;animation-duration:${11+(i%5)*2}s"></i>`).join('')}</span>
+ </div>
+ <div class="shade" style="background:linear-gradient(90deg,#02050b80,transparent 30%,transparent 70%,#02050b80),linear-gradient(0deg,#02050bb0,transparent 26%)"></div>
+ <div class="doors">
+  <div class="wall left"><div class="wall-inner">${left.map(door).join('')}</div></div>
+  <div class="endhall"><h2 class="serif">EMPLOYEE FLOOR</h2><p>AI TEAM OFFICES · ENTER ANY AGENT'S OFFICE</p><div class="mini">${NEXT_WING.map(n=>`<button type="button" data-room="${n.toLowerCase()}">${n.toUpperCase()}</button>`).join('')}</div></div>
+  <div class="wall right"><div class="wall-inner">${right.map(door).join('')}</div></div>
+ </div><div class="floor-hint">SELECT A DOOR TO STEP INSIDE</div>`;
+ s.querySelectorAll('[data-room]').forEach(b=>b.onclick=travel('room/'+b.dataset.room));
+ // The hallway clip loops on its own; doors fade in once the camera move lands.
+ s.onArrive=()=>setTimeout(()=>s.classList.add('arrived'),reduced?0:500);
+ return s;
+}
+
+/* ===== Agent office ===== */
+function buildRoom(a){
+ const s=document.createElement('section');s.className='room';s.style.setProperty('--c',a.c);s.setAttribute('aria-label',`${a.name}'s office`);
+ const idx=FLOOR.indexOf(a),prev=FLOOR[(idx-1+FLOOR.length)%FLOOR.length],next=FLOOR[(idx+1)%FLOOR.length];
+ // Offices are sharp stills: AI video slowly morphs the robot and the screens, so motion comes from light instead.
+ const [hx,hy]=HEAD[a.id]||[50,40];
+ const [mx,my]=BODY[a.id]||[50,60],clip=k=>CLIPS[a.id]?.[k]?`<video class="clip clip-${k}" muted loop playsinline preload="auto" src="assets/${a.id}-${k}.mp4" aria-hidden="true"></video>`:'';
+ const visual=a.office?`<div class="stage" style="--hx:${hx}%;--hy:${hy}%;--mx:${mx}%;--my:${my}%"><img class="still" src="assets/${a.id}-still.jpg" alt="${a.name} at the desk">${clip('listen')}${clip('talk')}<span class="shine"></span><span class="eye"></span></div><div class="aura"></div>`
+  :`<div class="gen"><img src="assets/floor-still.jpg" alt=""><span class="orb big" style="--c:${a.c}">${initials(a.name)}</span></div>`;
+ const chain=a.id==='simon'?['founder','simon','marie','gatekeeper']:a.id==='marie'?['simon','marie','team','gatekeeper']:a.id==='gatekeeper'?['simon','marie','gatekeeper','founder']:a.id==='sofia'?['founder','sofia','simon','gatekeeper']:['simon','marie',a.id,'gatekeeper'];
+ const chainHtml=chain.map(id=>id==='founder'?'<button type="button" disabled>Founder</button>':id==='team'?'<button type="button" data-room="floor">Specialists</button>':`<button type="button" class="${id===a.id?'me':''}" data-room="${id}">${byId[id].name}</button>`).join('<i>›</i>');
+ const tabs={
+  overview:`<h3>TODAY</h3><ul>${(a.today||[['—','Office video in production']]).map(([n,l])=>`<li><span>${l}</span><em>${n}</em></li>`).join('')}</ul>
+   <h3>ACTIVE MISSIONS</h3><ul>${(a.missions||[['Room build','next']]).map(([m,p])=>`<li><span>${m}</span><em>${p}</em></li>`).join('')}</ul>`,
+  duties:`<h3>RESPONSIBILITIES</h3><ul>${(a.duties||[a.dept]).map(d=>`<li><span>${d}</span><em>✓</em></li>`).join('')}</ul>`,
+  handoffs:`<h3>HANDOFF CHAIN</h3><div class="chain">${chainHtml}</div><p class="status-line">Click a name to walk straight to that office.</p>`,
+  states:`<h3>OFFICE STATES · PREVIEW</h3><div class="state">${['listening','working','approval_wait','completed'].map(st=>`<button type="button" data-state="${st}">${st.replace('_',' ')}</button>`).join('')}</div><p class="status-line" data-status>${a.name} is at the desk. Preview only — no live task has been sent.</p>`};
+ s.innerHTML=`${visual}<div class="shade"></div>
+ <nav class="rail" aria-label="${a.name} office sections">${[['overview','Overview'],['duties','Responsibilities'],['handoffs','Handoffs'],['states','Office states']].map(([k,l],i)=>`<button type="button" data-tab="${k}" class="${i?'':'on'}">${l}</button>`).join('')}</nav>
+ <aside class="hud"><span class="eyebrow">${a.exec?'EXECUTIVE SUITE':a.next?'NEXT WING':'EMPLOYEE FLOOR'} · ${a.dept.toUpperCase()}</span><h2 class="serif">${a.name.toUpperCase()}</h2><span class="role">${a.role}</span>${a.quote?`<blockquote class="serif">“${a.quote}”</blockquote>`:''}<div data-body>${tabs.overview}</div></aside>
+ <div class="room-name"><b class="serif">${a.name.toUpperCase()}</b><span>${a.role.toUpperCase()}</span></div>
+ <div class="convo">
+  <p class="caption" aria-live="polite"></p>
+  <div class="suggest">${suggestions(a).map(q=>`<button type="button">${q}</button>`).join('')}</div>
+  <form class="composer"><span class="vorb" aria-hidden="true"></span><input type="text" autocomplete="off" placeholder="Talk to ${a.name}…" aria-label="Message ${a.name}"><button type="button" class="mic" aria-label="Speak to ${a.name}" hidden>🎙</button><button type="button" class="voice" aria-pressed="true" aria-label="${a.name}'s voice on or off">🔊</button><button type="submit" class="send">Send</button></form>
+ </div>
+ ${a.next?'':`<button class="next-door prev" type="button" data-room="${prev.id}" aria-label="Previous office: ${prev.name}">‹</button><button class="next-door nxt" type="button" data-room="${next.id}" aria-label="Next office: ${next.name}">›</button>`}`;
+ const body=s.querySelector('[data-body]');
+ function bind(){body.querySelectorAll('[data-room]').forEach(b=>b.onclick=b.dataset.room==='floor'?travel('floor'):travel('room/'+b.dataset.room));body.querySelectorAll('[data-state]').forEach(b=>b.onclick=()=>{body.querySelector('[data-status]').textContent=`Preview state: ${b.dataset.state.replace('_',' ')}. No live task, voice, or approval was triggered.`})}
+ s.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{s.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('on',x===b));body.innerHTML=tabs[b.dataset.tab];bind()});
+ s.querySelectorAll('.next-door').forEach(b=>b.onclick=e=>go('room/'+b.dataset.room,{origin:{x:e.clientX,y:e.clientY},dir:'fwd'}));
+ bind();
+ wireConversation(s,a);
+ return s;
+}
+
+/* ===== Talk-back =====
+   Preview replies come from each agent's own office data. The presentation layer is built so a live
+   model (api/chat) can drop in later: swap reply() for a fetch and keep speak() as-is. */
+const pick=arr=>arr[Math.floor(Math.random()*arr.length)];
+function suggestions(a){return a.next?['What will this office do?']:['What are you working on?','Give me today’s numbers','What’s your role?','Hand this to the team']}
+function reply(a,q){
+ const t=q.toLowerCase(),today=a.today||[],missions=a.missions||[],duties=a.duties||[a.dept];
+ const list=xs=>xs.length>1?xs.slice(0,-1).join(', ')+', and '+xs.at(-1):xs[0]||'';
+ if(a.next)return `My office is still being built. Once it opens, I'll handle ${a.dept.toLowerCase()}.`;
+ if(/^(hi|hey|hello|yo|good (morning|afternoon|evening))\b/.test(t))return pick([`Hey. ${a.name} here, ${a.role}. ${a.quote||''} What do you need?`,`Welcome in. I'm ${a.name}. Ask me anything about ${a.role.toLowerCase()}.`]);
+ if(/number|today|stat|metric|how (are|is)|report|kpi/.test(t))return `Here's today: ${list(today.map(([n,l])=>`${n} ${l.toLowerCase()}`))}.`;
+ if(/work|mission|project|progress|focus|doing/.test(t))return missions.length?`Right now I'm moving ${list(missions.map(([m,p])=>`${m} at ${p}`))}. ${missions[0][0]} is my top priority.`:`I'm focused on ${duties[0].toLowerCase()}.`;
+ if(/role|who are you|what do you do|responsib|help/.test(t))return `I'm ${a.name}, ${a.role}. I own ${list(duties.slice(0,4).map(d=>d.toLowerCase()))}.`;
+ if(/hand|send|approve|delegate|team|assign/.test(t))return a.id==='simon'?`Understood. I'll set the priority and pass it to Marie to dispatch. Gatekeeper reviews before anything goes out.`:a.id==='marie'?`On it. I'll split it across the floor and track every handoff. Gatekeeper gets the final review.`:a.id==='gatekeeper'?`Send it my way. Nothing goes out until it clears review, and anything sensitive comes back to you.`:`Got it. I'll draft my part, Marie routes it, and Gatekeeper signs off before it ships.`;
+ return pick([`Noted: "${q}". In the live build I'll pull that straight from the CRM. For now I'm running on preview data.`,`Good question. Once I'm connected to the live CRM I'll answer that with real records. Right now this office is a preview.`]);
+}
+const synth=window.speechSynthesis;let voices=[];
+if(synth){const load=()=>voices=synth.getVoices().filter(v=>/^en/i.test(v.lang));load();synth.addEventListener?.('voiceschanged',load)}
+const VOICE_FEMALE=/female|zira|aria|jenny|samantha|victoria|karen|moira|tessa|susan|libby|sonia|natasha|google uk english female|google us english/i;
+const FEMALE=new Set(['marie','iris','cammy','lucy','alice','sofia','claire','maven']);
+function voiceFor(a){if(!voices.length)return null;const fem=voices.filter(v=>VOICE_FEMALE.test(v.name)),male=voices.filter(v=>!VOICE_FEMALE.test(v.name));const pool=(FEMALE.has(a.id)?fem:male).length?(FEMALE.has(a.id)?fem:male):voices;let h=0;for(const ch of a.id)h=(h*31+ch.charCodeAt(0))>>>0;return pool[h%pool.length]}
+function wireConversation(s,a){
+ const cap=s.querySelector('.caption'),form=s.querySelector('.composer'),input=form.querySelector('input'),voiceBtn=form.querySelector('.voice'),mic=form.querySelector('.mic'),clips={listening:s.querySelector('.clip-listen'),speaking:s.querySelector('.clip-talk')};
+ let voiceOn=true,ampT,run=0,idleT,micOn=false;
+ // idle → listening (you type or talk) → speaking (they answer) → idle. Each state crossfades its own clip over the still.
+ function setState(st){
+  s.dataset.state=st;s.classList.toggle('listening',st==='listening');s.classList.toggle('speaking',st==='speaking');
+  for(const [k,v] of Object.entries(clips)){if(!v)continue;
+   if(k===st&&!motionPaused){if(v.paused){v.currentTime=0;v.play().catch(()=>{})}}
+   else setTimeout(()=>{if(s.dataset.state!==k){v.pause();v.currentTime=0}},500)}
+ }
+ function listen(){if(s.dataset.state==='speaking')return;setState('listening');clearTimeout(idleT);if(!micOn)idleT=setTimeout(()=>{if(s.dataset.state==='listening')setState('idle')},2600)}
+ input.addEventListener('input',()=>input.value?listen():setState('idle'));
+ voiceBtn.onclick=()=>{voiceOn=!voiceOn;voiceBtn.setAttribute('aria-pressed',String(voiceOn));voiceBtn.textContent=voiceOn?'🔊':'🔇';if(!voiceOn)synth?.cancel()};
+ const setAmp=v=>s.style.setProperty('--amp',v.toFixed(2));
+ function start(){clearTimeout(idleT);setState('speaking');clearInterval(ampT);ampT=setInterval(()=>setAmp(.35+Math.random()*.65),110)}
+ function stop(){clearInterval(ampT);setAmp(0);if(s.dataset.state==='speaking')setState('idle')}
+ function speak(text,asked){
+  const id=++run;synth?.cancel();
+  const words=text.split(/\s+/);
+  cap.innerHTML=(asked?`<span class="you">You: ${asked.replace(/</g,'&lt;')}</span>`:'')+words.map(w=>`<span class="w">${w.replace(/</g,'&lt;')}</span> `).join('');
+  const spans=[...cap.querySelectorAll('.w')];let lit=0;const light=n=>{for(;lit<Math.min(n,spans.length);lit++)spans[lit].classList.add('on')};
+  start();
+  // Captions always run on a timer; when the browser can speak, word boundaries keep them in sync with the voice.
+  const voiced=voiceOn&&synth&&voices.length;let synced=false;const pace=voiced?330:240;let i=0;const tick=setInterval(()=>{if(id!==run)return clearInterval(tick);i++;if(!synced)light(i);if(i>=spans.length&&!(voiceOn&&synth&&synth.speaking)){clearInterval(tick);stop()}},pace);
+  if(voiced){const u=new SpeechSynthesisUtterance(text);const v=voiceFor(a);if(v)u.voice=v;u.rate=1.02;u.pitch=FEMALE.has(a.id)?1.05:.92;
+   let chars=0;const offsets=words.map(w=>{const o=chars;chars+=w.length+1;return o});
+   u.onboundary=e=>{if(id!==run)return;synced=true;const n=offsets.findIndex(o=>o>e.charIndex);light(n<0?spans.length:n);setAmp(1)};
+   u.onend=u.onerror=()=>{if(id!==run)return;clearInterval(tick);light(spans.length);stop()};
+   synth.speak(u)}
+ }
+ form.onsubmit=e=>{e.preventDefault();const q=input.value.trim();if(!q)return;input.value='';speak(reply(a,q),q)};
+ s.querySelectorAll('.suggest button').forEach(b=>b.onclick=()=>speak(reply(a,b.textContent),b.textContent));
+ const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(SR){mic.hidden=false;mic.onclick=()=>{const r=new SR();r.lang='en-US';r.interimResults=true;mic.classList.add('live');synth?.cancel();run++;micOn=true;listen();
+  r.onresult=e=>{input.value=[...e.results].map(x=>x[0].transcript).join('');if(e.results[e.results.length-1].isFinal){const q=input.value.trim();input.value='';if(q)speak(reply(a,q),q)}};
+  r.onend=r.onerror=()=>{mic.classList.remove('live');micOn=false;if(s.dataset.state==='listening')setState('idle')};r.start()}}
+ s.onArrive=()=>{cap.innerHTML='';setTimeout(()=>{if(current===s.dataset.key)speak(a.next?`${a.name}'s office is the next room in production.`:pick([`Hey. I'm ${a.name}. ${a.quote||''}`,`Welcome to my office. I'm ${a.name}, ${a.role}.`]))},1500)};
+ s.onLeave=()=>{run++;synth?.cancel();clearTimeout(idleT);stop();setState('idle')};
+ setState('idle');
+}
+
+/* ===== CRM ===== */
+function buildCRM(){
+ const s=document.createElement('section');s.className='panel-scene';s.setAttribute('aria-label','Pegasus CRM');
+ const activity=[['echo','New lead from website','10m'],['alice','Opportunity moved to Proposal','32m'],['booker','Meeting scheduled','1h'],['iris','Research report completed','2h'],['cammy','Campaign draft ready','3h']];
+ const agents=[['simon','Working'],['marie','Complete'],['iris','Working'],['mark','Working'],['cammy','Queued'],['lucy','Working']];
+ s.innerHTML=`<img class="bg" src="assets/pegasus-atrium.png" alt="">
+ <div class="board"><div class="scene-title"><h2 class="serif">PEGASUS CRM</h2><p>PIPELINE · TASKS · AGENT ACTIVITY · <span class="sample">SAMPLE DATA</span></p></div>
+ <div class="card kpis"><div class="kpi"><span>LEADS</span><b>124</b><em>↑ 12%</em></div><div class="kpi"><span>OPPORTUNITIES</span><b>$287K</b><em>↑ 18%</em></div><div class="kpi"><span>ACTIVE CLIENTS</span><b>18</b><em>↑ 2%</em></div><div class="kpi"><span>TASKS</span><b>42</b><em>↑ 6%</em></div></div>
+ <div class="crm-grid"><div class="card funnel"><h3>PIPELINE</h3>${[['New leads',124,100],['Discovery',86,84],['Proposal',52,68],['Negotiation',28,52],['Closed',18,38]].map(([l,n,w])=>`<div style="width:${w}%"><span>${l}</span><b>${n}</b></div>`).join('')}</div>
+ <div class="card"><h3>AI AGENT ACTIVITY · TAP TO VISIT</h3>${agents.map(([id,st])=>`<button class="agent-row" type="button" data-room="${id}">${orb(byId[id])}<span>${byId[id].name}<br><small>${byId[id].role}</small></span><em>${st}</em></button>`).join('')}</div></div>
+ <div class="card"><h3>RECENT ACTIVITY</h3>${activity.map(([id,t,ago])=>`<button class="agent-row" type="button" data-room="${id}">${orb(byId[id])}<span>${byId[id].name} — ${t}</span><small>${ago} ago</small></button>`).join('')}</div></div>`;
+ s.querySelectorAll('[data-room]').forEach(b=>b.onclick=travel('room/'+b.dataset.room));
+ return s;
+}
+
+/* ===== War room — mission flow ===== */
+function buildWarRoom(){
+ const s=document.createElement('section');s.className='panel-scene';s.setAttribute('aria-label','War Room');
+ const step=(id,sub)=>{const a=byId[id];return `<button type="button" data-room="${id}" style="--c:${a.c}">${orb(a)}<strong>${a.name.toUpperCase()}</strong><span>${sub}</span></button>`};
+ s.innerHTML=`<img class="bg" src="assets/pegasus-atrium.png" alt="">
+ <div class="board" style="align-content:center"><div class="scene-title"><h2 class="serif">WAR ROOM</h2><p>HOW A MISSION MOVES THROUGH PEGASUS</p></div>
+ <div class="card flow"><button type="button" disabled style="--c:#dfba80"><span class="orb" style="--c:#dfba80">YOU</span><strong>FOUNDER</strong><span>sets the mission</span></button><i>›</i>
+ ${step('simon','strategy & priority')}<i>›</i>${step('marie','dispatch & operations')}<i>›</i>
+ <button type="button" data-floor style="--c:#7ddcf3"><span class="orb" style="--c:#7ddcf3">12</span><strong>SPECIALISTS</strong><span>the employee floor</span></button><i>›</i>
+ ${step('gatekeeper','review & compliance')}<i>›</i><button type="button" disabled style="--c:#dfba80"><span class="orb" style="--c:#dfba80">✓</span><strong>FOUNDER</strong><span>final decision</span></button></div>
+ <p class="sample" style="text-align:center">PREVIEW OF THE INTENDED FLOW · NOT CONNECTED TO LIVE MISSIONS</p></div>`;
+ s.querySelectorAll('[data-room]').forEach(b=>b.onclick=travel('room/'+b.dataset.room));
+ s.querySelector('[data-floor]').onclick=travel('floor');
+ return s;
+}
+
+/* ===== Client lobby ===== */
+function buildLobby(){
+ const s=document.createElement('section');s.className='panel-scene';s.setAttribute('aria-label','Client Welcome Lobby');
+ s.innerHTML=`<img class="bg" src="assets/pegasus-atrium.png" alt="" style="filter:blur(4px) brightness(.45) sepia(.35) saturate(1.2)">
+ <div class="board" style="align-content:center"><div class="scene-title"><h2 class="serif">WELCOME</h2><p>PARTNER · BUILD · GROW</p></div>
+ <div class="lobby-tiles">${[['My Projects','View progress'],['My Tasks','Action items'],['My Documents','Upload & review'],['My Meetings','Schedule with Booker'],['Messages','Concierge support'],['Approvals','Items waiting']].map(([t,d])=>`<button type="button" data-tile="${t}"><strong>${t}</strong><span>${d}</span></button>`).join('')}</div></div>`;
+ s.querySelectorAll('[data-tile]').forEach(b=>b.onclick=()=>b.dataset.tile==='My Meetings'?go('room/booker',{origin:{x:innerWidth/2,y:innerHeight/2}}):toast(`${b.dataset.tile} opens once the client portal is connected.`));
+ return s;
+}
+
+/* ===== Intro + motion control ===== */
+const intro=document.querySelector('#intro'),introVideo=document.querySelector('#intro-video');
+function enterHQ(){intro.classList.add('done');introVideo.pause();const start=location.hash.replace(/^#\//,'');go(sceneInfo(start)?start:'atrium',{dir:'fwd'})}
+document.querySelector('#enter').onclick=enterHQ;
+if(reduced||location.hash.length>2){enterHQ()}else{introVideo.play().catch(()=>{});document.querySelector('#enter').focus()}
+const motionBtn=document.querySelector('#motion');
+motionBtn.onclick=()=>{motionPaused=!motionPaused;document.body.classList.toggle('paused',motionPaused);motionBtn.textContent=motionPaused?'Resume motion':'Pause motion';motionBtn.setAttribute('aria-pressed',String(motionPaused));const el=cache[current];if(!el)return;if(motionPaused){sleep(el);el.pauseLoop&&el.pauseLoop()}else arrive(el)};
+</script>
+</body></html>
