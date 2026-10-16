@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Pegasus HQ</title>
-<meta name="description" content="Pegasus.io immersive headquarters: walk through the atrium, the employee floor, and each AI agent's office.">
+<meta name="description" content="Pegasus.io immersive headquarters: walk through headquarters, the employee floor, and each AI agent's office.">
 <style>
 :root{color-scheme:dark;--gold:#dfba80;--gold-hi:#ffd998;--cyan:#7ddcf3;--ink:#04070d;--glass:#07101cd0;--line:#9c7c5488;--txt:#f5ebda;--mute:#a6bbca}
 *{box-sizing:border-box}html,body{height:100%}body{margin:0;overflow:hidden;background:var(--ink);color:var(--txt);font-family:Inter,system-ui,"Segoe UI",sans-serif}
@@ -608,7 +608,7 @@ sizeStage();addEventListener('resize',sizeStage);
 /* ===== Scene registry ===== */
 const world=document.querySelector('#world'),reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const SCENES={
- atrium:{label:'Atrium',depth:0,build:buildAtrium},
+ hq:{label:'Headquarters',short:'HQ',depth:0,build:buildAtrium},
  executive:{label:'Executive Office',depth:1,alias:'room/simon'},
  floor:{label:'Employee Floor',depth:1,build:buildFloor},
  crm:{label:'CRM Dashboard',depth:1,build:buildCRM},
@@ -616,12 +616,13 @@ const SCENES={
  lobby:{label:'Clients',depth:1,build:buildClientList},
 };
 const cache={};let current=null,busy=false,motionPaused=false;
-function sceneInfo(key){if(key.startsWith('client/'))return {label:'Client portal',depth:2,parent:'lobby',build:()=>buildClientPortal(key.slice(7))};if(key.startsWith('room/')){const a=byId[key.slice(5)];return a?{label:a.name,depth:2,parent:a.exec?'atrium':'floor',build:()=>buildRoom(a)}:null}const s=SCENES[key];return s?{parent:'atrium',...s}:null}
+function sceneInfo(key){if(key==='atrium')key='hq';if(key.startsWith('client/'))return {label:'Client portal',depth:2,parent:'lobby',build:()=>buildClientPortal(key.slice(7))};if(key.startsWith('room/')){const a=byId[key.slice(5)];return a?{label:a.name,depth:2,parent:a.exec?'hq':'floor',build:()=>buildRoom(a)}:null}const s=SCENES[key];return s?{parent:'hq',...s}:null}
 function getScene(key){if(!cache[key]){const el=sceneInfo(key).build();el.classList.add('scene');el.dataset.key=key;world.append(el);cache[key]=el}return cache[key]}
 
 /* ===== Travel — the "pull you through" camera move ===== */
 const warp=document.querySelector('#warp');
 function go(key,{origin,dir}={}){
+ if(key==='atrium')key='hq'; // old links
  if(SCENES[key]?.alias)key=SCENES[key].alias;
  const info=sceneInfo(key);if(!info||key===current||busy)return;
  const from=current&&cache[current],to=getScene(key);
@@ -656,32 +657,32 @@ function arrive(el,fwd){
 }
 function sleep(el){if(!el)return;el.onLeave&&el.onLeave();el.querySelectorAll('video').forEach(v=>v.pause())}
 const travel=key=>e=>{const r=e.currentTarget.getBoundingClientRect();go(key,{origin:{x:r.left+r.width/2,y:r.top+r.height/2}})};
-addEventListener('popstate',()=>{const k=location.hash.replace(/^#\//,'')||'atrium';if(sceneInfo(k))go(k)});
-addEventListener('keydown',e=>{if(e.key==='Escape'&&current&&current!=='atrium'){goBack()}});
+addEventListener('popstate',()=>{const k=location.hash.replace(/^#\//,'')||'hq';if(sceneInfo(k))go(k)});
+addEventListener('keydown',e=>{if(e.key==='Escape'&&current&&current!=='hq'){goBack()}});
 
 /* ===== Chrome: back, breadcrumbs, map ===== */
 const backBtn=document.querySelector('#back'),crumbs=document.querySelector('#crumbs'),map=document.querySelector('#map');
 function goBack(){const p=sceneInfo(current).parent;if(p)go(p,{dir:'back'})}
 backBtn.onclick=goBack;
 function updateChrome(key){
- const info=sceneInfo(key),trail=[];let k=key;while(k){trail.unshift(k);k=k==='atrium'?null:sceneInfo(k).parent}
+ const info=sceneInfo(key),trail=[];let k=key;while(k){trail.unshift(k);k=k==='hq'?null:sceneInfo(k).parent}
  crumbs.innerHTML=trail.map((t,i)=>i===trail.length-1?`<b>${sceneInfo(t).label}</b>`:`<span>${sceneInfo(t).label}</span> ›`).join(' ');
- backBtn.classList.toggle('show',key!=='atrium');
- document.querySelector('#back-label').textContent=info.parent?sceneInfo(info.parent).label.toUpperCase():'BACK';
+ backBtn.classList.toggle('show',key!=='hq');
+ document.querySelector('#back-label').textContent=info.parent?(sceneInfo(info.parent).short||sceneInfo(info.parent).label).toUpperCase():'BACK';
  map.querySelectorAll('button').forEach(b=>b.classList.toggle('on',trail.includes(b.dataset.go)||(b.dataset.go==='executive'&&key==='room/simon')));
 }
-[['atrium','Atrium'],['executive','Executive'],['floor','Floor'],['crm','CRM'],['war-room','War Room'],['lobby','Clients']].forEach(([k,l])=>{const b=document.createElement('button');b.type='button';b.dataset.go=k;b.textContent=l;b.onclick=travel(k);map.append(b)});
+[['hq','HQ'],['executive','Executive'],['floor','Floor'],['crm','CRM'],['war-room','War Room'],['lobby','Clients']].forEach(([k,l])=>{const b=document.createElement('button');b.type='button';b.dataset.go=k;b.textContent=l;b.onclick=travel(k);map.append(b)});
 const toastEl=document.querySelector('#toast');let toastT;
 function toast(msg){toastEl.textContent=msg;toastEl.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>toastEl.classList.remove('show'),3200)}
 
 /* ===== Atrium ===== */
 function hot(key,x,y,title,sub,{icon='↗',c,forward}={}){return `<button class="hot${forward?' forward':''}" type="button" data-go="${key}" style="--x:${x};--y:${y};${c?`--c:${c}`:''}"><span class="ring"><i>${icon}</i></span><span class="tag"><strong>${title}</strong><span>${sub}</span></span></button>`}
 function buildAtrium(){
- const s=document.createElement('section');s.id='s-atrium';s.setAttribute('aria-label','Pegasus Headquarters Atrium');
+ const s=document.createElement('section');s.id='s-atrium';s.setAttribute('aria-label','Pegasus Headquarters');
  s.innerHTML=`<img class="bg" src="assets/pegasus-atrium.png" alt="">
  <video id="holo" muted playsinline preload="auto" src="assets/pegasus-centerpiece.mp4" aria-hidden="true"></video><video id="holo2" muted playsinline preload="auto" src="assets/pegasus-centerpiece.mp4" aria-hidden="true"></video>
  <div class="shade" style="background:radial-gradient(ellipse at 50% 45%,transparent 35%,#02050bcc 100%)"></div>
- <div class="atrium-title"><h1 class="serif">PEGASUS</h1><p>HEADQUARTERS ATRIUM</p></div>
+ <div class="atrium-title"><h1 class="serif">PEGASUS</h1><p>HEADQUARTERS</p></div>
  ${hot('executive','20%','30%','SIMON · EXECUTIVE OFFICE','Strategy · leadership · final approvals',{icon:'♛',c:'#e8c27a'})}
  ${hot('floor','50%','84%','EMPLOYEE FLOOR','Walk the hall · AI team offices',{icon:'⇡',forward:true})}
  ${hot('crm','80%','30%','PEGASUS CRM','Live metrics · AI workforce leaderboard',{icon:'◎',c:'#7ddcf3'})}
@@ -1256,7 +1257,7 @@ function buildClientPortal(id){
 
 /* ===== Intro + motion control ===== */
 const intro=document.querySelector('#intro'),introVideo=document.querySelector('#intro-video');
-function enterHQ(){intro.classList.add('done');introVideo.pause();const start=location.hash.replace(/^#\//,'');go(sceneInfo(start)?start:'atrium',{dir:'fwd'})}
+function enterHQ(){intro.classList.add('done');introVideo.pause();const start=location.hash.replace(/^#\//,'');go(sceneInfo(start)?start:'hq',{dir:'fwd'})}
 document.querySelector('#enter').onclick=enterHQ;
 if(reduced||location.hash.length>2){enterHQ()}else{introVideo.play().catch(()=>{});document.querySelector('#enter').focus()}
 const motionBtn=document.querySelector('#motion');
