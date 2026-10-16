@@ -490,6 +490,33 @@ a.cl-row:hover .cl-open{color:var(--gold-hi)}
 .sched b{color:#fff;font-variant-numeric:tabular-nums}
 .agr-note{display:block;margin-top:6px;font-size:10.5px;color:var(--mute);line-height:1.45}
 
+
+/* ---------- holographic HQ buttons ---------- */
+.hb{--d:clamp(98px,8.2vw,134px);position:absolute;left:var(--x);top:var(--y);transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:10px;border:0;background:none;padding:0;z-index:2;color:inherit;cursor:pointer}
+.hb-disc{position:relative;width:var(--d);height:var(--d);border-radius:50%;overflow:hidden;background:radial-gradient(circle at 50% 42%,#0d2236 0%,#04080f 72%);box-shadow:0 0 0 1px color-mix(in srgb,var(--c) 70%,#dfba80),0 0 0 5px #04070dd0,0 0 0 6px #dfba8040,0 0 30px color-mix(in srgb,var(--c) 40%,transparent);transition:transform .25s,box-shadow .25s}
+.hb:hover .hb-disc,.hb:focus-visible .hb-disc{transform:translateY(-4px) scale(1.05);box-shadow:0 0 0 1.5px var(--c),0 0 0 5px #04070dd0,0 0 0 7px color-mix(in srgb,var(--c) 60%,transparent),0 0 46px color-mix(in srgb,var(--c) 65%,transparent)}
+.hb:focus-visible{outline:none}
+.hb::before{content:'';position:absolute;top:0;left:50%;width:var(--d);height:var(--d);margin-left:calc(var(--d)/-2);border-radius:50%;border:1.5px solid var(--c);opacity:0;animation:hbPing 3.2s ease-out infinite;pointer-events:none}
+@keyframes hbPing{0%{transform:scale(1);opacity:.55}100%{transform:scale(1.32);opacity:0}}
+.hb-stage{position:absolute;left:10%;right:10%;top:6%;height:66%;perspective:420px}
+.hb-plat{position:absolute;left:0;right:0;bottom:6%;width:100%;opacity:.9;pointer-events:none}
+.hb-scan{position:absolute;inset:0;border-radius:50%;pointer-events:none;background:repeating-linear-gradient(0deg,#9fe6ff0d 0 1px,transparent 1px 3px),radial-gradient(circle,transparent 58%,#03070d 80%)}
+.hb .spinner{left:0;right:0;top:0;height:100%}
+.hb .spinner svg.face{filter:drop-shadow(0 0 5px #4fc3ff)}
+.spinner.bust .face{border-radius:50%;object-fit:cover;-webkit-mask-image:radial-gradient(circle at 50% 42%,#000 46%,transparent 70%);mask-image:radial-gradient(circle at 50% 42%,#000 46%,transparent 70%);filter:grayscale(1) contrast(1.25) brightness(1.05) sepia(1) hue-rotate(165deg) saturate(3.2) drop-shadow(0 0 6px #4fc3ff)}
+.globe{position:absolute;left:50%;top:52%;width:62%;aspect-ratio:1;transform:translate(-50%,-50%);transform-style:preserve-3d;animation:turn 12s linear infinite}
+.globe i,.globe b{position:absolute;inset:0;border-radius:50%;border:1.4px solid #7fdcff;box-shadow:0 0 6px #4fc3ff88}
+.globe b{border-color:#ffcf8a;opacity:.75}
+.carousel{--rz:clamp(26px,2.4vw,38px);position:absolute;left:50%;top:56%;width:34%;aspect-ratio:1;transform:translate(-50%,-50%);transform-style:preserve-3d;animation:turn 14s linear infinite}
+.carousel img{position:absolute;inset:0;width:100%;height:100%;border-radius:50%;object-fit:cover;border:1px solid #9ff0c2;filter:grayscale(1) contrast(1.2) sepia(1) hue-rotate(110deg) saturate(2.6) drop-shadow(0 0 4px #3ee6a0);backface-visibility:hidden}
+.hb .tag{padding:7px 12px;border:1px solid color-mix(in srgb,var(--c) 55%,transparent);border-radius:10px;background:#050b14e0;backdrop-filter:blur(8px);text-align:center;white-space:nowrap;transition:border-color .2s}
+.hb .tag strong{display:block;font-size:12px;letter-spacing:.16em;color:var(--gold-hi)}
+.hb .tag span{display:block;margin-top:3px;font-size:10.5px;color:var(--mute);letter-spacing:.06em}
+.hb:hover .tag{border-color:var(--c)}
+.paused .hb *,.paused .hb::before{animation-play-state:paused!important}
+@media(prefers-reduced-motion:reduce){.hb *,.hb::before{animation:none!important}}
+@media(max-width:860px){.hb{--d:84px}.hb .tag span{display:none}}
+
 /* ---------- responsive ---------- */
 @media(max-width:860px){
  #crumbs,.pill{display:none}
@@ -524,7 +551,7 @@ a.cl-row:hover .cl-open{color:var(--gold-hi)}
 </div></div>
 
 <div id="world" aria-live="polite"></div>
-<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dfba80" stop-opacity=".45"/><stop offset="1" stop-color="#dfba80" stop-opacity="0"/></linearGradient></defs></svg>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><g id="clientsGlyph" fill="none" stroke="#8fe3ff" stroke-width="3.2" stroke-linecap="round"><circle cx="78" cy="30" r="13"/><path d="M56 82c2-17 11-27 22-27s20 10 22 27"/><circle cx="44" cy="34" r="16" fill="#0b2a40"/><path d="M14 90c2-21 14-33 30-33s28 12 30 33" fill="#0b2a40"/><path d="M30 92h28" opacity=".5"/></g><linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dfba80" stop-opacity=".45"/><stop offset="1" stop-color="#dfba80" stop-opacity="0"/></linearGradient></defs></svg>
 <div id="warp"></div>
 <div id="doorfx" aria-hidden="true"><div class="leaf l"></div><div class="leaf r"></div><div class="plate"><span class="orb"></span><b class="serif"></b><span></span></div></div>
 
@@ -701,17 +728,28 @@ function toast(msg){toastEl.textContent=msg;toastEl.classList.add('show');clearT
 
 /* ===== Atrium ===== */
 function hot(key,x,y,title,sub,{icon='↗',c,forward}={}){return `<button class="hot${forward?' forward':''}" type="button" data-go="${key}" style="--x:${x};--y:${y};${c?`--c:${c}`:''}"><span class="ring"><i>${icon}</i></span><span class="tag"><strong>${title}</strong><span>${sub}</span></span></button>`}
+/* Holographic HQ buttons: every destination is a glowing disc with its own hologram turning steadily on a platform. */
+const spin2=(src,cls='')=>`<div class="spinner ${cls}"><img class="face front" src="${src}" alt=""><img class="face back" src="${src}" alt=""></div>`;
+const HOLO={
+ crm:()=>spin2('assets/pegasus-holo.png'),
+ executive:()=>spin2('assets/avatars/simon.jpg','bust'),
+ 'war-room':()=>`<div class="globe">${[0,30,60,90,120,150].map(r=>`<i style="transform:rotateY(${r}deg)"></i>`).join('')}${[-55,-25,0,25,55].map(l=>`<b style="transform:translateY(${Math.sin(l*Math.PI/180)*50}%) rotateX(90deg) scale(${Math.cos(l*Math.PI/180).toFixed(3)})"></b>`).join('')}</div>`,
+ lobby:()=>`<div class="spinner"><svg class="face front" viewBox="0 0 120 100"><use href="#clientsGlyph"/></svg><svg class="face back" viewBox="0 0 120 100"><use href="#clientsGlyph"/></svg></div>`,
+ floor:()=>`<div class="carousel">${['simon','marie','iris','mark','lucy','snake','alice','echo'].map((id,i,a)=>`<img src="assets/avatars/${id}.jpg" alt="" style="transform:rotateY(${i*360/a.length}deg) translateZ(var(--rz))">`).join('')}</div>`,
+};
+function holoButton(key,x,y,title,sub,c='#7ddcf3'){return `<button class="hb" type="button" data-go="${key}" style="--x:${x};--y:${y};--c:${c}" aria-label="${title}: ${sub}">
+ <span class="hb-disc"><span class="hb-stage">${HOLO[key]()}</span><img class="hb-plat" src="assets/pegasus-platform.png" alt=""><span class="hb-scan"></span></span>
+ <span class="tag"><strong>${title}</strong><span>${sub}</span></span></button>`}
 function buildAtrium(){
  const s=document.createElement('section');s.id='s-atrium';s.setAttribute('aria-label','Pegasus Headquarters');
  s.innerHTML=`<img class="bg" src="assets/pegasus-atrium.png" alt="">
- <div class="emblem" aria-hidden="true"><div class="turntable"><div class="spinner"><img class="face front" src="assets/pegasus-holo.png" alt=""><img class="face back" src="assets/pegasus-holo.png" alt=""></div><img class="platform" src="assets/pegasus-platform.png" alt=""></div><span class="emblem-tag">PEGASUS · LIVE</span></div>
  <div class="shade" style="background:radial-gradient(ellipse at 50% 45%,transparent 35%,#02050bcc 100%)"></div>
  <div class="atrium-title"><h1 class="serif">PEGASUS</h1><p>HEADQUARTERS</p></div>
- ${hot('executive','20%','30%','SIMON · EXECUTIVE OFFICE','Strategy · leadership · final approvals',{icon:'♛',c:'#e8c27a'})}
- ${hot('floor','50%','84%','EMPLOYEE FLOOR','Walk the hall · AI team offices',{icon:'⇡',forward:true})}
- ${hot('crm','80%','30%','PEGASUS CRM','Live metrics · AI workforce leaderboard',{icon:'◎',c:'#7ddcf3'})}
- ${hot('war-room','14%','62%','WAR ROOM','Mission execution',{icon:'✦',c:'#ff9a5c'})}
- ${hot('lobby','86%','62%','CLIENTS','Client portals · projects · concierge',{icon:'⌂',c:'#f0d7a8'})}`;
+ ${holoButton('executive','19%','27%','SIMON · EXECUTIVE OFFICE','Strategy · leadership · approvals','#e8c27a')}
+ ${holoButton('crm','81%','27%','PEGASUS CRM','Live metrics · AI workforce leaderboard','#7ddcf3')}
+ ${holoButton('war-room','12%','63%','WAR ROOM','Mission execution','#ff9a5c')}
+ ${holoButton('lobby','88%','63%','CLIENTS','Client portals · concierge','#f0d7a8')}
+ ${holoButton('floor','50%','84%','EMPLOYEE FLOOR','Walk the hall · AI team offices','#9ff0c2')}`;
  s.querySelectorAll('[data-go]').forEach(b=>b.onclick=travel(b.dataset.go));
  return s;
 }
