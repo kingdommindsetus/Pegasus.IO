@@ -480,6 +480,23 @@ button{font:inherit;color:inherit;cursor:pointer}button:focus-visible,a:focus-vi
 .r-sep::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(212,175,55,.55),transparent)}
 .paused .roster::before,.paused .r-item::after,.paused .r-dot::before,.paused .roster-head span::before{animation-play-state:paused}
 @media(prefers-reduced-motion:reduce){.roster::before,.r-item::after,.r-dot::before,.roster-head span::before{animation:none}.r-item:hover{transform:none}}
+
+/* gold plaques: the directory is a feature, so each agent card is polished gold with dark engraved text */
+.r-item{background:linear-gradient(135deg,#FFF1C9 0%,#F0CF6A 28%,#D4AF37 55%,#B98A2C 80%,#E9C766 100%)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.75),inset 0 -2px 6px rgba(120,80,10,.35),0 8px 22px rgba(0,0,0,.55),0 0 18px rgba(212,175,55,.25)!important}
+.r-item::before{background:linear-gradient(135deg,#fff8e1,#8a6216 50%,#fff1c4)!important}
+.r-item:hover,.r-item:focus-visible{background:linear-gradient(135deg,#FFF7DD 0%,#F7DC84 28%,#E2BE4A 55%,#C99A33 80%,#F3D57A 100%)!important;
+ box-shadow:inset 0 1px 0 #fff,inset 0 -2px 6px rgba(120,80,10,.3),0 14px 30px rgba(0,0,0,.55),0 0 30px rgba(240,207,106,.55)!important}
+.r-item::after{background:conic-gradient(from var(--spin),transparent 0 62%,rgba(255,255,255,.2) 72%,#fff 84%,rgba(255,255,255,.4) 90%,transparent 96%)!important;filter:drop-shadow(0 0 5px #fff6d0)!important}
+.r-txt b{color:#1b1206!important;text-shadow:0 1px 0 rgba(255,245,210,.6)!important;font-weight:800!important}
+.r-txt small{color:#4a3208!important;font-weight:600!important}
+.r-dot{color:#b8ffd6!important;background:rgba(20,14,4,.82);padding:5px 9px 5px 8px;border-radius:999px;box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}
+.r-item:hover .r-dot,.r-item:focus-visible .r-dot{color:#fff3cf!important}
+.r-item .orb{box-shadow:0 0 0 2px #2a1c06,0 2px 8px rgba(0,0,0,.45)!important;background:conic-gradient(from 210deg,#3a2708,#1a1205,#3a2708)!important}
+.r-sep{color:#F5D77A!important;text-shadow:0 0 10px rgba(240,207,106,.35)}
+.r-sep::after{background:linear-gradient(90deg,rgba(240,207,106,.8),transparent)!important}
+.roster::before{background:linear-gradient(var(--sheen),#F7DC84,rgba(180,140,50,.35) 45%,#F0CF6A 70%,rgba(180,140,50,.3))!important}
+.roster-head span{color:#F3E7C4!important}
 @media(max-width:860px){.roster{left:12px;right:12px;width:auto;top:auto;bottom:70px;height:46vh}}
 
 
