@@ -383,8 +383,8 @@ const AGENTS=[
 // flag them here, e.g. simon:{listen:true,talk:true}. Agents without clips stay still and use the voice light alone.
 const CLIPS={};
 // Where each robot's body sits, for the soft mask that keeps the room still while the robot moves.
-const BODY={evan:[63,50],atlas:[55,60],claire:[48,62],flow:[63,62],ledger:[53,58],midas:[50,55],snake:[47,58],tube:[50,60],cammy:[40,58],mark:[49,58],simon:[50,55],marie:[47,58],gatekeeper:[51,62],lucy:[52,60],sofia:[48,62],iris:[50,62],maven:[47,64],booker:[48,62],scout:[54,68],echo:[48,60],alice:[49,60]};
-const HEAD={evan:[67,20],atlas:[55,40],claire:[47,42],flow:[62,40],ledger:[54,34],midas:[51,28],snake:[48,33],tube:[49,37],cammy:[41,37],mark:[48,36],simon:[50,36],marie:[45,40],gatekeeper:[47,45],lucy:[51,38],sofia:[47,38],iris:[48,41],maven:[48,42],booker:[47,40],scout:[53,55],echo:[50,34],alice:[46,34]};
+const BODY={evan:[63,50],atlas:[55,60],claire:[48,62],flow:[63,62],ledger:[53,58],midas:[50,55],snake:[47,58],tube:[50,60],cammy:[40,58],mark:[49,58],simon:[50,55],marie:[47,58],gatekeeper:[51,62],lucy:[52,64],sofia:[48,62],iris:[50,62],maven:[47,64],booker:[48,62],scout:[54,68],echo:[48,60],alice:[49,60]};
+const HEAD={evan:[67,20],atlas:[55,40],claire:[47,42],flow:[62,40],ledger:[54,34],midas:[51,28],snake:[48,33],tube:[49,37],cammy:[41,37],mark:[48,36],simon:[50,36],marie:[45,40],gatekeeper:[47,45],lucy:[53,44],sofia:[47,38],iris:[48,41],maven:[48,42],booker:[47,40],scout:[53,55],echo:[50,34],alice:[46,34]};
 // Rooms still being built go here by name; each gets a placeholder office and an end-of-hall chip.
 const NEXT_WING=[];
 NEXT_WING.forEach(n=>AGENTS.push({id:n.toLowerCase(),name:n,role:'Room in production',dept:'Office build scheduled for the next slice',c:'#7ddcf3',next:true}));
