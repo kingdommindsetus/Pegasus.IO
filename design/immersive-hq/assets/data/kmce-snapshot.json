@@ -4,8 +4,6 @@
   "kpis": {
     "verifiedRevenue": 9055,
     "recordedRevenue": 11855,
-    "openCheckouts": 44,
-    "openCheckoutValue": 121000,
     "leadsDiscovered": 9,
     "jobsCompleted": 31,
     "jobsFailed": 0,
@@ -20,34 +18,193 @@
     "milestonesPaused": 2
   },
   "revenueByVerification": [
-    { "label": "Processor verified", "entries": 3, "amount": 9055 },
-    { "label": "Document supported", "entries": 2, "amount": 2500 },
-    { "label": "Method unverified", "entries": 1, "amount": 300 }
+    {
+      "label": "Processor verified",
+      "entries": 3,
+      "amount": 9055
+    },
+    {
+      "label": "Document supported",
+      "entries": 2,
+      "amount": 2500
+    },
+    {
+      "label": "Method unverified",
+      "entries": 1,
+      "amount": 300
+    }
   ],
   "daily": [
-    { "day": "2026-10-10", "runs": 18, "jobs": 4, "huddles": 0, "tasks": 3, "leads": 0, "checkouts": 3 },
-    { "day": "2026-10-11", "runs": 25, "jobs": 4, "huddles": 13, "tasks": 7, "leads": 0, "checkouts": 25 },
-    { "day": "2026-10-12", "runs": 24, "jobs": 7, "huddles": 13, "tasks": 3, "leads": 0, "checkouts": 0 },
-    { "day": "2026-10-13", "runs": 24, "jobs": 4, "huddles": 13, "tasks": 1, "leads": 0, "checkouts": 0 },
-    { "day": "2026-10-14", "runs": 24, "jobs": 4, "huddles": 13, "tasks": 1, "leads": 0, "checkouts": 0 },
-    { "day": "2026-10-15", "runs": 24, "jobs": 4, "huddles": 13, "tasks": 3, "leads": 9, "checkouts": 16 },
-    { "day": "2026-10-16", "runs": 4, "jobs": 4, "huddles": 0, "tasks": 1, "leads": 0, "checkouts": 0 }
+    {
+      "day": "2026-10-10",
+      "runs": 18,
+      "jobs": 4,
+      "huddles": 0,
+      "tasks": 3,
+      "leads": 0
+    },
+    {
+      "day": "2026-10-11",
+      "runs": 25,
+      "jobs": 4,
+      "huddles": 13,
+      "tasks": 7,
+      "leads": 0
+    },
+    {
+      "day": "2026-10-12",
+      "runs": 24,
+      "jobs": 7,
+      "huddles": 13,
+      "tasks": 3,
+      "leads": 0
+    },
+    {
+      "day": "2026-10-13",
+      "runs": 24,
+      "jobs": 4,
+      "huddles": 13,
+      "tasks": 1,
+      "leads": 0
+    },
+    {
+      "day": "2026-10-14",
+      "runs": 24,
+      "jobs": 4,
+      "huddles": 13,
+      "tasks": 1,
+      "leads": 0
+    },
+    {
+      "day": "2026-10-15",
+      "runs": 24,
+      "jobs": 4,
+      "huddles": 13,
+      "tasks": 3,
+      "leads": 9
+    },
+    {
+      "day": "2026-10-16",
+      "runs": 4,
+      "jobs": 4,
+      "huddles": 0,
+      "tasks": 1,
+      "leads": 0
+    }
   ],
   "agents": {
-    "marie":  { "jobsDone": 7, "tasks": 8, "huddleTasks": 25, "huddles": 5, "meetingReports": 1, "leads": 0 },
-    "alice":  { "jobsDone": 8, "tasks": 4, "huddleTasks": 19, "huddles": 5, "meetingReports": 1, "leads": 0 },
-    "snake":  { "jobsDone": 8, "tasks": 1, "huddleTasks": 5,  "huddles": 5, "meetingReports": 1, "leads": 0 },
-    "scout":  { "jobsDone": 0, "tasks": 0, "huddleTasks": 0,  "huddles": 0, "meetingReports": 0, "leads": 9 },
-    "echo":   { "jobsDone": 0, "tasks": 2, "huddleTasks": 5,  "huddles": 5, "meetingReports": 1, "leads": 0 },
-    "mark":   { "jobsDone": 0, "tasks": 1, "huddleTasks": 5,  "huddles": 5, "meetingReports": 1, "leads": 0 },
-    "simon":  { "jobsDone": 0, "tasks": 0, "huddleTasks": 0,  "huddles": 5, "meetingReports": 1, "leads": 0 },
-    "booker": { "jobsDone": 0, "tasks": 0, "huddleTasks": 0,  "huddles": 5, "meetingReports": 1, "leads": 0 },
-    "cammy":  { "jobsDone": 0, "tasks": 0, "huddleTasks": 0,  "huddles": 5, "meetingReports": 1, "leads": 0 },
-    "lucy":   { "jobsDone": 0, "tasks": 0, "huddleTasks": 0,  "huddles": 5, "meetingReports": 1, "leads": 0 },
-    "midas":  { "jobsDone": 0, "tasks": 0, "huddleTasks": 0,  "huddles": 5, "meetingReports": 1, "leads": 0 },
-    "tube":   { "jobsDone": 0, "tasks": 0, "huddleTasks": 0,  "huddles": 5, "meetingReports": 1, "leads": 0 },
-    "iris":   { "jobsDone": 0, "tasks": 1, "huddleTasks": 0,  "huddles": 0, "meetingReports": 0, "leads": 0 },
-    "maven":  { "jobsDone": 0, "tasks": 1, "huddleTasks": 0,  "huddles": 0, "meetingReports": 0, "leads": 0 }
+    "marie": {
+      "jobsDone": 7,
+      "tasks": 8,
+      "huddleTasks": 25,
+      "huddles": 5,
+      "meetingReports": 1,
+      "leads": 0
+    },
+    "alice": {
+      "jobsDone": 8,
+      "tasks": 4,
+      "huddleTasks": 19,
+      "huddles": 5,
+      "meetingReports": 1,
+      "leads": 0
+    },
+    "snake": {
+      "jobsDone": 8,
+      "tasks": 1,
+      "huddleTasks": 5,
+      "huddles": 5,
+      "meetingReports": 1,
+      "leads": 0
+    },
+    "scout": {
+      "jobsDone": 0,
+      "tasks": 0,
+      "huddleTasks": 0,
+      "huddles": 0,
+      "meetingReports": 0,
+      "leads": 9
+    },
+    "echo": {
+      "jobsDone": 0,
+      "tasks": 2,
+      "huddleTasks": 5,
+      "huddles": 5,
+      "meetingReports": 1,
+      "leads": 0
+    },
+    "mark": {
+      "jobsDone": 0,
+      "tasks": 1,
+      "huddleTasks": 5,
+      "huddles": 5,
+      "meetingReports": 1,
+      "leads": 0
+    },
+    "simon": {
+      "jobsDone": 0,
+      "tasks": 0,
+      "huddleTasks": 0,
+      "huddles": 5,
+      "meetingReports": 1,
+      "leads": 0
+    },
+    "booker": {
+      "jobsDone": 0,
+      "tasks": 0,
+      "huddleTasks": 0,
+      "huddles": 5,
+      "meetingReports": 1,
+      "leads": 0
+    },
+    "cammy": {
+      "jobsDone": 0,
+      "tasks": 0,
+      "huddleTasks": 0,
+      "huddles": 5,
+      "meetingReports": 1,
+      "leads": 0
+    },
+    "lucy": {
+      "jobsDone": 0,
+      "tasks": 0,
+      "huddleTasks": 0,
+      "huddles": 5,
+      "meetingReports": 1,
+      "leads": 0
+    },
+    "midas": {
+      "jobsDone": 0,
+      "tasks": 0,
+      "huddleTasks": 0,
+      "huddles": 5,
+      "meetingReports": 1,
+      "leads": 0
+    },
+    "tube": {
+      "jobsDone": 0,
+      "tasks": 0,
+      "huddleTasks": 0,
+      "huddles": 5,
+      "meetingReports": 1,
+      "leads": 0
+    },
+    "iris": {
+      "jobsDone": 0,
+      "tasks": 1,
+      "huddleTasks": 0,
+      "huddles": 0,
+      "meetingReports": 0,
+      "leads": 0
+    },
+    "maven": {
+      "jobsDone": 0,
+      "tasks": 1,
+      "huddleTasks": 0,
+      "huddles": 0,
+      "meetingReports": 0,
+      "leads": 0
+    }
   },
   "clients": [
     {
@@ -55,37 +212,155 @@
       "name": "Dr. Timothy Adams",
       "short": "Dr. Adams",
       "credentials": "DDS, D.ASBA, D.ACSDD",
-      "title": "Lead Faculty & Clinical Innovator · Craniofacial Biodentistry & Airway Development",
+      "title": "Lead Faculty & Clinical Innovator \u00b7 Craniofacial Biodentistry & Airway Development",
       "track": "Dental Sleep Medicine",
       "status": "Active",
       "agreements": [
-        { "title": "90-Day Educator Marketing & Launch Agreement", "total": 3500, "start": "2026-09-18", "end": "2026-12-16", "signed": true },
-        { "title": "Platform Ownership & Management Investment", "total": 10000, "start": "2026-09-18", "end": "2027-09-17", "signed": true }
+        {
+          "title": "90-Day Educator Marketing & Launch Agreement",
+          "total": 3500,
+          "start": "2026-09-18",
+          "end": "2026-12-16",
+          "signed": true
+        },
+        {
+          "title": "Platform Ownership & Management Investment",
+          "total": 10000,
+          "start": "2026-09-18",
+          "end": "2027-09-17",
+          "signed": true
+        }
       ],
-      "payments": { "recorded": 11855, "verified": 9055, "entries": 6 },
-      "event": { "title": "Craniofacial Biodentistry & Advanced Airway Integration", "city": "Phoenix", "state": "AZ", "type": "Live CE", "status": "Planning", "ceHours": 16, "tuition": 2750 },
-      "campaign": { "name": "90-Day Faculty, Course & Speaker Launch", "start": "2026-09-18", "end": "2026-12-16", "status": "Draft" },
+      "payments": {
+        "recorded": 11855,
+        "verified": 9055,
+        "entries": 6
+      },
+      "event": {
+        "title": "Craniofacial Biodentistry & Advanced Airway Integration",
+        "city": "Phoenix",
+        "state": "AZ",
+        "type": "Live CE",
+        "status": "Planning",
+        "ceHours": 16,
+        "tuition": 2750
+      },
+      "campaign": {
+        "name": "90-Day Faculty, Course & Speaker Launch",
+        "start": "2026-09-18",
+        "end": "2026-12-16",
+        "status": "Draft"
+      },
       "workstreams": [
-        { "name": "Faculty intake, credentials, agreements, assets", "lead": "marie", "support": ["simon"], "status": "Awaiting founder approval" },
-        { "name": "Market research, audience targeting, positioning", "lead": "iris", "support": ["mark"], "status": "Awaiting founder approval" },
-        { "name": "Campaign strategy and creative production", "lead": "mark", "support": ["cammy", "evan", "tube"], "status": "Awaiting founder approval" },
-        { "name": "Landing pages, lead capture, conversion", "lead": "alice", "support": ["lucy"], "status": "Awaiting founder approval" },
-        { "name": "Podcast bookings, speaker outreach, follow-up", "lead": "echo", "support": ["booker"], "status": "Awaiting founder approval" },
-        { "name": "Performance, attribution, executive reporting", "lead": "snake", "support": ["simon"], "status": "Awaiting founder approval" }
+        {
+          "name": "Faculty intake, credentials, agreements, assets",
+          "lead": "marie",
+          "support": [
+            "simon"
+          ],
+          "status": "Awaiting founder approval"
+        },
+        {
+          "name": "Market research, audience targeting, positioning",
+          "lead": "iris",
+          "support": [
+            "mark"
+          ],
+          "status": "Awaiting founder approval"
+        },
+        {
+          "name": "Campaign strategy and creative production",
+          "lead": "mark",
+          "support": [
+            "cammy",
+            "evan",
+            "tube"
+          ],
+          "status": "Awaiting founder approval"
+        },
+        {
+          "name": "Landing pages, lead capture, conversion",
+          "lead": "alice",
+          "support": [
+            "lucy"
+          ],
+          "status": "Awaiting founder approval"
+        },
+        {
+          "name": "Podcast bookings, speaker outreach, follow-up",
+          "lead": "echo",
+          "support": [
+            "booker"
+          ],
+          "status": "Awaiting founder approval"
+        },
+        {
+          "name": "Performance, attribution, executive reporting",
+          "lead": "snake",
+          "support": [
+            "simon"
+          ],
+          "status": "Awaiting founder approval"
+        }
       ],
       "milestones": [
-        { "label": "Campaign start (contract)", "due": "2026-09-18", "status": "Open" },
-        { "label": "Day 7: faculty profile and onboarding package", "due": "2026-09-24", "status": "Open" },
-        { "label": "Intake and documentation", "due": "2026-09-24", "status": "Open" },
-        { "label": "Day 15 gate (Mark)", "due": "2026-10-02", "status": "Paused" },
-        { "label": "Market research and positioning", "due": "2026-10-02", "status": "Open" },
-        { "label": "Campaign assets and landing page", "due": "2026-10-17", "status": "Open" },
-        { "label": "Day 35 gate (Alice)", "due": "2026-10-22", "status": "Paused" },
-        { "label": "Outreach and podcast booking", "due": "2026-11-16", "status": "Open" },
-        { "label": "Optimization and follow-up", "due": "2026-12-01", "status": "Open" },
-        { "label": "Final delivery and performance report", "due": "2026-12-16", "status": "Open" },
-        { "label": "Campaign end (contract)", "due": "2026-12-16", "status": "Open" }
+        {
+          "label": "Campaign start (contract)",
+          "due": "2026-09-18",
+          "status": "Open"
+        },
+        {
+          "label": "Day 7: faculty profile and onboarding package",
+          "due": "2026-09-24",
+          "status": "Open"
+        },
+        {
+          "label": "Intake and documentation",
+          "due": "2026-09-24",
+          "status": "Open"
+        },
+        {
+          "label": "Day 15 gate (Mark)",
+          "due": "2026-10-02",
+          "status": "Paused"
+        },
+        {
+          "label": "Market research and positioning",
+          "due": "2026-10-02",
+          "status": "Open"
+        },
+        {
+          "label": "Campaign assets and landing page",
+          "due": "2026-10-17",
+          "status": "Open"
+        },
+        {
+          "label": "Day 35 gate (Alice)",
+          "due": "2026-10-22",
+          "status": "Paused"
+        },
+        {
+          "label": "Outreach and podcast booking",
+          "due": "2026-11-16",
+          "status": "Open"
+        },
+        {
+          "label": "Optimization and follow-up",
+          "due": "2026-12-01",
+          "status": "Open"
+        },
+        {
+          "label": "Final delivery and performance report",
+          "due": "2026-12-16",
+          "status": "Open"
+        },
+        {
+          "label": "Campaign end (contract)",
+          "due": "2026-12-16",
+          "status": "Open"
+        }
       ]
     }
-  ]
+  ],
+  "excluded": "44 test checkout links (test emails, never paid, 43 expired) are not counted."
 }

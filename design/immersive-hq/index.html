@@ -1069,7 +1069,7 @@ function buildCRM(){
    <span class="live">LIVE DATA · AS OF ${asOf.toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}</span></div>
   <div class="kgrid">
    <div class="card" style="--i:0"><div class="k-lab">Verified revenue</div><div class="k-val" data-count="${k.verifiedRevenue}" data-fmt="money">$0</div><div class="k-sub">${money(k.recordedRevenue)} recorded in total</div>${sparkline([0,0,3,3,6,6,9])}</div>
-   <div class="card" style="--i:1"><div class="k-lab">Checkout pipeline</div><div class="k-val" data-count="${k.openCheckoutValue}" data-fmt="money">$0</div><div class="k-sub">${k.openCheckouts} open checkouts</div>${sparkline(days.map(d=>d.checkouts))}</div>
+   <div class="card" style="--i:1"><div class="k-lab">Huddle reports filed</div><div class="k-val" data-count="${k.huddleReports}">0</div><div class="k-sub">by the AI team · last ${days.length} days</div>${sparkline(days.map(d=>d.huddles))}</div>
    <div class="card" style="--i:2"><div class="k-lab">Jobs completed</div><div class="k-val" data-count="${k.jobsCompleted}">0</div><div class="k-sub"><b>${k.jobsFailed} failed</b> · ${num(k.workerRuns)} worker runs</div>${sparkline(days.map(d=>d.jobs))}</div>
    <div class="card" style="--i:3"><div class="k-lab">Agent tasks</div><div class="k-val" data-count="${k.tasksQueued+k.tasksAwaitingApproval}">0</div><div class="k-sub">${k.tasksAwaitingApproval} awaiting your approval</div>${sparkline(days.map(d=>d.tasks))}</div>
    <div class="card" style="--i:4"><div class="k-lab">Leads discovered</div><div class="k-val" data-count="${k.leadsDiscovered}">0</div><div class="k-sub">found by Scout</div>${sparkline(days.map(d=>d.leads))}</div>
@@ -1095,7 +1095,7 @@ function buildCRM(){
    <div class="card" style="--i:11"><h3>AUTONOMY ENGINE</h3>
     <div class="stat-line"><span>Worker runs</span><b>${num(k.workerRuns)}</b></div><div class="stat-line"><span>Jobs completed</span><b>${num(k.jobsCompleted)}</b></div><div class="stat-line"><span>Failed jobs</span><b>${k.jobsFailed}</b></div><div class="stat-line"><span>Huddle reports filed</span><b>${num(k.huddleReports)}</b></div><div class="stat-line"><span>Campaign milestones</span><b>${k.milestonesOpen} open · ${k.milestonesPaused} paused</b></div><div class="stat-line"><span>Active clients</span><b>${k.activeClients}</b></div></div>
   </div>
-  <p class="src">Source: ${D.source}. Snapshot ${asOf.toLocaleString()}. Figures update each time the HQ is deployed.</p>`;
+  <p class="src">Source: ${D.source}. Snapshot ${asOf.toLocaleString()}. ${D.excluded||''} Figures update each time the HQ is deployed.</p>`;
   const main=s.querySelector('.dash-main'),chart=main.querySelector('.chart');
   main.querySelectorAll('[data-room]').forEach(b=>b.onclick=travel('room/'+b.dataset.room));
   main.querySelectorAll('[data-go]').forEach(b=>b.onclick=travel(b.dataset.go));
