@@ -869,7 +869,7 @@ function buildFloor(){
   <span class="motes">${Array.from({length:22},(_,i)=>`<i style="left:${(i*37)%100}%;animation-delay:${-(i*1.3)%14}s;animation-duration:${11+(i%5)*2}s"></i>`).join('')}</span>
  </div>
  <div class="shade" style="background:linear-gradient(90deg,#02050b80,transparent 30%,transparent 70%,#02050b80),linear-gradient(0deg,#02050bb0,transparent 26%)"></div>
- <aside class="roster" aria-label="AI team directory"><div class="roster-head"><b>AI TEAM HUB</b><span>${FLOOR.length} agents online · tap to enter</span></div><div class="roster-list">
+ <aside class="roster" aria-label="AI team directory"><div class="roster-head"><b>AI TEAM HUB</b><span>${FLOOR.length} agents online · tap to enter</span><span class="hub-calls" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><a href="http://127.0.0.1:4189/one-on-one" target="_blank" rel="noopener" style="color:#e5c17b;border:1px solid #887550;border-radius:999px;padding:6px 12px;font-size:12px;text-decoration:none">☎ Simon &amp; Marie one-on-one</a><a href="http://127.0.0.1:4189/war-room" target="_blank" rel="noopener" style="color:#e5c17b;border:1px solid #887550;border-radius:999px;padding:6px 12px;font-size:12px;text-decoration:none">⚑ War Room</a></span></div><div class="roster-list">
   <div class="r-sep">EXECUTIVE</div>${FLOOR.filter(a=>a.exec).map(rosterItem).join('')}
   <div class="r-sep">LEADERSHIP & REVIEW</div>${FLOOR.filter(a=>['marie','gatekeeper'].includes(a.id)).map(rosterItem).join('')}
   <div class="r-sep">SPECIALISTS</div>${FLOOR.filter(a=>!a.exec&&!['marie','gatekeeper'].includes(a.id)).map(rosterItem).join('')}
@@ -904,7 +904,7 @@ function buildRoom(a){
  <div class="convo">
   <p class="caption" aria-live="polite"></p>
   <div class="suggest">${suggestions(a).map(q=>`<button type="button">${q}</button>`).join('')}</div>
-  <form class="composer"><span class="vorb" aria-hidden="true"></span><input type="text" autocomplete="off" placeholder="Talk to ${a.name}…" aria-label="Message ${a.name}"><button type="button" class="mic" aria-label="Speak to ${a.name}" hidden>🎙</button><button type="button" class="voice" aria-pressed="true" aria-label="${a.name}'s voice on or off">🔊</button><button type="submit" class="send">Send</button></form>
+  <form class="composer"><span class="vorb" aria-hidden="true"></span><input type="text" autocomplete="off" placeholder="Talk to ${a.name}…" aria-label="Message ${a.name}">${a.id==='simon'?'<a class="phone-link" href="http://127.0.0.1:4189/simon-call" target="_blank" rel="noopener" aria-label="Call Simon on the phone" style="display:inline-flex;align-items:center;justify-content:center;height:36px;padding:0 14px;border-radius:999px;border:1px solid #e8c27a;background:#e8c27a;color:#05090f;font-size:13px;font-weight:600;text-decoration:none">☎ Call Simon</a>':''}<button type="button" class="mic" aria-label="Speak to ${a.name}" hidden>🎙</button><button type="button" class="voice" aria-pressed="true" aria-label="${a.name}'s voice on or off">🔊</button><button type="submit" class="send">Send</button></form>
  </div>
  ${a.next?'':`<button class="next-door prev" type="button" data-room="${prev.id}" aria-label="Previous office: ${prev.name}">‹</button><button class="next-door nxt" type="button" data-room="${next.id}" aria-label="Next office: ${next.name}">›</button>`}`;
  const body=s.querySelector('[data-body]');
