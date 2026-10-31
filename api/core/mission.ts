@@ -21,7 +21,16 @@ const AGENT_CHAIN=[
  ['snake','Measurement Framework','Define KPIs, evidence requirements, measurement logic, and the handoff brief for Alice.'],
  ['alice','Storefront & CRO Review','Assess the digital conversion path, identify site/CRO priorities, and hand off qualified commercial context to Echo.'],
  ['echo','Sales Outreach Plan','Develop prospecting targets, outreach drafts, qualification logic, and the handoff brief for Booker without sending externally.'],
- ['booker','Scheduling Readiness','Prepare the appointment-conversion and scheduling handoff plan without creating external bookings; close the mission with next-action readiness.']
+ ['booker','Scheduling Readiness','Prepare the appointment-conversion and scheduling handoff plan without creating external bookings; hand the offer and pricing work to Midas.'],
+ ['midas','Offer & Revenue Architecture','Build offers, pricing strategy, and monetization models from the completed work, and the handoff brief for Scout.'],
+ ['scout','Lead Discovery','Identify the dentists, educators, practices, DSOs, and partners that fit the offer, and the handoff brief for Claire.'],
+ ['claire','Research & Enrichment','Verify contact details and prospect facts with sources, label anything unverified, and hand the verified list to Atlas.'],
+ ['atlas','Lead Qualification','Score the verified prospects on fit and readiness, and prepare the sales handoff brief for Sofia.'],
+ ['sofia','Digital Growth','Develop the acquisition and funnel test plan for the qualified audience, and the handoff brief for Maven.'],
+ ['maven','Campaign Messaging','Produce the campaign message set and promotional briefs from the growth plan, and the handoff brief for Gatekeeper.'],
+ ['gatekeeper','Compliance Review','Review every claim, message, and approval requirement before anything ships, and hand the approved set to Flow.'],
+ ['flow','Workflow Automation','Map the handoffs, owners, and dependencies needed to run the approved plan, and hand the finance plan to Ledger.'],
+ ['ledger','Finance & Accounting','Set out the payment tracking, receivables, and revenue reporting for the plan, and close the mission with the financial next steps.']
 ] as const;
 
 
@@ -117,14 +126,14 @@ async function hydrate(sql:any,requestedMissionId?:string){
    FROM pegasus_core.objectives o
    JOIN pegasus_core.projects p ON p.id=o.project_id
    WHERE o.id=${missionId}
-     AND o.title='Pegasus 12-Agent War Room Mission'
+     AND o.title IN ('Pegasus 12-Agent War Room Mission','Pegasus 21-Agent War Room Mission')
   `;
  }else{
   [objective]=await sql`
    SELECT o.id,o.project_id,o.created_at,p.objective AS founder_objective,p.status AS project_status
    FROM pegasus_core.objectives o
    JOIN pegasus_core.projects p ON p.id=o.project_id
-   WHERE o.title='Pegasus 12-Agent War Room Mission'
+   WHERE o.title IN ('Pegasus 12-Agent War Room Mission','Pegasus 21-Agent War Room Mission')
    ORDER BY o.created_at DESC
    LIMIT 1
   `;
@@ -229,7 +238,7 @@ async function start(sql:any,text:string){
  const slug='war-room-'+Date.now();
  const [org]=await sql`INSERT INTO pegasus_core.organizations(name,slug) VALUES('Pegasus War Room',${slug}) RETURNING id`;
  const [project]=await sql`INSERT INTO pegasus_core.projects(organization_id,name,objective) VALUES(${org.id},'War Room Mission',${text}) RETURNING id`;
- const [objective]=await sql`INSERT INTO pegasus_core.objectives(project_id,title,success_criteria,owner_agent_id,status_v2) VALUES(${project.id},'Pegasus 12-Agent War Room Mission',${sql.json(['12 completed agent tasks','12 completed job runs','durable memory for every agent','auditable evidence chain'])},'simon','active') RETURNING id`;
+ const [objective]=await sql`INSERT INTO pegasus_core.objectives(project_id,title,success_criteria,owner_agent_id,status_v2) VALUES(${project.id},'Pegasus 21-Agent War Room Mission',${sql.json([AGENT_CHAIN.length+' completed agent tasks',AGENT_CHAIN.length+' completed job runs','durable memory for every agent','auditable evidence chain'])},'simon','active') RETURNING id`;
  const tasks:any[]=[];
  for(const [agent,title,instructions] of AGENT_CHAIN){
   const [t]=await sql`INSERT INTO pegasus_core.tasks(project_id,objective_id,assigned_agent_id,title,instructions,priority,input) VALUES(${project.id},${objective.id},${agent},${title},${instructions+' Founder objective: '+text},100,${sql.json({mission:slug,objective:text})}) RETURNING id`;

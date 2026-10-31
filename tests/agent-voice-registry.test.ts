@@ -10,9 +10,9 @@ function voice(name:string,lang:string):SpeechSynthesisVoice{
   return {name,lang,voiceURI:name,localService:true,default:false} as SpeechSynthesisVoice;
 }
 
-test('all 12 agents have deterministic browser voice settings',()=>{
+test('all 21 agents have deterministic browser voice settings',()=>{
   assert.deepEqual(Object.keys(AGENT_VOICE_REGISTRY),[
-    'Simon','Marie','IRIS','Mark','Cammy','Evan','Tube','Lucy','Snake','Alice','Echo','Booker'
+    'Simon','Marie','IRIS','Mark','Cammy','Evan','Tube','Lucy','Snake','Alice','Echo','Booker','Midas','Scout','Claire','Atlas','Sofia','Maven','Gatekeeper','Flow','Ledger'
   ]);
   for(const [agent,config] of Object.entries(AGENT_VOICE_REGISTRY)){
     assert.ok(config.preferredVoices.length>0,`${agent} needs preferred voices`);
