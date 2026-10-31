@@ -26,6 +26,7 @@ async function startServer(){
     {default:coreSessionHandler},
     {default:coreMissionHandler},
     {default:coreStepHandler},
+    {default:agentMemoryHandler},
   ]=await Promise.all([
     import('./api/chat.js'),
     import('./api/agent/speak.js'),
@@ -34,6 +35,7 @@ async function startServer(){
     import('./api/core/session.js'),
     import('./api/core/mission.js'),
     import('./api/core/step.js'),
+    import('./api/core/agent-memory.js'),
   ]);
 
   // Local development uses the exact same canonical API handlers as production.
@@ -46,6 +48,7 @@ async function startServer(){
   app.all('/api/core/session',(req,res)=>void coreSessionHandler(req,res));
   app.all('/api/core/mission',(req,res)=>void coreMissionHandler(req,res));
   app.all('/api/core/step',(req,res)=>void coreStepHandler(req,res));
+  app.all('/api/core/agent-memory',(req,res)=>void agentMemoryHandler(req,res));
 
   const isDev=process.env.NODE_ENV!=='production';
 
