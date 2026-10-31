@@ -18,6 +18,15 @@ export const AGENT_VOICE_REGISTRY: Record<string, AgentVoiceConfig> = {
   Alice: { preferredVoices: ["Google US English Female", "Allison", "en-US"], lang: "en-US", pitch: 1.02, rate: 0.98 },
   Echo: { preferredVoices: ["Bruce", "Google US English Male", "en-US"], lang: "en-US", pitch: 0.96, rate: 1.02 },
   Booker: { preferredVoices: ["Susan", "Google US English Female", "en-US"], lang: "en-US", pitch: 1.00, rate: 1.00 },
+  Midas: { preferredVoices: ["Google UK English Male", "Oliver", "en-GB"], lang: "en-GB", pitch: 0.94, rate: 0.98 },
+  Scout: { preferredVoices: ["Google US English Male", "Fred", "en-US"], lang: "en-US", pitch: 1.04, rate: 1.04 },
+  Claire: { preferredVoices: ["Google UK English Female", "Kate", "en-GB"], lang: "en-GB", pitch: 1.03, rate: 1.00 },
+  Atlas: { preferredVoices: ["Google US English Male", "Alex", "en-US"], lang: "en-US", pitch: 0.90, rate: 0.96 },
+  Sofia: { preferredVoices: ["Google US English Female", "Samantha", "en-US"], lang: "en-US", pitch: 1.06, rate: 1.03 },
+  Maven: { preferredVoices: ["Google US English Female", "Victoria", "en-US"], lang: "en-US", pitch: 1.10, rate: 1.05 },
+  Gatekeeper: { preferredVoices: ["Google UK English Male", "Daniel", "en-GB"], lang: "en-GB", pitch: 0.90, rate: 0.94 },
+  Flow: { preferredVoices: ["Google US English Male", "Tom", "en-US"], lang: "en-US", pitch: 1.00, rate: 1.00 },
+  Ledger: { preferredVoices: ["Google UK English Female", "Serena", "en-GB"], lang: "en-GB", pitch: 0.97, rate: 0.95 },
 };
 
 const AGENT_ALIASES: Record<string, keyof typeof AGENT_VOICE_REGISTRY> = {
@@ -33,6 +42,15 @@ const AGENT_ALIASES: Record<string, keyof typeof AGENT_VOICE_REGISTRY> = {
   alice: "Alice",
   echo: "Echo",
   booker: "Booker",
+  midas: "Midas",
+  scout: "Scout",
+  claire: "Claire",
+  atlas: "Atlas",
+  sofia: "Sofia",
+  maven: "Maven",
+  gatekeeper: "Gatekeeper",
+  flow: "Flow",
+  ledger: "Ledger",
 };
 
 export function getAgentVoiceConfig(agentIdOrName?: string): AgentVoiceConfig {
