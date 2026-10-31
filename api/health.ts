@@ -7,7 +7,7 @@ export default function handler(req: any, res: any) {
     voiceProvider: 'Browser Web Speech',
     voiceConfigured: true,
     voiceFallback: null,
-    totalAgents: 12,
+    totalAgents: 21,
     timestamp: new Date().toISOString(),
   });
 }

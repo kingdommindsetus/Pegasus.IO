@@ -898,7 +898,7 @@ Taking Echo's qualified prospects and the full team's work:
 1. Provide the frictionless calendar invitation script that locks in the appointment.
 2. Outline the 3-step Show-Up Maximizer sequence that prevents no-shows.
 3. Pre-frame the consultation so the prospect arrives primed, educated, and ready to do business.
-4. Summarize the complete 12-agent pipeline victory: from Simon's first directive to the confirmed calendar close!
+4. Summarize the complete 21-agent pipeline victory: from Simon's first directive to the confirmed calendar close!
 Keep your voice wise, reassuring, deeply confident, and closing-oriented.`,
     crewAiPython: `from crewai import Agent
 
