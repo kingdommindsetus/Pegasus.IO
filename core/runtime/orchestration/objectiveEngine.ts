@@ -8,7 +8,7 @@ export type PlannedTask = {
 };
 export type ObjectivePlan = { objective:ObjectiveDraft; tasks:PlannedTask[] };
 
-const AGENTS = new Set(['simon','marie','iris','mark','cammy','evan','tube','lucy','snake','alice','echo','booker']);
+const AGENTS = new Set(['simon','marie','iris','mark','cammy','evan','tube','lucy','snake','alice','echo','booker','midas','scout','claire','atlas','sofia','maven','gatekeeper','flow','ledger']);
 
 export function validateObjectivePlan(plan:ObjectivePlan, customAgentIds:Iterable<string> = []) {
  const allowedAgents = new Set([...AGENTS, ...customAgentIds]);
