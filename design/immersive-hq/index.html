@@ -1,0 +1,1433 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Pegasus HQ</title>
+<meta name="description" content="Pegasus.io immersive headquarters: walk through headquarters, the employee floor, and each AI agent's office.">
+<style>
+:root{color-scheme:dark;--gold:#dfba80;--gold-hi:#ffd998;--cyan:#7ddcf3;--ink:#04070d;--glass:#07101cd0;--line:#9c7c5488;--txt:#f5ebda;--mute:#a6bbca}
+*{box-sizing:border-box}html,body{height:100%}body{margin:0;overflow:hidden;background:var(--ink);color:var(--txt);font-family:Inter,system-ui,"Segoe UI",sans-serif}
+button{font:inherit;color:inherit;cursor:pointer}button:focus-visible,a:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+.serif{font-family:"Cormorant Garamond","Playfair Display",Georgia,serif}
+
+/* ---------- world + scenes ---------- */
+#world{position:fixed;inset:0;overflow:hidden;background:#020409}
+.scene{position:absolute;inset:0;opacity:0;visibility:hidden;transform-origin:var(--ox,50%) var(--oy,50%);will-change:transform,opacity,filter}
+.scene.active{opacity:1;visibility:visible}
+.scene.exit-fwd{animation:exitFwd .95s cubic-bezier(.55,0,.35,1) forwards}
+.scene.enter-fwd{animation:enterFwd 1s cubic-bezier(.2,.75,.2,1) both}
+.scene.exit-back{animation:exitBack .8s cubic-bezier(.5,0,.4,1) forwards}
+.scene.enter-back{animation:enterBack .9s cubic-bezier(.2,.75,.2,1) both}
+@keyframes exitFwd{0%{transform:scale(1);opacity:1;filter:none}100%{transform:scale(2.6);opacity:0;filter:blur(10px) brightness(1.5)}}
+@keyframes enterFwd{0%{transform:scale(1.35);opacity:0;filter:blur(12px) brightness(1.4)}100%{transform:none;opacity:1;filter:none}}
+@keyframes exitBack{to{transform:scale(.72);opacity:0;filter:blur(6px)}}
+@keyframes enterBack{0%{transform:scale(1.7);opacity:0;filter:blur(10px)}100%{transform:none;opacity:1;filter:none}}
+.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.shade{position:absolute;inset:0;pointer-events:none}
+
+/* warp streaks during forward travel */
+#warp{position:fixed;inset:0;z-index:20;pointer-events:none;opacity:0;background:repeating-conic-gradient(from 0deg at var(--ox,50%) var(--oy,50%),#ffffff00 0deg 3deg,#cfe9ff1c 3.4deg 3.8deg,#ffffff00 4.2deg 9deg),radial-gradient(circle at var(--ox,50%) var(--oy,50%),#fff4dc55,transparent 40%);mix-blend-mode:screen}
+#warp.on{animation:warp .95s ease-out}
+@keyframes warp{0%{opacity:0;transform:scale(.6)}35%{opacity:1}100%{opacity:0;transform:scale(1.8)}}
+
+/* ---------- chrome ---------- */
+#chrome{position:fixed;z-index:15;top:0;left:0;right:0;display:flex;align-items:center;gap:12px;padding:14px max(16px,2.5vw);background:linear-gradient(#02050bdd,transparent);pointer-events:none}
+#chrome>*{pointer-events:auto}
+.brand{font-size:15px;letter-spacing:.32em;color:var(--gold);font-weight:600;white-space:nowrap}
+#back{display:none;align-items:center;gap:8px;border:1px solid var(--line);background:var(--glass);backdrop-filter:blur(10px);border-radius:999px;padding:8px 14px;font-size:12px;letter-spacing:.12em}
+#back.show{display:inline-flex}
+#crumbs{display:flex;gap:8px;align-items:center;font-size:11px;letter-spacing:.16em;color:var(--mute);text-transform:uppercase;overflow:hidden;white-space:nowrap}
+#crumbs b{color:var(--gold-hi);font-weight:600}
+.spacer{flex:1}
+.pill{border:1px solid #668ca088;border-radius:999px;background:#07121fcc;color:#b9c7d3;font-size:10px;letter-spacing:.14em;padding:6px 10px;white-space:nowrap}
+#motion{border:1px solid var(--line);background:var(--glass);border-radius:999px;padding:7px 12px;font-size:11px;color:var(--gold)}
+
+/* minimap */
+#map{position:fixed;z-index:15;left:max(16px,2.5vw);bottom:16px;display:flex;gap:6px;padding:6px;border:1px solid var(--line);border-radius:14px;background:var(--glass);backdrop-filter:blur(10px)}
+#map button{border:0;background:transparent;border-radius:9px;padding:8px 10px;font-size:10px;letter-spacing:.14em;color:var(--mute);text-transform:uppercase}
+#map button.on{background:#1d2a3a;color:var(--gold-hi);box-shadow:inset 0 0 0 1px #dfba8066}
+
+#toast{position:fixed;z-index:30;left:50%;bottom:76px;transform:translate(-50%,20px);opacity:0;transition:.3s;padding:11px 16px;border:1px solid var(--line);border-radius:12px;background:#07101cf0;font-size:12px;color:#d9e6ee;max-width:min(520px,90vw);text-align:center;pointer-events:none}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* ---------- intro ---------- */
+#intro{position:fixed;inset:0;z-index:40;background:#02050b;display:grid;place-items:center;text-align:center;transition:opacity .7s,visibility .7s}
+#intro.done{opacity:0;visibility:hidden;pointer-events:none}
+#intro video{width:min(520px,80vw);aspect-ratio:16/9;object-fit:cover;mask-image:radial-gradient(ellipse,#000 30%,transparent 74%)}
+#intro h2{margin:6px 0 4px;letter-spacing:.4em;color:var(--gold);font-weight:500}
+#intro p{margin:0;color:var(--mute);font-size:11px;letter-spacing:.3em}
+#enter{margin-top:22px;border:1px solid var(--gold);background:#131f2e;color:var(--gold-hi);border-radius:999px;padding:11px 26px;letter-spacing:.2em;font-size:12px}
+
+/* ---------- hotspots (street-view style markers) ---------- */
+.hot{position:absolute;left:var(--x);top:var(--y);transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:8px;border:0;background:none;padding:0;z-index:2}
+.hot .ring{position:relative;width:46px;height:46px;border-radius:50%;border:2px solid var(--c,var(--gold-hi));background:radial-gradient(circle,#ffffff30,#0000 62%);box-shadow:0 0 22px var(--c,var(--gold))}
+.hot .ring::before,.hot .ring::after{content:'';position:absolute;inset:-2px;border-radius:50%;border:2px solid var(--c,var(--gold-hi));animation:ping 2.4s ease-out infinite}
+.hot .ring::after{animation-delay:1.2s}
+.hot .ring i{position:absolute;inset:0;display:grid;place-items:center;font-style:normal;font-size:18px;color:#fff}
+@keyframes ping{0%{transform:scale(1);opacity:.8}100%{transform:scale(2.3);opacity:0}}
+.hot .tag{padding:8px 12px;border:1px solid #dfba8099;border-radius:10px;background:#050b14d9;backdrop-filter:blur(8px);text-align:center;white-space:nowrap;transition:transform .2s,border-color .2s}
+.hot .tag strong{display:block;font-size:12px;letter-spacing:.16em;color:var(--gold-hi)}
+.hot .tag span{display:block;margin-top:3px;font-size:10px;color:var(--mute);letter-spacing:.08em}
+.hot:hover .tag,.hot:focus-visible .tag{transform:translateY(-3px);border-color:var(--gold-hi)}
+.hot.forward .ring{width:62px;height:62px}
+.hot.forward .ring i{font-size:26px}
+
+/* ---------- atrium ---------- */
+#s-atrium .bg{filter:saturate(1.08)}
+/* The animated Pegasus lives in the top-right corner as a live emblem, so it never overlaps the statue in the backdrop. */
+.emblem{position:absolute;top:66px;right:clamp(14px,2vw,30px);width:clamp(96px,9vw,138px);aspect-ratio:1;border-radius:50%;overflow:hidden;background:radial-gradient(circle,#0b1a2c 0%,#03070d 70%);box-shadow:0 0 0 1px #dfba8077,0 0 0 5px #04070dcc,0 0 0 6px #dfba8040,0 0 34px #4fc3ff44;z-index:2;pointer-events:none}
+.emblem::after{content:'';position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,transparent 55%,#03070d 78%)}
+/* Steady hologram turntable: one crisp frame spinning at a constant speed (the AI video morphed as it turned). */
+.turntable{position:absolute;inset:8% 6% 14%;perspective:520px}
+.spinner{position:absolute;left:8%;right:8%;top:4%;height:72%;transform-style:preserve-3d;animation:turn 9s linear infinite,edge 4.5s ease-in-out infinite}
+/* soften the moment it's edge-on (90° and 270°) so it reads as a hologram flicker, not a hard line */
+@keyframes edge{0%,100%{opacity:1}50%{opacity:.45}}
+.spinner .face{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;backface-visibility:hidden;filter:drop-shadow(0 0 6px #4fc3ffaa)}
+.spinner .back{transform:rotateY(180deg) scaleX(-1)}
+.turntable .platform{position:absolute;left:0;right:0;bottom:0;width:100%;opacity:.95}
+@keyframes turn{to{transform:rotateY(360deg)}}
+.paused .spinner{animation-play-state:paused}
+@media(prefers-reduced-motion:reduce){.spinner{animation:none}}
+.emblem-tag{position:absolute;left:50%;bottom:9%;transform:translateX(-50%);z-index:1;font-size:7.5px;letter-spacing:.26em;color:#bfe9ff;white-space:nowrap;text-shadow:0 0 6px #4fc3ff}
+.atrium-title{position:absolute;left:50%;top:66%;transform:translate(-50%,-50%);text-align:center;pointer-events:none}
+.atrium-title h1{margin:0;font-size:clamp(28px,5.4vw,72px);letter-spacing:.32em;font-weight:500;color:var(--gold-hi);text-shadow:0 0 30px #dfba8077,0 4px 18px #000}
+.atrium-title p{margin:6px 0 0;font-size:11px;letter-spacing:.42em;color:#d6c3a2}
+.stats{position:absolute;left:50%;bottom:78px;transform:translateX(-50%);display:flex;gap:2px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--glass);backdrop-filter:blur(10px)}
+.stats div{padding:10px 18px;text-align:center}.stats b{display:block;font-size:20px;color:var(--gold-hi);font-weight:500}.stats span{font-size:9px;letter-spacing:.14em;color:var(--mute);text-transform:uppercase}
+
+/* ---------- employee floor ---------- */
+#s-floor .doors{position:absolute;inset:0;z-index:2;transform:translateZ(0);opacity:0;transition:opacity .8s}
+#s-floor .bg{z-index:0}#s-floor .shade{z-index:1}
+#s-floor.arrived .doors{opacity:1}
+.wall{position:absolute;top:53%;bottom:11%;width:27%}
+.wall.left{left:3%}.wall.right{right:3.5%}
+.wall-inner{height:100%;display:grid;grid-template-columns:1fr 1fr 1fr;grid-auto-rows:1fr;gap:10px}
+.wall.left .wall-inner{transform:perspective(900px) rotateY(24deg);transform-origin:left center}
+.wall.right .wall-inner{transform:perspective(900px) rotateY(-24deg);transform-origin:right center}
+.door{position:relative;display:flex;align-items:center;gap:10px;min-height:0;padding:8px 10px;border:1px solid color-mix(in srgb,var(--c) 55%,transparent);border-radius:12px;background:linear-gradient(135deg,#0a1220e6,#05090fe6);text-align:left;box-shadow:0 0 18px color-mix(in srgb,var(--c) 22%,transparent),inset 0 0 18px #0008;transition:transform .2s,box-shadow .2s,border-color .2s}
+.door:hover,.door:focus-visible{transform:scale(1.05);border-color:var(--c);box-shadow:0 0 34px color-mix(in srgb,var(--c) 55%,transparent)}
+.orb{flex:none;display:grid;place-items:center;width:38px;height:38px;border-radius:50%;border:1px solid var(--c);background:radial-gradient(circle at 35% 30%,color-mix(in srgb,var(--c) 70%,#fff),color-mix(in srgb,var(--c) 40%,#000) 45%,#05090f 75%);font-size:12px;font-weight:700;letter-spacing:.04em;color:#fff;box-shadow:0 0 14px color-mix(in srgb,var(--c) 60%,transparent)}
+.door strong{display:block;font-size:13px;letter-spacing:.1em}
+.door>span:not(.orb){min-width:0;flex:1}
+.door>span:not(.orb) span,.door strong{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wall .door .orb{width:32px;height:32px;font-size:11px}
+.wall .door{gap:8px;padding:6px 8px}
+.door span{display:block;font-size:10px;color:var(--mute);letter-spacing:.04em;margin-top:2px;line-height:1.25}
+.door .live{position:absolute;top:8px;right:9px;width:7px;height:7px;border-radius:50%;background:#3ee68a;box-shadow:0 0 8px #3ee68a}
+.door .live.next{background:#6b7785;box-shadow:none}
+.door.exec{grid-column:1/-1}
+.endhall{position:absolute;left:50%;top:40%;transform:translateX(-50%);width:min(34%,420px);text-align:center}
+.endhall h2,.endhall p{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.endhall h2{margin:0 0 4px;font-size:12px;letter-spacing:.3em;color:var(--gold-hi);font-weight:500}
+.endhall p{margin:0 0 10px;font-size:10px;letter-spacing:.12em;color:var(--mute)}
+.endhall .mini:empty{display:none}
+.endhall .mini{display:flex;flex-wrap:wrap;justify-content:center;gap:6px}
+.endhall .mini button{border:1px solid #7ddcf355;background:#06101ccc;border-radius:999px;padding:5px 10px;font-size:10px;letter-spacing:.12em;color:#cfe7f1}
+.endhall .mini button:hover{border-color:var(--cyan)}
+.floor-hint{position:absolute;left:50%;bottom:78px;transform:translateX(-50%);font-size:10px;letter-spacing:.3em;color:#d6c3a2;text-shadow:0 2px 8px #000}
+
+/* still hallway that feels alive: the camera never moves, only the light does */
+.stage{position:absolute;left:var(--sx,0);top:var(--sy,0);width:var(--sw,100vw);height:var(--sh,100vh);overflow:hidden;transform:translateZ(0);backface-visibility:hidden;contain:strict}
+.stage>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.fx{position:absolute;pointer-events:none;mix-blend-mode:screen}
+.fx-sign{left:30%;top:0;width:36%;height:30%;background:radial-gradient(ellipse at 50% 40%,#ffd99855,transparent 62%);animation:pulse 5s ease-in-out infinite}
+.fx-window{left:36%;top:41%;width:24%;height:22%;background:radial-gradient(ellipse,#ff9a6a30,transparent 65%);animation:pulse 7s ease-in-out infinite}
+.fx-holo{left:37%;top:62%;width:20%;height:28%;background:radial-gradient(ellipse at 50% 55%,#6fd3ff88,#2a7bff33 40%,transparent 68%);animation:holo 3.2s ease-in-out infinite}
+.fx-ring{left:28%;top:79%;width:40%;height:18%;background:radial-gradient(ellipse at 50% 45%,#ffcf7a99,#ffb24633 45%,transparent 70%);animation:pulse 4s ease-in-out infinite}
+/* LED baseboards traced on the floor's own light lines: a slow breath plus one soft pulse gliding to the far end */
+.led{inset:0;width:100%;height:100%}
+.led line{fill:none;stroke-linecap:round;vector-effect:non-scaling-stroke}
+.led-base line{stroke:#ffe7bd;stroke-width:2.2;filter:drop-shadow(0 0 3px #ffcf7a) drop-shadow(0 0 10px #ffb246);animation:ledBreath 9s ease-in-out infinite}
+.led-flow line{stroke:#fff8ea;stroke-width:3.4;stroke-dasharray:16 400;stroke-dashoffset:16;filter:drop-shadow(0 0 4px #fff1cf) drop-shadow(0 0 14px #ffc970);animation:ledGlide 9s cubic-bezier(.45,.05,.35,1) infinite}
+@keyframes ledBreath{0%,100%{opacity:.38}50%{opacity:.72}}
+@keyframes ledGlide{0%{stroke-dashoffset:16;opacity:0}12%{opacity:.95}78%{opacity:.6}100%{stroke-dashoffset:-100;opacity:0}}
+/* the city window: sunset clouds drift behind the towers, slow enough to feel rather than notice */
+.fx-sky{position:absolute;left:37.4%;top:45.6%;width:21%;height:16.4%;overflow:hidden;pointer-events:none;mix-blend-mode:screen;-webkit-mask:url(assets/floor-sky-mask.png) 0 0/100% 100%;mask:url(assets/floor-sky-mask.png) 0 0/100% 100%}
+.fx-sky i{position:absolute;left:0;width:400%;background:url(assets/floor-clouds.png) 0 0/25% 100% repeat-x;animation:drift 150s linear infinite}
+.fx-sky .c1{top:-6%;height:62%;opacity:.55}
+.fx-sky .c2{top:22%;height:44%;opacity:.32;animation-duration:230s;animation-delay:-80s}
+@keyframes drift{to{transform:translateX(-25%)}}
+.fx-orbit{inset:0;width:100%;height:100%}
+.fx-orbit ellipse{fill:none;stroke-width:3;vector-effect:non-scaling-stroke;stroke-linecap:round;stroke-dasharray:16 84;animation:orbit 5.5s linear infinite}
+.fx-orbit .o-cyan{stroke:#8ff3ff;filter:drop-shadow(0 0 4px #4fd8ff) drop-shadow(0 0 12px #2aa8ff)}
+.fx-orbit .o-gold{stroke:#ffe1a0;filter:drop-shadow(0 0 4px #ffcf7a) drop-shadow(0 0 12px #ffb246);animation-delay:-2.75s}
+.fx-orbit .o-wide{stroke-width:2;stroke-dasharray:10 90;opacity:.7;animation-duration:8s;animation-direction:reverse}
+@keyframes orbit{to{stroke-dashoffset:-100}}
+.paused .fx-orbit ellipse{animation-play-state:paused}
+.fx-strips{inset:0;width:100%;height:100%;filter:drop-shadow(0 0 4px #ffcf7a) drop-shadow(0 0 10px #ffb246)}
+.fx-strips line{stroke:#fff6dd;stroke-width:4;vector-effect:non-scaling-stroke;stroke-linecap:round;stroke-dasharray:12 88;stroke-dashoffset:0;animation:run 4.4s linear infinite;opacity:.9}
+.fx.screen{width:3.2%;height:4%;border-radius:3px;background:radial-gradient(#7fd8ff40,transparent 70%);animation:flick 5s steps(1) infinite}
+.motes{position:absolute;inset:0;pointer-events:none}
+.motes i{position:absolute;bottom:-2%;width:3px;height:3px;border-radius:50%;background:#ffe2a8;box-shadow:0 0 6px #ffcf7a;opacity:0;animation:mote linear infinite}
+@keyframes pulse{50%{opacity:.45}}
+@keyframes holo{0%,100%{opacity:1;filter:hue-rotate(0)}30%{opacity:.7}33%{opacity:.95}60%{opacity:.75;filter:hue-rotate(-15deg)}}
+@keyframes run{to{stroke-dashoffset:-100}}
+@keyframes flick{0%,100%{opacity:.9}37%{opacity:.4}41%{opacity:1}73%{opacity:.6}}
+@keyframes mote{0%{transform:translateY(0);opacity:0}15%{opacity:.7}85%{opacity:.5}100%{transform:translateY(-70vh) translateX(2vw);opacity:0}}
+.paused .fx,.paused .fx *,.paused .motes i,.paused .fx-sky i{animation-play-state:paused}
+@media(prefers-reduced-motion:reduce){.fx,.fx *,.motes i,.fx-sky i{animation:none!important}}
+
+/* ---------- agent rooms ---------- */
+.room .shade{background:linear-gradient(90deg,#02050bcc 0%,#02050b55 22%,transparent 46%,transparent 62%,#02050bb0 100%),linear-gradient(0deg,#02050bd9,transparent 32%)}
+.room .gen{position:absolute;inset:0;background:radial-gradient(circle at 50% 44%,color-mix(in srgb,var(--c) 30%,transparent),transparent 46%),#03060c}
+.room .gen img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(14px) brightness(.45) saturate(1.2);inset:-5%;width:110%;height:110%;transform:translateZ(0)}
+.room .gen .big{position:absolute;left:42%;top:46%;transform:translate(-50%,-50%);width:min(30vw,280px);height:min(30vw,280px);font-size:clamp(40px,6vw,76px);animation:float 6s ease-in-out infinite}
+@keyframes float{50%{transform:translate(-50%,-54%)}}
+.rail{position:absolute;left:max(16px,2.5vw);top:84px;display:flex;flex-direction:column;gap:4px;padding:8px;border:1px solid var(--line);border-radius:14px;background:var(--glass);backdrop-filter:blur(10px)}
+.rail button{border:0;background:transparent;border-radius:9px;padding:9px 14px;text-align:left;font-size:12px;letter-spacing:.08em;color:#c9d4dc}
+.rail button.on{background:#1d2a3a;color:var(--gold-hi);box-shadow:inset 2px 0 0 var(--c)}
+.hud{position:absolute;right:max(16px,2.5vw);top:84px;bottom:84px;width:min(380px,36vw);display:flex;flex-direction:column;gap:12px;overflow:auto;padding:20px;border:1px solid color-mix(in srgb,var(--c) 45%,transparent);border-radius:18px;background:#050a12d6;backdrop-filter:blur(14px);box-shadow:0 0 50px color-mix(in srgb,var(--c) 18%,transparent)}
+.hud .eyebrow{font-size:10px;letter-spacing:.24em;color:var(--c)}
+.hud h2{margin:0;font-size:clamp(26px,3vw,40px);letter-spacing:.2em;font-weight:500;color:#fff}
+.hud .role{font-size:12px;letter-spacing:.14em;color:var(--gold-hi);text-transform:uppercase}
+.hud blockquote{margin:4px 0 0;font-size:18px;font-style:italic;color:#e9dcc6}
+.hud h3{margin:6px 0 0;font-size:10px;letter-spacing:.24em;color:var(--mute);font-weight:500}
+.hud ul{margin:0;padding:0;list-style:none;display:grid;gap:6px}
+.hud li{display:flex;justify-content:space-between;gap:10px;padding:9px 11px;border-radius:9px;background:#0d1826;font-size:12px;color:#dbe6ee}
+.hud li em{font-style:normal;font-size:10px;letter-spacing:.1em;color:var(--c)}
+.chain{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.chain button{border:1px solid #ffffff22;background:#0d1826;border-radius:999px;padding:6px 10px;font-size:11px;color:#dbe6ee}
+.chain button.me{border-color:var(--c);color:#fff;box-shadow:0 0 12px color-mix(in srgb,var(--c) 40%,transparent)}
+.chain i{font-style:normal;color:var(--gold)}
+.state{display:flex;gap:8px;flex-wrap:wrap}
+.state button{border:1px solid color-mix(in srgb,var(--c) 50%,transparent);background:#0d1826;border-radius:8px;padding:8px 11px;font-size:11px}
+.status-line{font-size:12px;color:#b9c7d3;padding:10px 12px;border-left:2px solid var(--c);background:#0a1420}
+.room-name{position:absolute;left:max(16px,2.5vw);bottom:84px;pointer-events:none}
+.room-name b{display:block;font-size:clamp(34px,5vw,64px);letter-spacing:.24em;font-weight:500;color:#fff;text-shadow:0 0 30px color-mix(in srgb,var(--c) 70%,transparent),0 4px 16px #000}
+.room-name span{font-size:11px;letter-spacing:.3em;color:var(--c)}
+.next-door{position:absolute;top:50%;transform:translateY(-50%);border:1px solid var(--line);background:var(--glass);border-radius:50%;width:44px;height:44px;font-size:18px;color:var(--gold-hi)}
+.next-door.prev{left:calc(max(16px,2.5vw) + 170px)}.next-door.nxt{right:calc(max(16px,2.5vw) + min(380px,36vw) + 14px)}
+
+/* ---------- office door: you're pulled up to the glass doors, they part, you're inside ---------- */
+#doorfx{position:fixed;inset:0;z-index:19;display:flex;pointer-events:none;visibility:hidden}
+#doorfx.on{visibility:visible;animation:doorStage 1.5s ease forwards}
+#doorfx .leaf{flex:1;position:relative;background:linear-gradient(100deg,#060b14f2,#0d1726e8 45%,#060b14f2),repeating-linear-gradient(90deg,transparent 0 46px,#ffffff08 46px 47px);box-shadow:inset 0 0 120px #000}
+#doorfx .leaf.l{border-right:2px solid var(--c);box-shadow:inset -30px 0 60px color-mix(in srgb,var(--c) 25%,transparent)}
+#doorfx .leaf.r{border-left:2px solid var(--c);box-shadow:inset 30px 0 60px color-mix(in srgb,var(--c) 25%,transparent)}
+#doorfx .leaf::after{content:'';position:absolute;top:44%;width:6px;height:120px;border-radius:3px;background:linear-gradient(var(--gold-hi),#8a6a3a)}
+#doorfx .leaf.l::after{right:26px}#doorfx .leaf.r::after{left:26px}
+#doorfx.on .leaf.l{animation:leafL 1.5s cubic-bezier(.75,0,.2,1) forwards}
+#doorfx.on .leaf.r{animation:leafR 1.5s cubic-bezier(.75,0,.2,1) forwards}
+#doorfx .plate{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+#doorfx.on .plate{animation:plate 1.5s ease forwards}
+#doorfx .plate .orb{width:86px;height:86px;font-size:24px;box-shadow:0 0 60px var(--c)}
+#doorfx .plate b{font-size:clamp(30px,5vw,58px);letter-spacing:.3em;font-weight:500;color:#fff;text-shadow:0 0 30px var(--c)}
+#doorfx .plate>span:last-child{font-size:11px;letter-spacing:.32em;color:var(--c)}
+@keyframes doorStage{0%{opacity:0;transform:scale(1.25)}14%{opacity:1;transform:scale(1)}100%{opacity:1}}
+@keyframes leafL{0%,48%{transform:none}100%{transform:translateX(-102%)}}
+@keyframes leafR{0%,48%{transform:none}100%{transform:translateX(102%)}}
+@keyframes plate{0%{opacity:0;transform:translate(-50%,-40%)}16%,40%{opacity:1;transform:translate(-50%,-50%)}56%,100%{opacity:0;transform:translate(-50%,-50%) scale(1.3)}}
+.scene.enter-door{animation:enterFwd 1.1s cubic-bezier(.2,.75,.2,1) .55s both}
+
+/* ---------- office stage: still room, living robot ---------- */
+.room .stage{position:absolute;left:var(--sx,0);top:var(--sy,0);width:var(--sw,100vw);height:var(--sh,100vh);overflow:hidden;transform:translateZ(0);backface-visibility:hidden;contain:strict}
+.room .stage .still{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.room .stage .clip{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .45s ease;-webkit-mask-image:radial-gradient(ellipse 25% 46% at var(--mx) var(--my),#000 52%,transparent 100%);mask-image:radial-gradient(ellipse 25% 46% at var(--mx) var(--my),#000 52%,transparent 100%)}
+.room.listening .clip-listen,.room.speaking .clip-talk{opacity:1}
+.room.listening .eye{opacity:.62;animation-duration:2.4s}
+.room.thinking .eye{opacity:.8;animation-duration:.8s}
+.caption .thinking{animation:think 1s ease-in-out infinite}
+@keyframes think{50%{opacity:.3}}
+.room.listening .vorb{animation:listenPulse 1.3s ease-in-out infinite}
+@keyframes listenPulse{50%{box-shadow:0 0 26px var(--c);transform:scale(1.12)}}
+.room .stage .eye{position:absolute;left:var(--hx);top:var(--hy);width:12%;height:20%;transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;mix-blend-mode:screen;background:radial-gradient(closest-side,color-mix(in srgb,var(--c) 70%,#fff),color-mix(in srgb,var(--c) 35%,transparent) 45%,transparent);opacity:calc(.28 + var(--amp,0)*.7);animation:eye 4.2s ease-in-out infinite}
+@keyframes eye{50%{filter:brightness(1.35)}}
+.room.speaking .eye{animation-duration:1.1s}
+.paused .room .eye{animation-play-state:paused}
+.room .stage .shine{position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;background:linear-gradient(105deg,transparent 40%,#ffffff14 47%,#ffffff22 50%,#ffffff14 53%,transparent 60%);background-size:300% 100%;animation:shine 9s ease-in-out infinite}
+@keyframes shine{0%,20%{background-position:120% 0}70%,100%{background-position:-20% 0}}
+.paused .room .shine{animation-play-state:paused}
+
+/* ---------- talk-back: the agent has no mouth, so light, motion and captions carry the voice ---------- */
+.room.speaking .stage{animation:breathe 1.8s ease-in-out infinite}
+@keyframes breathe{50%{filter:brightness(1.12) saturate(1.15)}}
+.room .aura{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 45% 46%,color-mix(in srgb,var(--c) calc(var(--amp,0)*38%),transparent),transparent 55%);mix-blend-mode:screen;transition:background .12s}
+.convo{position:absolute;left:max(16px,2.5vw);right:calc(max(16px,2.5vw) + min(380px,36vw) + 18px);bottom:72px;display:flex;flex-direction:column;align-items:center;gap:12px}
+.caption:empty{display:none}
+.caption{max-width:760px;min-height:1.5em;margin:0;padding:12px 18px;border-radius:14px;background:#02050bc4;backdrop-filter:blur(8px);border:1px solid color-mix(in srgb,var(--c) 30%,transparent);text-align:center;font-size:clamp(16px,1.6vw,22px);line-height:1.45;color:#fff;text-shadow:0 2px 14px #000,0 0 2px #000}
+.caption .w{opacity:.25;transition:opacity .18s}.caption .w.on{opacity:1}
+.caption .you{display:block;margin-bottom:6px;font-size:12px;letter-spacing:.08em;color:var(--mute)}
+.composer{display:flex;align-items:center;gap:10px;width:min(640px,100%);padding:8px 8px 8px 10px;border:1px solid color-mix(in srgb,var(--c) 55%,transparent);border-radius:999px;background:#050a12e0;backdrop-filter:blur(14px);box-shadow:0 0 40px color-mix(in srgb,var(--c) 20%,transparent)}
+.vorb{position:relative;flex:none;width:34px;height:34px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,var(--c) 40%,#05090f 80%);box-shadow:0 0 calc(10px + var(--amp,0)*30px) var(--c);transform:scale(calc(1 + var(--amp,0)*.25));transition:transform .1s,box-shadow .1s}
+.vorb::after{content:'';position:absolute;inset:-6px;border-radius:50%;border:1px solid var(--c);opacity:calc(.2 + var(--amp,0)*.8);transform:scale(calc(1 + var(--amp,0)*.6))}
+.composer input{flex:1;min-width:0;border:0;background:transparent;color:#fff;font:inherit;font-size:14px;outline:none}
+.composer input::placeholder{color:#8a99a6}
+.composer button{flex:none;border:1px solid #ffffff22;background:#0f1c2b;border-radius:999px;height:36px;min-width:36px;padding:0 12px;font-size:13px}
+.composer button.send{background:var(--c);color:#05090f;border-color:transparent;font-weight:600}
+.composer button.mic.live{background:#e5484d;border-color:transparent}
+.composer button[aria-pressed=false]{opacity:.5}
+.suggest{display:flex;flex-wrap:wrap;justify-content:center;gap:6px}
+.suggest button{border:1px solid #ffffff1f;background:#07101cb3;border-radius:999px;padding:5px 11px;font-size:11px;color:#cfdbe3}
+.suggest button:hover{border-color:var(--c)}
+.room .room-name{display:none}
+
+/* ---------- panels (CRM, war room, lobby) ---------- */
+.panel-scene .bg{inset:-3%;width:106%;height:106%;filter:blur(6px) brightness(.38) saturate(1.1);transform:translateZ(0)}
+.board{position:absolute;inset:84px max(16px,2.5vw) 84px;display:grid;gap:12px;overflow:auto}
+.card{border:1px solid #7ddcf333;border-radius:14px;background:#06101bdd;backdrop-filter:blur(10px);padding:16px}
+.card h3{margin:0 0 10px;font-size:11px;letter-spacing:.2em;color:var(--gold-hi);font-weight:500}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.kpi b{display:block;font-size:26px;font-weight:500}.kpi span{font-size:10px;letter-spacing:.14em;color:var(--mute)}.kpi em{display:block;margin-top:4px;font-style:normal;font-size:11px;color:#3ee68a}
+.crm-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:12px}
+.funnel div{height:30px;margin:0 auto 6px;border-radius:6px;background:linear-gradient(90deg,#1f6fd1,#2a8cf0);display:flex;justify-content:space-between;align-items:center;padding:0 12px;font-size:11px}
+.agent-row{display:flex;align-items:center;gap:10px;width:100%;padding:8px;border:0;border-radius:9px;background:transparent;text-align:left}
+.agent-row:hover{background:#0f1d2e}
+.agent-row .orb{width:30px;height:30px;font-size:10px}
+.agent-row span{flex:1;font-size:12px}.agent-row small{color:var(--mute);font-size:11px}
+.agent-row em{font-style:normal;font-size:10px;letter-spacing:.08em;padding:3px 8px;border-radius:999px;background:#13324a;color:#8fe5ff}
+.sample{font-size:10px;letter-spacing:.14em;color:var(--mute)}
+.flow{display:flex;align-items:stretch;justify-content:center;gap:10px;flex-wrap:wrap;padding:20px 0}
+.flow button{min-width:130px;padding:16px 14px;border:1px solid color-mix(in srgb,var(--c,#dfba80) 60%,transparent);border-radius:14px;background:#06101bdd;text-align:center}
+.flow button .orb{margin:0 auto 8px}
+.flow button strong{display:block;font-size:13px;letter-spacing:.12em}.flow button span{display:block;margin-top:4px;font-size:10px;color:var(--mute)}
+.flow i{align-self:center;font-style:normal;font-size:22px;color:var(--gold)}
+.lobby-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:900px;margin:auto;width:100%}
+.lobby-tiles button{padding:22px;border:1px solid #dfba8066;border-radius:14px;background:#0b0d12dd;text-align:left}
+.lobby-tiles strong{display:block;font-size:14px;letter-spacing:.1em;color:var(--gold-hi)}.lobby-tiles span{font-size:11px;color:var(--mute)}
+.scene-title{text-align:center}
+.scene-title h2{margin:0;font-size:clamp(22px,3.2vw,40px);letter-spacing:.26em;font-weight:500;color:var(--gold-hi)}
+.scene-title p{margin:6px 0 0;font-size:11px;letter-spacing:.24em;color:var(--mute)}
+
+
+/* ---------- Pegasus CRM dashboard + client portal ---------- */
+.dash{position:absolute;inset:0;display:grid;grid-template-columns:236px minmax(0,1fr);color:#e8edf3;background:radial-gradient(1100px 560px at 72% -12%,#16304a 0%,transparent 62%),radial-gradient(900px 520px at -5% 105%,#3a280e66 0%,transparent 60%),#04070d}
+.dash-side{display:flex;flex-direction:column;gap:4px;padding:78px 14px 84px;border-right:1px solid #dfba8022;background:linear-gradient(#060b14f2,#04070df2)}
+.dash-logo{display:flex;align-items:center;gap:12px;margin:0 6px 20px}
+.dash-logo .emb{position:relative;flex:none;width:56px;height:56px;border-radius:50%;overflow:hidden;background:#02050b;box-shadow:0 0 26px #4fc3ff55,inset 0 0 0 1px #dfba8070}
+.dash-logo .emb video{position:absolute;inset:-30%;width:160%;height:160%;object-fit:cover;mix-blend-mode:screen}
+.dash-logo b{display:block;font-family:"Cormorant Garamond",Georgia,serif;font-size:17px;letter-spacing:.26em;font-weight:500;color:var(--gold-hi)}
+.dash-logo span{font-size:9px;letter-spacing:.24em;color:var(--mute)}
+.dash-nav{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border:0;border-radius:10px;background:transparent;color:#b7c3cf;font-size:13px;text-align:left}
+.dash-nav:hover{background:#0f1a29;color:#fff}
+.dash-nav.on{background:linear-gradient(90deg,#dfba8026,transparent);color:var(--gold-hi);box-shadow:inset 2px 0 0 var(--gold)}
+.dash-nav i{width:18px;font-style:normal;text-align:center;opacity:.8}
+.dash-side .foot{margin-top:auto;padding:12px;border:1px solid #ffffff10;border-radius:12px;font-size:11px;color:var(--mute);line-height:1.5}
+.dash-main{overflow:auto;padding:78px 28px 96px;scrollbar-width:thin}
+.dash-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.dash-head h2{margin:0;font-family:"Cormorant Garamond",Georgia,serif;font-size:clamp(26px,3vw,38px);letter-spacing:.18em;font-weight:500;color:#fff}
+.dash-head p{margin:4px 0 0;font-size:12px;color:var(--mute);letter-spacing:.06em}
+.live{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border:1px solid #3ee68a44;border-radius:999px;background:#07150ecc;font-size:11px;letter-spacing:.12em;color:#9ff0c2}
+.live::before{content:'';width:7px;height:7px;border-radius:50%;background:#3ee68a;box-shadow:0 0 0 0 #3ee68a88;animation:livePulse 2s infinite}
+@keyframes livePulse{70%{box-shadow:0 0 0 9px #3ee68a00}100%{box-shadow:0 0 0 0 #3ee68a00}}
+.kgrid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:14px}
+.card{position:relative;border-radius:16px;padding:16px 18px;background:linear-gradient(160deg,#0d1726ee,#070c15ee);border:1px solid #ffffff10;box-shadow:0 18px 40px #0007;overflow:hidden}
+.card::before{content:'';position:absolute;left:0;right:0;top:0;height:1px;background:linear-gradient(90deg,transparent,#dfba8099,transparent)}
+.card::after{content:'';position:absolute;inset:0;background:linear-gradient(110deg,transparent 40%,#ffffff0d 50%,transparent 60%);background-size:250% 100%;background-position:130% 0;pointer-events:none;transition:background-position 1.2s}
+.card:hover::after{background-position:-30% 0}
+.dash.in .card{animation:cardIn .7s cubic-bezier(.2,.75,.2,1) both;animation-delay:calc(var(--i,0)*70ms)}
+@keyframes cardIn{from{opacity:0;transform:translateY(14px) scale(.98)}}
+.card h3{margin:0 0 12px;font-size:11px;letter-spacing:.2em;color:var(--gold-hi);font-weight:600}
+.card h3 small{float:right;font-weight:400;letter-spacing:.06em;color:var(--mute)}
+.k-lab{font-size:10px;letter-spacing:.16em;color:var(--mute);text-transform:uppercase}
+.k-val{margin-top:8px;font-size:clamp(22px,2vw,30px);font-weight:600;color:#fff;font-variant-numeric:tabular-nums;letter-spacing:.01em}
+.k-sub{margin-top:4px;font-size:11.5px;color:#9fb0bf}
+.k-sub b{color:#9ff0c2;font-weight:600}
+.spark{display:block;width:100%;height:34px;margin-top:10px}
+.spark path.line{fill:none;stroke:var(--gold);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:300;stroke-dashoffset:300}
+.dash.in .spark path.line{animation:draw 1.4s .3s ease forwards}
+.spark path.area{fill:url(#sparkFill);opacity:.5}
+@keyframes draw{to{stroke-dashoffset:0}}
+.drow{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:16px;margin-top:16px}
+.drow.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.lb-row{display:grid;grid-template-columns:30px 36px minmax(0,1fr) minmax(70px,1.3fr) 54px;align-items:center;gap:12px;width:100%;padding:9px 8px;border:0;border-radius:10px;background:transparent;color:inherit;text-align:left}
+.lb-row:hover{background:#0f1b2b}
+.lb-rank{font-size:13px;font-weight:600;color:var(--mute);text-align:center;font-variant-numeric:tabular-nums}
+.lb-row.top .lb-rank{width:26px;height:26px;line-height:26px;border-radius:50%;color:#05080f;background:var(--medal);box-shadow:0 0 14px var(--medal)}
+.lb-row .orb{width:34px;height:34px;font-size:11px}
+.lb-name b{display:block;font-size:13px;letter-spacing:.06em}
+.lb-name span{font-size:11px;color:var(--mute)}
+.lb-bar{height:6px;border-radius:4px;background:#ffffff0d;overflow:hidden}
+.lb-bar i{display:block;height:100%;width:0;border-radius:4px;background:linear-gradient(90deg,#9b7a45,var(--gold-hi));box-shadow:0 0 10px #dfba8066;transition:width 1.2s cubic-bezier(.2,.75,.2,1)}
+.lb-score{font-size:15px;font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+.lb-note{margin-top:10px;font-size:11px;color:var(--mute);line-height:1.5}
+.lb-idle{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.lb-idle button{border:1px solid #ffffff14;background:#0b1422;border-radius:999px;padding:4px 10px;font-size:11px;color:#9fb0bf}
+.seg{display:inline-flex;gap:2px;padding:3px;border:1px solid #ffffff12;border-radius:10px;background:#060b13;margin-bottom:10px}
+.seg button{border:0;background:transparent;border-radius:8px;padding:6px 10px;font-size:11px;color:#9fb0bf}
+.seg button.on{background:#1a2638;color:var(--gold-hi)}
+.chart{position:relative}
+.chart svg{display:block;width:100%;height:190px;overflow:visible}
+.chart .grid line{stroke:#ffffff12}
+.chart .grid text,.chart .xl text{fill:#7f8fa0;font-size:10px}
+.chart rect.bar{fill:var(--gold);transition:opacity .2s}
+.chart rect.bar:hover{fill:var(--gold-hi)}
+.chart rect.hit{fill:transparent}
+.tip{position:absolute;pointer-events:none;padding:7px 10px;border:1px solid #dfba8055;border-radius:8px;background:#05080ff2;font-size:11.5px;color:#e8edf3;white-space:nowrap;transform:translate(-50%,-110%);opacity:0;transition:opacity .15s}
+.tip b{color:var(--gold-hi)}
+.rev-hero{font-size:34px;font-weight:600;color:#fff;font-variant-numeric:tabular-nums}
+.rev-hero small{display:block;font-size:11px;font-weight:400;letter-spacing:.14em;color:var(--mute)}
+.rev-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;margin-top:12px;font-size:12px;color:#c9d4de}
+.rev-row .lb-bar{grid-column:1/-1}
+.rev-row.muted .lb-bar i{background:#5b6775;box-shadow:none}
+.appr{display:flex;align-items:center;gap:10px;width:100%;padding:8px;border:0;border-radius:10px;background:transparent;color:inherit;text-align:left}
+.appr:hover{background:#0f1b2b}
+.appr .orb{width:30px;height:30px;font-size:10px}
+.appr>span:not(.orb){flex:1;min-width:0;font-size:12.5px;line-height:1.35;color:#e8edf3}
+.appr>span:not(.orb) small{display:block;margin-top:2px;color:var(--mute);font-size:11px}
+.chip{flex:none;display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:999px;font-size:10px;letter-spacing:.04em;white-space:nowrap}
+.chip.wait{background:#3a2a0c;color:#ffd27a;border:1px solid #ffd27a33}
+.chip.ok{background:#0c2a1a;color:#9ff0c2;border:1px solid #3ee68a33}
+.chip.pause{background:#1b2230;color:#aab6c3;border:1px solid #ffffff1a}
+.chip.due{background:#3a170f;color:#ffab8f;border:1px solid #ff8a6633}
+.client-card{display:flex;gap:14px;align-items:center;width:100%;padding:14px;border:1px solid #dfba8033;border-radius:14px;background:linear-gradient(120deg,#16120a,#0b111c);color:inherit;text-align:left}
+.client-card:hover{border-color:var(--gold)}
+.client-card .orb{width:46px;height:46px;font-size:14px}
+.client-card b{display:block;font-size:14px;letter-spacing:.04em}
+.client-card>span:not(.orb) span{display:block;font-size:11px;color:var(--mute);margin-top:2px}
+.stat-line{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid #ffffff0a;font-size:12.5px;color:#c9d4de}
+.stat-line:last-child{border-bottom:0}
+.stat-line b{color:#fff;font-variant-numeric:tabular-nums}
+.src{margin-top:18px;font-size:11px;color:var(--mute)}
+/* client portal */
+.portal{grid-template-columns:minmax(0,1fr)}
+.portal .dash-main{padding:78px clamp(16px,4vw,56px) 96px}
+.p-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.p-tabs button{display:inline-flex;align-items:center;gap:8px;border:1px solid #ffffff18;background:#0a111c;border-radius:999px;padding:7px 14px;font-size:12px;color:#c9d4de}
+.p-tabs button.on{border-color:var(--gold);color:var(--gold-hi);background:#17120a}
+.p-tabs button:disabled{opacity:.5}
+.p-hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:center}
+.p-hero h2{margin:0;font-family:"Cormorant Garamond",Georgia,serif;font-size:clamp(28px,3.4vw,46px);font-weight:500;letter-spacing:.06em;color:#fff}
+.p-hero .cred{margin-top:4px;font-size:12px;letter-spacing:.2em;color:var(--gold-hi)}
+.p-hero p{margin:8px 0 0;font-size:13px;color:#aebccb;max-width:640px;line-height:1.5}
+.ring{position:relative;width:132px;height:132px}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:9}
+.ring .track{stroke:#ffffff10}
+.ring .fill{stroke:url(#ringGold);stroke-linecap:round;transition:stroke-dashoffset 1.6s cubic-bezier(.2,.75,.2,1)}
+.ring div{position:absolute;inset:0;display:grid;place-items:center;text-align:center;font-size:11px;color:var(--mute);letter-spacing:.08em}
+.ring div b{display:block;font-size:30px;color:#fff;letter-spacing:0}
+.tl{position:relative;margin:4px 0 0;padding:0;list-style:none}
+.tl li{position:relative;display:grid;grid-template-columns:86px 16px minmax(0,1fr) auto;align-items:center;gap:10px;padding:7px 0;font-size:12.5px;color:#d4dde6}
+.tl li .d{font-size:11px;color:var(--mute);text-align:right;font-variant-numeric:tabular-nums}
+.tl li .dot{width:10px;height:10px;border-radius:50%;background:#2a3646;box-shadow:0 0 0 3px #04070d;justify-self:center}
+.tl li.past .dot{background:var(--gold)}
+.tl li.today{color:var(--gold-hi)}
+.tl li.today .dot{background:#3ee68a;box-shadow:0 0 0 3px #04070d,0 0 12px #3ee68a}
+.tl::before{content:'';position:absolute;left:104px;top:12px;bottom:12px;width:1px;background:#ffffff14}
+.concierge{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.concierge button{padding:14px;border:1px solid #dfba8033;border-radius:12px;background:#0b0f16;color:inherit;text-align:left}
+.concierge button:hover{border-color:var(--gold)}
+.concierge strong{display:block;font-size:13px;color:var(--gold-hi)}
+.concierge span{font-size:11px;color:var(--mute)}
+@media(max-width:1200px){.kgrid{grid-template-columns:repeat(3,minmax(0,1fr))}.drow,.drow.three{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:860px){.dash{grid-template-columns:minmax(0,1fr)}.dash-side{display:none}.dash-main{padding:72px 14px 90px}.kgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.p-hero{grid-template-columns:1fr}.concierge{grid-template-columns:repeat(2,minmax(0,1fr))}.lb-row{grid-template-columns:26px 32px minmax(0,1fr) 44px}.lb-row .lb-bar{display:none}}
+@media(prefers-reduced-motion:reduce){.dash.in .card,.dash.in .spark path.line{animation:none}.spark path.line{stroke-dashoffset:0}.lb-bar i,.ring .fill{transition:none}}
+
+
+/* ---------- agent portraits ---------- */
+.orb.face{padding:0;overflow:hidden;background:#05090f;border:1.5px solid color-mix(in srgb,var(--c) 75%,#fff 0%);box-shadow:0 0 0 2px #04070d,0 0 14px color-mix(in srgb,var(--c) 45%,transparent)}
+.orb.face img{display:block;width:100%;height:100%;object-fit:cover;border-radius:50%}
+.appr{padding:10px 8px;border-bottom:1px solid #ffffff0a;border-radius:0}
+.appr:last-child{border-bottom:0}
+.appr:hover{border-radius:10px}
+.appr .orb{width:38px;height:38px}
+.lb-row .orb{width:36px;height:36px}
+/* ---------- employee floor roster (panel-style directory) ---------- */
+/* ---------- AI team hub (employee floor directory): Pegasus Blanc & Gold ---------- */
+@property --sheen{syntax:'<angle>';inherits:false;initial-value:135deg}
+.roster{position:absolute;left:clamp(12px,1.6vw,28px);top:72px;bottom:74px;width:min(360px,32vw);display:flex;flex-direction:column;border-radius:22px;isolation:isolate;
+ background:radial-gradient(120% 60% at 20% 0%,#d4af3714,transparent 60%),rgba(10,10,14,.65);
+ backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.15),inset 0 -1px 0 rgba(255,255,255,.04),inset 0 0 40px rgba(255,255,255,.03),0 20px 40px rgba(0,0,0,.6),0 0 60px rgba(212,175,55,.08);
+ overflow:hidden;opacity:0;transform:translateX(-16px);transition:opacity .6s,transform .6s cubic-bezier(.16,1,.3,1)}
+/* living gold edge: a gradient ring drawn with a mask so the glass stays see-through */
+.roster::before,.r-item::before,.r-item::after{content:'';position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;
+ background:linear-gradient(var(--sheen),rgba(234,212,138,.6),rgba(180,140,50,.2) 45%,rgba(234,212,138,.45) 70%,rgba(180,140,50,.15));
+ -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+.r-item::before{background:rgba(245,158,11,.3)}
+/* a soft golden light that travels the card's edge: always on for the hovered card, and once in a
+   while (staggered) on the others so the eye is drawn to the list without anything blinking */
+@property --spin{syntax:'<angle>';inherits:false;initial-value:0deg}
+.r-item::after{padding:1.5px;background:conic-gradient(from var(--spin),transparent 0 62%,rgba(253,230,138,.15) 70%,#fde68a 82%,#fff7dc 86%,rgba(212,175,55,.5) 90%,transparent 96%);
+ opacity:0;filter:drop-shadow(0 0 4px rgba(253,230,138,.7));animation:spin 5s linear infinite,idleTrace 16s ease-in-out infinite;transition:opacity .5s cubic-bezier(.16,1,.3,1)}
+@keyframes spin{to{--spin:360deg}}
+@keyframes idleTrace{0%,70%,100%{opacity:0}78%,90%{opacity:.6}}
+.r-item:nth-child(4n+1)::after{animation-delay:0s,-4s}.r-item:nth-child(4n+2)::after{animation-delay:-1.2s,-8s}
+.r-item:nth-child(4n+3)::after{animation-delay:-2.4s,-12s}.r-item:nth-child(4n)::after{animation-delay:-3.6s,0s}
+.r-item:hover::after,.r-item:focus-visible::after,.r-item.active::after{opacity:1;animation:spin 3.2s linear infinite}
+.roster::before{animation:sheen 14s linear infinite;z-index:2}
+@keyframes sheen{to{--sheen:495deg}}
+#s-floor.arrived .roster{opacity:1;transform:none}
+.roster-head{padding:20px 20px 12px}
+.roster-head b{display:inline-block;font-family:"Cormorant Garamond",Georgia,serif;font-size:26px;font-weight:600;letter-spacing:.16em;
+ background:linear-gradient(to right,#FFF4D6,#F0CF6A 55%,#D4AF37);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 12px rgba(212,175,55,.35))}
+.roster-head span{display:flex;align-items:center;gap:9px;margin-top:6px;font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#D1D1E0}
+.roster-list{flex:1;overflow:auto;padding:6px 14px 16px;display:flex;flex-direction:column;gap:8px;scrollbar-width:thin;scrollbar-color:#d4af3766 transparent}
+.r-item{position:relative;display:flex;align-items:center;gap:14px;width:100%;padding:10px 14px 10px 10px;border:0;border-radius:16px;color:inherit;text-align:left;cursor:pointer;
+ background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,0) 60%),rgba(0,0,0,.6);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 10px 24px rgba(0,0,0,.4);
+ transition:all .4s cubic-bezier(.16,1,.3,1)}
+.r-item::before{transition:background .4s cubic-bezier(.16,1,.3,1)}
+.r-item:hover,.r-item:focus-visible{transform:translateY(-2px) scale(1.01);outline:none;
+ background:linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,.03)),rgba(14,13,16,.6);
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -8px 16px rgba(0,0,0,.2),0 14px 30px rgba(0,0,0,.45),0 0 25px rgba(212,175,55,.25)}
+.r-item:hover::before,.r-item:focus-visible::before{background:rgba(245,158,11,.55)}
+/* gold-spun bezel around each portrait */
+.r-item .orb{position:relative;width:52px;height:52px;flex:none;border:0;padding:2px;
+ background:conic-gradient(from 210deg,#F3E7C4,#AA771C,#D4AF37,#fff6dc,#AA771C,#F3E7C4);
+ box-shadow:0 0 0 1px rgba(10,10,14,.9),0 0 14px rgba(212,175,55,.35),0 0 4px rgba(243,231,196,.5)}
+.r-item .orb img{border-radius:50%;box-shadow:0 0 0 2px #0a0a0e;filter:brightness(1.35) contrast(1.08) saturate(1.1)}
+.r-item:hover .orb{box-shadow:0 0 0 1px rgba(10,10,14,.9),0 0 22px rgba(212,175,55,.6),0 0 6px #fff3cf}
+.r-txt{flex:1;min-width:0}
+.r-txt b{display:block;font-size:16.5px;letter-spacing:.06em;color:#FFFFFF;font-weight:700;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.r-txt small{display:block;margin-top:3px;font-size:13px;font-weight:500;letter-spacing:.02em;color:rgba(253,230,138,.8);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* breathing neon-emerald status core with a soft ripple */
+.r-dot{flex:none;display:flex;align-items:center;gap:8px;font-style:normal;font-size:11px;font-weight:700;letter-spacing:.1em;color:#b8ffd6;text-transform:uppercase}
+.r-dot::before,.roster-head span::before{content:'';position:relative;width:8px;height:8px;border-radius:50%;flex:none;
+ background:radial-gradient(circle at 40% 35%,#eafff3,#3ef0a0 45%,#10b46a);box-shadow:0 0 6px #3ef0a0,0 0 0 0 rgba(62,240,160,.45);animation:breathe 2.8s cubic-bezier(.16,1,.3,1) infinite}
+@keyframes breathe{0%{box-shadow:0 0 5px #3ef0a0,0 0 0 0 rgba(62,240,160,.5);transform:scale(.92)}50%{box-shadow:0 0 12px #3ef0a0,0 0 0 7px rgba(62,240,160,0);transform:scale(1.08)}100%{box-shadow:0 0 5px #3ef0a0,0 0 0 0 rgba(62,240,160,0);transform:scale(.92)}}
+.r-item:nth-child(3n) .r-dot::before{animation-delay:-.9s}.r-item:nth-child(3n+1) .r-dot::before{animation-delay:-1.8s}
+.r-item:hover .r-dot,.r-item:focus-visible .r-dot{color:#F3E7C4}
+.r-item:hover .r-dot::after,.r-item:focus-visible .r-dot::after{content:'→';font-size:14px;letter-spacing:0}
+.r-sep{display:flex;align-items:center;gap:10px;margin:12px 4px 2px;font-size:11.5px;letter-spacing:.26em;font-weight:700;color:#E9D49A}
+.r-sep::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(212,175,55,.55),transparent)}
+.paused .roster::before,.paused .r-item::after,.paused .r-dot::before,.paused .roster-head span::before{animation-play-state:paused}
+@media(prefers-reduced-motion:reduce){.roster::before,.r-item::after,.r-dot::before,.roster-head span::before{animation:none}.r-item:hover{transform:none}}
+
+/* gold plaques: the directory is a feature, so each agent card is polished gold with dark engraved text */
+.r-item{background:linear-gradient(135deg,#FFF1C9 0%,#F0CF6A 28%,#D4AF37 55%,#B98A2C 80%,#E9C766 100%)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.75),inset 0 -2px 6px rgba(120,80,10,.35),0 8px 22px rgba(0,0,0,.55),0 0 18px rgba(212,175,55,.25)!important}
+.r-item::before{background:linear-gradient(135deg,#fff8e1,#8a6216 50%,#fff1c4)!important}
+.r-item:hover,.r-item:focus-visible{background:linear-gradient(135deg,#FFF7DD 0%,#F7DC84 28%,#E2BE4A 55%,#C99A33 80%,#F3D57A 100%)!important;
+ box-shadow:inset 0 1px 0 #fff,inset 0 -2px 6px rgba(120,80,10,.3),0 14px 30px rgba(0,0,0,.55),0 0 30px rgba(240,207,106,.55)!important}
+.r-item::after{background:conic-gradient(from var(--spin),transparent 0 62%,rgba(255,255,255,.2) 72%,#fff 84%,rgba(255,255,255,.4) 90%,transparent 96%)!important;filter:drop-shadow(0 0 5px #fff6d0)!important}
+.r-txt b{color:#1b1206!important;text-shadow:0 1px 0 rgba(255,245,210,.6)!important;font-weight:800!important}
+.r-txt small{color:#4a3208!important;font-weight:600!important}
+.r-dot{color:#b8ffd6!important;background:rgba(20,14,4,.82);padding:5px 9px 5px 8px;border-radius:999px;box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}
+.r-item:hover .r-dot,.r-item:focus-visible .r-dot{color:#fff3cf!important}
+.r-item .orb{box-shadow:0 0 0 2px #2a1c06,0 2px 8px rgba(0,0,0,.45)!important;background:conic-gradient(from 210deg,#3a2708,#1a1205,#3a2708)!important}
+.r-sep{color:#F5D77A!important;text-shadow:0 0 10px rgba(240,207,106,.35)}
+.r-sep::after{background:linear-gradient(90deg,rgba(240,207,106,.8),transparent)!important}
+.roster::before{background:linear-gradient(var(--sheen),#F7DC84,rgba(180,140,50,.35) 45%,#F0CF6A 70%,rgba(180,140,50,.3))!important}
+.roster-head span{color:#F3E7C4!important}
+@media(max-width:860px){.roster{left:12px;right:12px;width:auto;top:auto;bottom:70px;height:46vh}}
+
+
+/* ---------- war room ---------- */
+.wf-row{display:flex;align-items:stretch;gap:0;overflow-x:auto;padding:4px 2px 6px}
+.wf-step{flex:1 1 0;min-width:120px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 10px;border:1px solid color-mix(in srgb,var(--c,#dfba80) 40%,transparent);border-radius:14px;background:linear-gradient(180deg,#0e1828,#070c15);color:inherit;text-align:center;transition:transform .2s,border-color .2s,box-shadow .2s}
+button.wf-step:hover{transform:translateY(-3px);border-color:var(--c);box-shadow:0 10px 30px color-mix(in srgb,var(--c) 25%,transparent)}
+.wf-step .orb{width:52px;height:52px}
+.wf-step.founder{--c:#dfba80;background:linear-gradient(180deg,#1a140a,#0b0a08)}
+.wf-step.founder .orb{display:grid;place-items:center;font-size:18px;color:var(--gold-hi)}
+.wf-step b{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:#fff}
+.wf-step small{font-size:11px;color:var(--mute)}
+.wf-crew{display:flex;justify-content:center;height:52px;align-items:center}
+.wf-crew .orb{width:34px;height:34px;margin-left:-10px}
+.wf-crew .orb:first-child{margin-left:0}
+.wf-arrow{flex:0 0 26px;align-self:center;height:2px;margin:0 2px;background:linear-gradient(90deg,#dfba8033,#dfba80);position:relative}
+.wf-arrow::after{content:'';position:absolute;right:-1px;top:-4px;border:5px solid transparent;border-left-color:#dfba80;border-right:0}
+.dash.in .wf-arrow{background-size:200% 100%;animation:flowPulse 2.4s linear infinite}
+@keyframes flowPulse{0%{opacity:.5}50%{opacity:1}100%{opacity:.5}}
+.mprog{height:6px;border-radius:4px;background:#ffffff0d;margin:-2px 0 10px;overflow:hidden}
+.mprog span{display:block;height:100%;width:var(--p);border-radius:4px;background:linear-gradient(90deg,#9b7a45,var(--gold-hi))}
+.ws{display:flex;align-items:center;gap:12px;padding:10px 4px;border-bottom:1px solid #ffffff0a}
+.ws:last-child{border-bottom:0}
+.ws-lead{flex:none;padding:0;border:0;background:none}
+.ws-lead .orb{width:40px;height:40px}
+.ws-txt{flex:1;min-width:0}
+.ws-txt b{display:block;font-size:12.5px;font-weight:500;color:#eef2f6}
+.ws-txt small{display:block;margin-top:2px;font-size:11px;color:var(--mute)}
+.ws-team{display:flex;flex:none}
+.ws-team button{padding:0;border:0;background:none;margin-left:-8px}
+.ws-team .orb{width:28px;height:28px}
+@media(max-width:860px){.ws-team{display:none}.wf-step{min-width:96px}}
+
+
+/* ---------- client list ---------- */
+.cl-tools{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.cl-search{flex:1;min-width:0;padding:11px 14px;border:1px solid #ffffff18;border-radius:10px;background:#060b13;color:#e8edf3;font:inherit;font-size:13px;outline:none}
+.cl-search:focus{border-color:var(--gold)}
+.cl-count{font-size:11px;color:var(--mute);letter-spacing:.08em}
+.cl-row{display:grid;grid-template-columns:minmax(220px,2fr) minmax(160px,1.6fr) minmax(120px,1fr) minmax(110px,.9fr) 90px 110px;align-items:center;gap:14px;padding:12px 10px;border-bottom:1px solid #ffffff0a;color:inherit;text-decoration:none;border-radius:10px}
+a.cl-row:hover,a.cl-row:focus-visible{background:linear-gradient(90deg,#dfba8018,transparent);outline:none}
+a.cl-row:hover .cl-open{color:var(--gold-hi)}
+.cl-headrow{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--mute);padding-top:4px;padding-bottom:8px}
+.cl-who{display:flex;align-items:center;gap:12px;min-width:0}
+.cl-who .orb{width:42px;height:42px;flex:none;font-size:13px}
+.cl-who b{display:block;font-size:14px;color:#fff;letter-spacing:.03em}
+.cl-who small,.cl-pay small,.cl-prog small{display:block;margin-top:2px;font-size:11px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cl-prog-name{font-size:12.5px;color:#c9d4de}
+.cl-prog .mprog{margin:0 0 4px}
+.cl-pay b{font-size:14px;color:#fff;font-variant-numeric:tabular-nums}
+.cl-open{font-size:12px;color:#9fb0bf;text-align:right;letter-spacing:.04em}
+.cl-empty{padding:18px 10px;color:var(--mute);font-size:13px}
+@media(max-width:1100px){.cl-row{grid-template-columns:minmax(0,1fr) auto}.cl-row>:not(.cl-who):not(.cl-open){display:none}}
+
+
+/* ---------- payments ---------- */
+.agr{margin-top:14px;padding-top:12px;border-top:1px solid #ffffff10}
+.agr-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;font-size:12.5px;color:#eef2f6}
+.agr .rev-row{margin-top:8px}
+.sched{list-style:none;margin:8px 0 0;padding:0}
+.sched li{display:grid;grid-template-columns:52px minmax(0,1fr) auto auto;gap:8px;align-items:center;padding:5px 0;font-size:11.5px;color:#c9d4de}
+.sched li span:first-child{color:var(--mute);font-variant-numeric:tabular-nums}
+.sched b{color:#fff;font-variant-numeric:tabular-nums}
+.agr-note{display:block;margin-top:6px;font-size:10.5px;color:var(--mute);line-height:1.45}
+
+
+/* ---------- holographic HQ buttons ---------- */
+.hb{--d:clamp(98px,8.2vw,134px);position:absolute;left:var(--x);top:var(--y);transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:10px;border:0;background:none;padding:0;z-index:2;color:inherit;cursor:pointer}
+.hb-disc{position:relative;width:var(--d);height:var(--d);border-radius:50%;overflow:hidden;background:radial-gradient(circle at 50% 42%,#0d2236 0%,#04080f 72%);box-shadow:0 0 0 1px color-mix(in srgb,var(--c) 70%,#dfba80),0 0 0 5px #04070dd0,0 0 0 6px #dfba8040,0 0 30px color-mix(in srgb,var(--c) 40%,transparent);transition:transform .25s,box-shadow .25s}
+.hb:hover .hb-disc,.hb:focus-visible .hb-disc{transform:translateY(-4px) scale(1.05);box-shadow:0 0 0 1.5px var(--c),0 0 0 5px #04070dd0,0 0 0 7px color-mix(in srgb,var(--c) 60%,transparent),0 0 46px color-mix(in srgb,var(--c) 65%,transparent)}
+.hb:focus-visible{outline:none}
+.hb::before{content:'';position:absolute;top:0;left:50%;width:var(--d);height:var(--d);margin-left:calc(var(--d)/-2);border-radius:50%;border:1.5px solid var(--c);opacity:0;animation:hbPing 3.2s ease-out infinite;pointer-events:none}
+@keyframes hbPing{0%{transform:scale(1);opacity:.55}100%{transform:scale(1.32);opacity:0}}
+.hb-stage{position:absolute;left:10%;right:10%;top:6%;height:66%;perspective:420px}
+.hb-plat{position:absolute;left:0;right:0;bottom:6%;width:100%;opacity:.9;pointer-events:none}
+.hb-scan{position:absolute;inset:0;border-radius:50%;pointer-events:none;background:repeating-linear-gradient(0deg,#9fe6ff0d 0 1px,transparent 1px 3px),radial-gradient(circle,transparent 58%,#03070d 80%)}
+.hb .spinner{left:0;right:0;top:0;height:100%}
+.hb .spinner svg.face{filter:drop-shadow(0 0 5px #4fc3ff)}
+.hb .spinner.door svg.face{filter:drop-shadow(0 0 6px #3ee6a0)}
+.spinner.bust .face{border-radius:50%;object-fit:cover;-webkit-mask-image:radial-gradient(circle at 50% 42%,#000 46%,transparent 70%);mask-image:radial-gradient(circle at 50% 42%,#000 46%,transparent 70%);filter:grayscale(1) contrast(1.25) brightness(1.05) sepia(1) hue-rotate(165deg) saturate(3.2) drop-shadow(0 0 6px #4fc3ff)}
+.holo-globe{position:absolute;left:50%;top:2%;height:96%;aspect-ratio:1;translate:-50% 0}
+.hb .tag{padding:7px 12px;border:1px solid color-mix(in srgb,var(--c) 55%,transparent);border-radius:10px;background:#050b14e0;backdrop-filter:blur(8px);text-align:center;white-space:nowrap;transition:border-color .2s}
+.hb .tag strong{display:block;font-size:12px;letter-spacing:.16em;color:var(--gold-hi)}
+.hb .tag span{display:block;margin-top:3px;font-size:10.5px;color:var(--mute);letter-spacing:.06em}
+.hb:hover .tag{border-color:var(--c)}
+.paused .hb *,.paused .hb::before{animation-play-state:paused!important}
+@media(prefers-reduced-motion:reduce){.hb *,.hb::before{animation:none!important}}
+@media(max-width:860px){.hb{--d:84px}.hb .tag span{display:none}}
+
+/* ---------- responsive ---------- */
+@media(max-width:860px){
+ #crumbs,.pill{display:none}
+ .wall{position:static;width:auto;perspective:none}
+ #s-floor .doors{display:flex;flex-direction:column;justify-content:flex-end;padding:76px 16px 76px;gap:10px;overflow:auto}
+ .wall-inner{transform:none!important;grid-template-columns:1fr 1fr}
+ .endhall{position:static;transform:none;width:auto}
+ .door{min-height:56px}
+ .rail{display:none}
+ .hud{left:16px;right:16px;width:auto;top:auto;bottom:76px;max-height:46vh}
+ .room-name{top:76px;bottom:auto}
+ .next-door{display:none}
+ .kpis{grid-template-columns:repeat(2,1fr)}.crm-grid{grid-template-columns:1fr}.lobby-tiles{grid-template-columns:repeat(2,1fr)}
+ .stats{display:none}
+ .hot .tag span{display:none}
+ #map button{padding:8px 7px;font-size:9px}
+ .convo{left:16px;right:16px;bottom:66px}
+ .suggest{display:none}
+ .hud{top:130px;bottom:auto;max-height:30vh}
+ .caption{font-size:15px}
+ .floor-hint{display:none}
+ .endhall{padding:6px 0;background:#02050bb3;border-radius:12px}
+}
+@media(max-height:760px){.stats{display:none}}
+@media(prefers-reduced-motion:reduce){.scene,#warp{animation:none!important}.hot .ring::before,.hot .ring::after,.gen .big{animation:none}}
+</style></head>
+<body>
+<div id="intro" role="dialog" aria-label="Entering Pegasus Headquarters"><div>
+ <video id="intro-video" muted playsinline preload="auto" src="assets/pegasus-centerpiece.mp4"></video>
+ <h2>PEGASUS</h2><p>AUTONOMY · INTELLIGENCE · IMPACT</p>
+ <button id="enter" type="button">ENTER HEADQUARTERS</button>
+</div></div>
+
+<div id="world" aria-live="polite"></div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><g id="doorGlyph" fill="none" stroke="#9ff0c2" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M60 52v44" stroke="url(#doorLight)" stroke-width="22" opacity=".55"/><rect x="42" y="10" width="36" height="82" fill="#0b3a2c"/><path d="M50 18h20v74H50z" fill="#9ff0c2" fill-opacity=".22" stroke-width="1.5"/><path d="M42 10l-14 8v80l14-6z" fill="#06261c"/><circle cx="36" cy="56" r="2.2" fill="#9ff0c2"/><path d="M20 96h80" opacity=".6"/></g><linearGradient id="doorLight" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9ff0c2" stop-opacity=".9"/><stop offset="1" stop-color="#9ff0c2" stop-opacity="0"/></linearGradient><g id="clientsGlyph" fill="none" stroke="#8fe3ff" stroke-width="3.2" stroke-linecap="round"><circle cx="78" cy="30" r="13"/><path d="M56 82c2-17 11-27 22-27s20 10 22 27"/><circle cx="44" cy="34" r="16" fill="#0b2a40"/><path d="M14 90c2-21 14-33 30-33s28 12 30 33" fill="#0b2a40"/><path d="M30 92h28" opacity=".5"/></g><linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dfba80" stop-opacity=".45"/><stop offset="1" stop-color="#dfba80" stop-opacity="0"/></linearGradient></defs></svg>
+<div id="warp"></div>
+<div id="doorfx" aria-hidden="true"><div class="leaf l"></div><div class="leaf r"></div><div class="plate"><span class="orb"></span><b class="serif"></b><span></span></div></div>
+
+<header id="chrome">
+ <span class="brand">PEGASUS</span>
+ <button id="back" type="button" aria-label="Go back">← <span id="back-label">BACK</span></button>
+ <nav id="crumbs" aria-label="Location"></nav>
+ <span class="spacer"></span>
+ <span class="pill">PREVIEW</span>
+ <button id="motion" type="button" aria-pressed="false">Pause motion</button>
+</header>
+<nav id="map" aria-label="Headquarters map"></nav>
+<div id="toast" role="status"></div>
+
+<script>
+/* ===== Roster — order matches the Employee Floor reference ===== */
+const AGENTS=[
+ {id:'simon',name:'Simon',role:'Executive Director',dept:'Executive Strategy & Mission Prioritization',c:'#e8c27a',office:true,quote:'Discern. Direct. Deliver.',exec:true,
+  duties:['Strategy & oversight','Final approvals','Performance review','Resource allocation','Executive close'],
+  missions:['KMCE Launch','Phoenix Event','Client Onboarding','Platform Scale']},
+ {id:'marie',name:'Marie',role:'Operations',dept:'Operational Architecture & Execution Systems',c:'#b784f4',office:true,quote:'Coordinate. Execute. Keep it moving.',
+  duties:['Task management','Team coordination','Workflow execution','Project tracking','Daily operations'],
+  missions:['Team handoffs','SOP library','Calendar sync','Agent onboarding']},
+ {id:'iris',name:'IRIS',role:'Market Intelligence',dept:'OSINT & Competitive Intelligence',c:'#3ee6b0',office:true,quote:'Research. Discover. Analyze.',
+  duties:['Market research','Lead discovery','Trends & opportunities','Competitor analysis','Industry insight reports'],
+  missions:['Competitor map','CE market scan','Partner targets']},
+ {id:'mark',name:'Mark',role:'Marketing Direction',dept:'Brand Strategy & Strategic Positioning',c:'#e8b866',office:true,quote:'Strategy. Positioning. Brand. Growth.',
+  duties:['Brand strategy','Positioning','Campaign direction','Growth planning','Audience development'],
+  missions:['KMCE brand refresh','National CE campaign','Partner positioning']},
+ {id:'cammy',name:'Cammy',role:'Campaign Generation',dept:'Creative Campaign Strategy & Launch Mechanics',c:'#ff6fa8',office:true,quote:'Ideas. Campaigns. Execute. Grow.',
+  duties:['Campaign strategy','Content ideas','Multi-channel launches','A/B testing','Performance optimization'],
+  missions:['Phoenix event launch','KMCE spring campaign','Influencer outreach']},
+ {id:'evan',name:'Evan',role:'Content Creation',dept:'High-Converting Copywriting & Narrative Craft',c:'#4f9dff',office:true,quote:'Storytelling. Content. Media. Engage.',
+  duties:['Content strategy','Script writing','Brand storytelling','Short & long-form content','Content calendars'],
+  missions:['KMCE story series','Podcast scripts','Course launch copy']},
+ {id:'tube',name:'Tube',role:'Video Production',dept:'Viral Video Direction & Short-Form Media',c:'#ff4d4d',office:true,quote:'Film. Edit. Produce. Distribute.',
+  duties:['Video strategy','Filming & production','Editing & post','Short-form content','Thumbnails & YouTube SEO'],
+  missions:['KMCE podcast teaser','Course promo series','Shorts batch']},
+ {id:'lucy',name:'Lucy',role:'Distribution',dept:'Omni-Channel Distribution & Amplification',c:'#c77dff',office:true,quote:'Publish. Distribute. Amplify.',
+  duties:['Multi-platform publishing','Content distribution','Community engagement','Email distribution','Partnership support'],
+  missions:['KMCE outreach','YouTube series','Email launch','Community growth']},
+ {id:'snake',name:'Snake',role:'Analytics & Insights',dept:'Attribution Modeling & Performance Analytics',c:'#3ee68a',office:true,quote:'Data. Trends. Performance. Intelligence.',
+  duties:['Data analysis','Performance tracking','Trend forecasting','ROI optimization','Predictive modeling'],
+  missions:['Attribution model','Revenue forecast','Funnel dashboard']},
+ {id:'alice',name:'Alice',role:'Storefront & Conversion',dept:'CRO & Storefront UX Architecture',c:'#ff7ad9',office:true,quote:'Attract. Engage. Convert.',
+  duties:['The KMCE Shop storefront','Conversion optimization','Customer journey','A/B testing','Product launches'],
+  missions:['Checkout redesign','Bundle launch','Upsell flow']},
+ {id:'echo',name:'Echo',role:'Sales & Outreach',dept:'Pipeline Acceleration & Outbound Pursuit',c:'#4ea8ff',office:true,quote:'Find. Engage. Follow up.',
+  duties:['Lead outreach','Email & SMS sequences','Pipeline follow-up','Call scheduling','Relationship building'],
+  missions:['Dr. Tim outreach','Partner sequence','Reactivation']},
+ {id:'booker',name:'Booker',role:'Scheduling & Appointments',dept:'Calendar Mastery & High-Ticket Closing',c:'#f0b35e',office:true,quote:'Schedule. Confirm. Remind.',
+  duties:['Calendar coordination','Appointment booking','Confirmations & reminders','Speaker scheduling','Time-zone handling'],
+  missions:['Phoenix event slots','Speaker calendar']},
+ {id:'scout',name:'Scout',role:'Lead Discovery',dept:'Lead Discovery & Intelligence',c:'#ffc04d',office:true,quote:'Find. Research. Deliver.',
+  duties:['Lead generation','Data enrichment','Territory mapping','Competitor analysis','Opportunity pipeline'],
+  missions:['Educator leads','Event prospects']},
+ {id:'maven',name:'Maven',role:'Campaigns & Content',dept:'Campaign & Content Strategy',c:'#b47cff',office:true,quote:'Create. Launch. Grow.',
+  duties:['Campaign strategy','Content calendar','Multi-channel launches','Performance reporting','Audience growth'],
+  missions:['KMCE launch campaign','Podcast promo']},
+ {id:'sofia',name:'Sofia',role:'Growth & Digital Presence',dept:'Growth & Digital Presence · KMCE',c:'#ff7fb0',office:true,quote:'Attract. Engage. Build.',
+  duties:['Brand presence','SEO & discovery','Audience growth','Reputation management','Founder growth reports'],
+  missions:['KMCE growth','Google profile','Weekly report']},
+ {id:'gatekeeper',name:'Gatekeeper',role:'Approval & Compliance',dept:'Authority, Compliance & Review',c:'#f0c66d',office:true,quote:'Right process. Real progress.',
+  duties:['Content review and approval','Verify credentials','Contract & policy review','Risk & audit'],
+  missions:['CE compliance','Doc verification']},
+ {id:'atlas',name:'Atlas',role:'Lead Qualification',dept:'Lead Scoring & Qualification',c:'#4ea8ff',office:true,quote:'Qualify. Prioritize. Route.',
+  duties:['Lead scoring','Qualification calls','Fit & intent analysis','Routing to sales','Pipeline hygiene'],
+  missions:['Educator lead scoring','Event lead triage']},
+ {id:'claire',name:'Claire',role:'Research & Enrichment',dept:'Research, Verification & Data Enrichment',c:'#d98cff',office:true,quote:'Research. Verify. Enrich. Insights.',
+  duties:['Company research','Contact enrichment','License & credential checks','Lead background analysis','Decision summaries'],
+  missions:['Partner research','CRM enrichment pass']},
+ {id:'flow',name:'Flow',role:'Workflow Automation',dept:'Automation & Systems Architecture',c:'#3ee6b4',office:true,quote:'Connect. Automate. Optimize. Scale.',
+  duties:['Workflow design','Event automation','API integrations','Routing & monitoring','Process optimization'],
+  missions:['CRM automations','Payment notifications','Agent handoffs']},
+ {id:'ledger',name:'Ledger',role:'Finance & Operations',dept:'Finance, Accounting & Compliance',c:'#e6b85c',office:true,quote:'Track. Reconcile. Report. Protect.',
+  duties:['Revenue tracking','Payment reconciliation','Invoice management','Financial reporting','Compliance support'],
+  missions:['Monthly close','CE quota tracking','Budget forecast']},
+ {id:'midas',name:'Midas',role:'Product & Revenue Architect',dept:'Product, Offers & Revenue Strategy',c:'#ff9a3c',office:true,quote:'Strategy. Offers. Pricing. Growth.',
+  duties:['Product development','Offer strategy & pricing','Revenue modeling','Market expansion','Partnership strategy'],
+  missions:['Live CE events offer','Digital courses','International expansion']},
+];
+// Where each robot's head sits in its office still (percent of the 16:9 frame) — the voice light glows there.
+// Behavior clips per office (clip-kit/README.md). When an agent's clips land in assets/ as <id>-listen.mp4 / <id>-talk.mp4,
+// flag them here, e.g. simon:{listen:true,talk:true}. Agents without clips stay still and use the voice light alone.
+const CLIPS={};
+// Where each robot's body sits, for the soft mask that keeps the room still while the robot moves.
+const BODY={evan:[63,50],atlas:[55,60],claire:[48,62],flow:[63,62],ledger:[53,58],midas:[50,55],snake:[47,58],tube:[50,60],cammy:[40,58],mark:[49,58],simon:[50,55],marie:[47,58],gatekeeper:[51,62],lucy:[52,64],sofia:[48,62],iris:[50,62],maven:[47,64],booker:[48,62],scout:[54,68],echo:[48,60],alice:[49,60]};
+const HEAD={evan:[67,20],atlas:[55,40],claire:[47,42],flow:[62,40],ledger:[54,34],midas:[51,28],snake:[48,33],tube:[49,37],cammy:[41,37],mark:[48,36],simon:[50,36],marie:[45,40],gatekeeper:[47,45],lucy:[53,44],sofia:[47,38],iris:[48,41],maven:[48,42],booker:[47,40],scout:[53,55],echo:[50,34],alice:[46,34]};
+// Rooms still being built go here by name; each gets a placeholder office and an end-of-hall chip.
+const NEXT_WING=[];
+NEXT_WING.forEach(n=>AGENTS.push({id:n.toLowerCase(),name:n,role:'Room in production',dept:'Office build scheduled for the next slice',c:'#7ddcf3',next:true}));
+const byId=Object.fromEntries(AGENTS.map(a=>[a.id,a]));
+const FLOOR=AGENTS.filter(a=>!a.next); // all 21 offices on the floor
+const initials=n=>n.slice(0,2).toUpperCase();
+// Agent portrait: a circle cropped from the agent's own office still (make-avatars.py); initials if none.
+const orb=a=>a.office?`<span class="orb face" style="--c:${a.c}"><img src="assets/avatars/${a.id}.jpg" alt="" decoding="async"></span>`:`<span class="orb" style="--c:${a.c}">${initials(a.name)}</span>`;
+
+/* ===== Background stage =====
+   Every background is a 16:9 box that covers the screen. Size and offset are rounded to whole pixels:
+   at fractional positions the browser re-rounds on every hover repaint, which made backgrounds jitter as the mouse moved. */
+function sizeStage(){const W=innerWidth,H=innerHeight,w=Math.ceil(Math.max(W,H*16/9)),h=Math.ceil(w*9/16),r=document.documentElement.style;
+ r.setProperty('--sw',w+'px');r.setProperty('--sh',h+'px');r.setProperty('--sx',Math.floor((W-w)/2)+'px');r.setProperty('--sy',Math.floor((H-h)/2)+'px')}
+sizeStage();addEventListener('resize',sizeStage);
+
+/* ===== Scene registry ===== */
+const world=document.querySelector('#world'),reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const SCENES={
+ hq:{label:'Headquarters',short:'HQ',depth:0,build:buildAtrium},
+ executive:{label:'Executive Office',depth:1,alias:'room/simon'},
+ floor:{label:'Employee Floor',depth:1,build:buildFloor},
+ crm:{label:'CRM Dashboard',depth:1,build:buildCRM},
+ 'war-room':{label:'War Room',depth:1,build:buildWarRoom},
+ lobby:{label:'Clients',depth:1,build:buildClientList},
+};
+const cache={};let current=null,busy=false,motionPaused=false;
+function sceneInfo(key){if(key==='atrium')key='hq';if(key.startsWith('client/'))return {label:'Client portal',depth:2,parent:'lobby',build:()=>buildClientPortal(key.slice(7))};if(key.startsWith('room/')){const a=byId[key.slice(5)];return a?{label:a.name,depth:2,parent:a.exec?'hq':'floor',build:()=>buildRoom(a)}:null}const s=SCENES[key];return s?{parent:'hq',...s}:null}
+function getScene(key){if(!cache[key]){const el=sceneInfo(key).build();el.classList.add('scene');el.dataset.key=key;world.append(el);cache[key]=el}return cache[key]}
+
+/* ===== Travel — the "pull you through" camera move ===== */
+const warp=document.querySelector('#warp');
+function go(key,{origin,dir}={}){
+ if(key==='atrium')key='hq'; // old links
+ if(SCENES[key]?.alias)key=SCENES[key].alias;
+ const info=sceneInfo(key);if(!info||key===current||busy)return;
+ const from=current&&cache[current],to=getScene(key);
+ const fwd=dir?dir==='fwd':!current||info.depth>=sceneInfo(current).depth;
+ const ox=origin?origin.x/innerWidth*100:50,oy=origin?origin.y/innerHeight*100:50;
+ [from,to,warp].forEach(el=>el&&(el.style.setProperty('--ox',ox+'%'),el.style.setProperty('--oy',oy+'%')));
+ current=key;updateChrome(key);
+ if(location.hash!=='#/'+key)history.pushState(null,'','#/'+key);
+ if(reduced||!from){from&&from.classList.remove('active');to.classList.add('active');arrive(to,fwd);sleep(from);return}
+ busy=true;
+ const agent=fwd&&key.startsWith('room/')&&byId[key.slice(5)];
+ const enter=agent?'enter-door':fwd?'enter-fwd':'enter-back';
+ from.classList.add(fwd?'exit-fwd':'exit-back');
+ to.classList.add('active',enter);
+ if(fwd){warp.classList.remove('on');void warp.offsetWidth;warp.classList.add('on')}
+ if(agent)openDoor(agent);
+ arrive(to,fwd);
+ setTimeout(()=>{from.classList.remove('active','exit-fwd','exit-back');to.classList.remove(enter);sleep(from);busy=false},agent?1650:1000);
+}
+const doorfx=document.querySelector('#doorfx');
+function openDoor(a){
+ doorfx.style.setProperty('--c',a.c);
+ const o=doorfx.querySelector('.orb');o.style.setProperty('--c',a.c);o.classList.toggle('face',!!a.office);o.innerHTML=a.office?`<img src="assets/avatars/${a.id}.jpg" alt="">`:initials(a.name);
+ doorfx.querySelector('b').textContent=a.name.toUpperCase();doorfx.querySelector('.plate>span:last-child').textContent=a.role.toUpperCase();
+ doorfx.classList.remove('on');void doorfx.offsetWidth;doorfx.classList.add('on');
+ clearTimeout(openDoor.t);openDoor.t=setTimeout(()=>doorfx.classList.remove('on'),1550);
+}
+function arrive(el,fwd){
+ el.querySelectorAll('video[data-play]').forEach(v=>{if(!motionPaused)v.play().catch(()=>{})});
+ el.onArrive&&el.onArrive(fwd);
+ const h=el.querySelector('h1,h2');h&&(h.tabIndex=-1,h.focus({preventScroll:true}));
+}
+function sleep(el){if(!el)return;el.onLeave&&el.onLeave();el.querySelectorAll('video').forEach(v=>v.pause())}
+const travel=key=>e=>{const r=e.currentTarget.getBoundingClientRect();go(key,{origin:{x:r.left+r.width/2,y:r.top+r.height/2}})};
+addEventListener('popstate',()=>{const k=location.hash.replace(/^#\//,'')||'hq';if(sceneInfo(k))go(k)});
+addEventListener('keydown',e=>{if(e.key==='Escape'&&current&&current!=='hq'){goBack()}});
+
+/* ===== Chrome: back, breadcrumbs, map ===== */
+const backBtn=document.querySelector('#back'),crumbs=document.querySelector('#crumbs'),map=document.querySelector('#map');
+function goBack(){const p=sceneInfo(current).parent;if(p)go(p,{dir:'back'})}
+backBtn.onclick=goBack;
+function updateChrome(key){
+ const info=sceneInfo(key),trail=[];let k=key;while(k){trail.unshift(k);k=k==='hq'?null:sceneInfo(k).parent}
+ crumbs.innerHTML=trail.map((t,i)=>i===trail.length-1?`<b>${sceneInfo(t).label}</b>`:`<span>${sceneInfo(t).label}</span> ›`).join(' ');
+ backBtn.classList.toggle('show',key!=='hq');
+ document.querySelector('#back-label').textContent=info.parent?(sceneInfo(info.parent).short||sceneInfo(info.parent).label).toUpperCase():'BACK';
+ map.querySelectorAll('button').forEach(b=>b.classList.toggle('on',trail.includes(b.dataset.go)||(b.dataset.go==='executive'&&key==='room/simon')));
+}
+[['hq','HQ'],['executive','Executive'],['floor','Floor'],['crm','CRM'],['war-room','War Room'],['lobby','Clients']].forEach(([k,l])=>{const b=document.createElement('button');b.type='button';b.dataset.go=k;b.textContent=l;b.onclick=travel(k);map.append(b)});
+const toastEl=document.querySelector('#toast');let toastT;
+function toast(msg){toastEl.textContent=msg;toastEl.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>toastEl.classList.remove('show'),3200)}
+
+/* ===== Atrium ===== */
+function hot(key,x,y,title,sub,{icon='↗',c,forward}={}){return `<button class="hot${forward?' forward':''}" type="button" data-go="${key}" style="--x:${x};--y:${y};${c?`--c:${c}`:''}"><span class="ring"><i>${icon}</i></span><span class="tag"><strong>${title}</strong><span>${sub}</span></span></button>`}
+/* Holographic HQ buttons: every destination is a glowing disc with its own hologram turning steadily on a platform. */
+const spin2=(src,cls='')=>`<div class="spinner ${cls}"><img class="face front" src="${src}" alt=""><img class="face back" src="${src}" alt=""></div>`;
+const HOLO={
+ crm:()=>spin2('assets/pegasus-holo.png'),
+ executive:()=>spin2('assets/avatars/simon.jpg','bust'),
+ 'war-room':()=>`<canvas class="holo-globe" width="220" height="220" aria-hidden="true"></canvas>`,
+ lobby:()=>`<div class="spinner"><svg class="face front" viewBox="0 0 120 100"><use href="#clientsGlyph"/></svg><svg class="face back" viewBox="0 0 120 100"><use href="#clientsGlyph"/></svg></div>`,
+ floor:()=>`<div class="spinner door"><svg class="face front" viewBox="0 0 120 100"><use href="#doorGlyph"/></svg><svg class="face back" viewBox="0 0 120 100"><use href="#doorGlyph"/></svg></div>`,
+};
+/* War Room hologram: a dotted Earth (land from Natural Earth 110m via world-atlas), turning at a steady 25°/s with a slight tilt. */
+const LAND_DOTS='-69,-55;-72,-52;-74,-48;-69,-48;-71,-45;170,-45;-72,-42;-68,-42;147,-42;173,-42;-73,-39;-69,-39;-65,-39;-61,-39;177,-39;-70,-36;-66,-36;-62,-36;-58,-36;139,-36;143,-36;147,-36;174,-36;-70,-32;-66,-32;-63,-32;-59,-32;-55,-32;21,-32;25,-32;28,-32;119,-32;123,-32;135,-32;138,-32;142,-32;146,-32;150,-32;-70,-29;-66,-29;-63,-29;-59,-29;-55,-29;-52,-29;18,-29;22,-29;25,-29;29,-29;117,-29;121,-29;124,-29;128,-29;132,-29;135,-29;139,-29;143,-29;146,-29;150,-29;-70,-26;-66,-26;-63,-26;-59,-26;-55,-26;-52,-26;16,-26;19,-26;23,-26;26,-26;30,-26;116,-26;119,-26;123,-26;126,-26;130,-26;133,-26;137,-26;140,-26;144,-26;148,-26;151,-26;-69,-23;-65,-23;-62,-23;-59,-23;-55,-23;-52,-23;-48,-23;-45,-23;14,-23;18,-23;21,-23;25,-23;28,-23;32,-23;35,-23;46,-23;115,-23;119,-23;122,-23;125,-23;129,-23;132,-23;136,-23;139,-23;143,-23;146,-23;150,-23;-68,-20;-65,-20;-61,-20;-58,-20;-54,-20;-51,-20;-48,-20;-44,-20;-41,-20;14,-20;17,-20;20,-20;24,-20;27,-20;31,-20;34,-20;48,-20;122,-20;126,-20;129,-20;133,-20;136,-20;139,-20;143,-20;146,-20;-180,-16;-73,-16;-70,-16;-67,-16;-63,-16;-60,-16;-57,-16;-53,-16;-50,-16;-47,-16;-43,-16;-40,-16;13,-16;17,-16;20,-16;23,-16;27,-16;30,-16;33,-16;37,-16;47,-16;127,-16;130,-16;134,-16;137,-16;144,-16;-75,-13;-72,-13;-68,-13;-65,-13;-62,-13;-58,-13;-55,-13;-52,-13;-49,-13;-45,-13;-42,-13;14,-13;17,-13;20,-13;24,-13;27,-13;30,-13;34,-13;37,-13;40,-13;132,-13;136,-13;142,-13;-76,-10;-73,-10;-70,-10;-66,-10;-63,-10;-60,-10;-57,-10;-53,-10;-50,-10;-47,-10;-44,-10;-40,-10;-37,-10;15,-10;18,-10;21,-10;25,-10;28,-10;31,-10;34,-10;38,-10;148,-10;-80,-7;-77,-7;-74,-7;-70,-7;-67,-7;-64,-7;-61,-7;-58,-7;-54,-7;-51,-7;-48,-7;-45,-7;-41,-7;-38,-7;-35,-7;13,-7;17,-7;20,-7;23,-7;26,-7;29,-7;33,-7;36,-7;39,-7;107,-7;139,-7;142,-7;145,-7;-77,-4;-74,-4;-71,-4;-68,-4;-65,-4;-61,-4;-58,-4;-55,-4;-52,-4;-49,-4;-45,-4;-42,-4;-39,-4;12,-4;16,-4;19,-4;22,-4;25,-4;28,-4;32,-4;35,-4;38,-4;102,-4;105,-4;115,-4;121,-4;134,-4;137,-4;141,-4;-78,0;-74,0;-71,0;-68,0;-65,0;-62,0;-58,0;-55,0;-52,0;-49,0;12,0;15,0;18,0;22,0;25,0;28,0;31,0;34,0;38,0;41,0;102,0;111,0;114,0;-77,3;-74,3;-71,3;-68,3;-65,3;-61,3;-58,3;-55,3;-52,3;12,3;15,3;19,3;22,3;25,3;28,3;31,3;35,3;38,3;41,3;44,3;99,3;102,3;115,3;-77,6;-74,6;-71,6;-67,6;-64,6;-61,6;-58,6;-9,6;-6,6;-3,6;0,6;7,6;10,6;13,6;16,6;19,6;23,6;26,6;29,6;32,6;36,6;39,6;42,6;45,6;48,6;-83,9;-80,9;-73,9;-70,9;-67,9;-63,9;-11,9;-8,9;-5,9;-2,9;2,9;5,9;8,9;11,9;15,9;18,9;21,9;24,9;27,9;31,9;34,9;37,9;40,9;44,9;47,9;50,9;99,9;105,9;118,9;-85,12;-16,12;-13,12;-10,12;-6,12;-3,12;0,12;3,12;7,12;10,12;13,12;17,12;20,12;23,12;26,12;30,12;33,12;36,12;40,12;43,12;76,12;79,12;98,12;105,12;108,12;125,12;-90,16;-87,16;-14,16;-11,16;-7,16;-4,16;-1,16;3,16;6,16;9,16;13,16;16,16;19,16;23,16;26,16;29,16;33,16;36,16;39,16;46,16;49,16;76,16;79,16;99,16;102,16;106,16;-102,19;-99,19;-89,19;-72,19;-14,19;-11,19;-8,19;-4,19;-1,19;3,19;6,19;9,19;13,19;16,19;19,19;23,19;26,19;30,19;33,19;36,19;43,19;46,19;50,19;53,19;57,19;74,19;77,19;80,19;84,19;97,19;101,19;104,19;-104,22;-101,22;-80,22;-14,22;-11,22;-7,22;-4,22;-1,22;3,22;6,22;10,22;13,22;17,22;20,22;24,22;27,22;31,22;34,22;41,22;44,22;48,22;51,22;55,22;58,22;72,22;75,22;79,22;82,22;86,22;93,22;96,22;100,22;103,22;106,22;110,22;-106,25;-102,25;-99,25;-81,25;-14,25;-10,25;-7,25;-3,25;0,25;4,25;7,25;11,25;15,25;18,25;22,25;25,25;29,25;32,25;39,25;43,25;46,25;50,25;68,25;71,25;75,25;78,25;82,25;85,25;89,25;92,25;96,25;99,25;103,25;106,25;110,25;114,25;117,25;-111,28;-107,28;-104,28;-100,28;-82,28;-9,28;-5,28;-2,28;2,28;6,28;9,28;13,28;16,28;20,28;24,28;27,28;31,28;38,28;42,28;46,28;53,28;56,28;60,28;64,28;67,28;71,28;75,28;78,28;82,28;86,28;89,28;93,28;96,28;100,28;104,28;107,28;111,28;115,28;118,28;-116,32;-112,32;-109,32;-105,32;-101,32;-97,32;-94,32;-90,32;-86,32;-82,32;-7,32;-3,32;0,32;4,32;8,32;12,32;15,32;23,32;38,32;42,32;45,32;49,32;53,32;57,32;60,32;64,32;68,32;72,32;75,32;79,32;83,32;87,32;91,32;94,32;98,32;102,32;106,32;109,32;113,32;117,32;121,32;-118,35;-114,35;-110,35;-106,35;-102,35;-98,35;-94,35;-90,35;-86,35;-83,35;-79,35;-5,35;-1,35;3,35;7,35;38,35;42,35;46,35;50,35;54,35;58,35;62,35;66,35;69,35;73,35;77,35;81,35;85,35;89,35;93,35;97,35;101,35;104,35;108,35;112,35;116,35;128,35;136,35;-119,38;-115,38;-111,38;-107,38;-103,38;-99,38;-95,38;-91,38;-87,38;-83,38;-78,38;-5,38;-1,38;15,38;23,38;27,38;31,38;35,38;39,38;43,38;47,38;56,38;60,38;64,38;68,38;72,38;76,38;80,38;84,38;88,38;92,38;96,38;100,38;104,38;108,38;112,38;116,38;129,38;141,38;-120,41;-116,41;-112,41;-108,41;-103,41;-99,41;-95,41;-91,41;-86,41;-82,41;-78,41;-74,41;-6,41;-1,41;16,41;20,41;24,41;28,41;33,41;37,41;41,41;45,41;58,41;62,41;67,41;71,41;75,41;79,41;84,41;88,41;92,41;96,41;101,41;105,41;109,41;113,41;118,41;122,41;126,41;-122,44;-117,44;-113,44;-108,44;-104,44;-99,44;-95,44;-90,44;-86,44;-81,44;-77,44;-73,44;-68,44;-1,44;4,44;8,44;17,44;22,44;26,44;39,44;44,44;53,44;57,44;62,44;66,44;71,44;75,44;80,44;84,44;89,44;93,44;98,44;102,44;107,44;111,44;116,44;120,44;125,44;129,44;134,44;142,44;-123,48;-118,48;-114,48;-109,48;-104,48;-99,48;-95,48;-90,48;-85,48;-80,48;-76,48;-71,48;-66,48;0,48;5,48;10,48;15,48;19,48;24,48;29,48;34,48;38,48;43,48;48,48;53,48;57,48;62,48;67,48;72,48;76,48;81,48;86,48;91,48;95,48;100,48;105,48;109,48;114,48;119,48;124,48;128,48;133,48;138,48;143,48;-124,51;-119,51;-114,51;-109,51;-104,51;-99,51;-94,51;-89,51;-84,51;-79,51;-74,51;-69,51;-64,51;-3,51;2,51;7,51;12,51;17,51;23,51;28,51;33,51;38,51;43,51;48,51;53,51;58,51;63,51;68,51;73,51;78,51;83,51;88,51;93,51;98,51;104,51;109,51;114,51;119,51;124,51;129,51;134,51;139,51;-126,54;-120,54;-115,54;-109,54;-104,54;-98,54;-93,54;-87,54;-77,54;-71,54;-66,54;-60,54;0,54;11,54;16,54;21,54;27,54;32,54;38,54;43,54;49,54;54,54;60,54;65,54;70,54;76,54;81,54;87,54;92,54;98,54;103,54;109,54;114,54;119,54;125,54;130,54;136,54;158,54;-133,57;-127,57;-121,57;-115,57;-109,57;-103,57;-97,57;-91,57;-74,57;-68,57;-62,57;-3,57;15,57;27,57;33,57;39,57;44,57;50,57;56,57;62,57;68,57;74,57;80,57;86,57;92,57;98,57;104,57;109,57;115,57;121,57;127,57;133,57;139,57;157,57;163,57;-161,60;-154,60;-141,60;-135,60;-128,60;-122,60;-115,60;-109,60;-102,60;-96,60;-76,60;-70,60;-44,60;8,60;14,60;34,60;40,60;47,60;53,60;60,60;66,60;73,60;79,60;86,60;92,60;99,60;105,60;112,60;118,60;124,60;131,60;137,60;144,60;150,60;163,60;170,60;-158,64;-151,64;-144,64;-137,64;-130,64;-122,64;-115,64;-108,64;-101,64;-94,64;-86,64;-65,64;-50,64;-43,64;14,64;29,64;36,64;43,64;50,64;57,64;65,64;72,64;79,64;86,64;93,64;101,64;108,64;115,64;122,64;129,64;137,64;144,64;151,64;158,64;165,64;173,64;-180,67;-172,67;-156,67;-148,67;-139,67;-131,67;-123,67;-115,67;-107,67;-99,67;-91,67;-83,67;-66,67;-50,67;-42,67;15,67;23,67;31,67;39,67;47,67;56,67;64,67;72,67;80,67;88,67;96,67;104,67;112,67;121,67;129,67;137,67;145,67;153,67;161,67;169,67;177,67;-161,70;-152,70;-115,70;-105,70;-96,70;-77,70;-49,70;-40,70;-30,70;26,70;73,70;82,70;91,70;101,70;110,70;119,70;129,70;138,70;147,70;157,70;-80,73;-47,73;-36,73;-25,73;86,73;97,73;108,73;119,73;-65,76;-52,76;-39,76;-26,76;102,76'.split(';').map(p=>p.split(',').map(Number));
+function startGlobe(canvas,isActive){
+ const ctx=canvas.getContext('2d'),dpr=Math.min(2,window.devicePixelRatio||1),S=110;
+ canvas.width=S*2*dpr;canvas.height=S*2*dpr;ctx.scale(dpr,dpr);
+ const R=S*.9,cx=S,cy=S,tilt=-18*Math.PI/180,ct=Math.cos(tilt),st=Math.sin(tilt),rad=Math.PI/180;
+ const proj=(lon,lat,rot)=>{const l=(lon+rot)*rad,p=lat*rad,X=Math.cos(p)*Math.sin(l),Y=Math.sin(p),Z=Math.cos(p)*Math.cos(l);return [cx+R*X,cy-R*(Y*ct-Z*st),Y*st+Z*ct]};
+ let rot=0,last=performance.now();
+ function draw(now){
+  const dt=Math.min(100,now-last);last=now;
+  if(isActive()&&!motionPaused&&!reduced)rot=(rot+dt*0.025)%360;
+  ctx.clearRect(0,0,S*2,S*2);
+  const g=ctx.createRadialGradient(cx-R*.3,cy-R*.35,R*.1,cx,cy,R);g.addColorStop(0,'#123a5a');g.addColorStop(1,'#04101d');
+  ctx.beginPath();ctx.arc(cx,cy,R,0,7);ctx.fillStyle=g;ctx.fill();
+  // graticule
+  ctx.lineWidth=1.1;
+  for(let lat=-60;lat<=60;lat+=30){ctx.beginPath();let pen=false;for(let lon=-180;lon<=180;lon+=6){const [x,y,z]=proj(lon,lat,rot);if(z>0){pen?ctx.lineTo(x,y):ctx.moveTo(x,y);pen=true}else pen=false}ctx.strokeStyle='#4fc3ff33';ctx.stroke()}
+  for(let lon=0;lon<360;lon+=30){ctx.beginPath();let pen=false;for(let lat=-90;lat<=90;lat+=6){const [x,y,z]=proj(lon,lat,rot);if(z>0){pen?ctx.lineTo(x,y):ctx.moveTo(x,y);pen=true}else pen=false}ctx.strokeStyle='#4fc3ff26';ctx.stroke()}
+  // land: far side faint (seen through the hologram), near side bright
+  for(const [lon,lat] of LAND_DOTS){const [x,y,z]=proj(lon,lat,rot);
+   if(z>0){ctx.fillStyle=`rgba(170,236,255,${.7+.3*z})`;ctx.beginPath();ctx.arc(x,y,1.9+1.1*z,0,7);ctx.fill()}
+   else{ctx.fillStyle='rgba(79,195,255,.16)';ctx.fillRect(x-1,y-1,2,2)}}
+  // rim glow
+  ctx.beginPath();ctx.arc(cx,cy,R,0,7);ctx.strokeStyle='#8fe3ff';ctx.lineWidth=2.4;ctx.shadowColor='#4fc3ff';ctx.shadowBlur=16;ctx.stroke();ctx.shadowBlur=0;
+  requestAnimationFrame(draw);
+ }
+ draw(last);
+}
+function holoButton(key,x,y,title,sub,c='#7ddcf3'){return `<button class="hb" type="button" data-go="${key}" style="--x:${x};--y:${y};--c:${c}" aria-label="${title}: ${sub}">
+ <span class="hb-disc"><span class="hb-stage">${HOLO[key]()}</span><img class="hb-plat" src="assets/pegasus-platform.png" alt=""><span class="hb-scan"></span></span>
+ <span class="tag"><strong>${title}</strong><span>${sub}</span></span></button>`}
+function buildAtrium(){
+ const s=document.createElement('section');s.id='s-atrium';s.setAttribute('aria-label','Pegasus Headquarters');
+ s.innerHTML=`<img class="bg" src="assets/pegasus-atrium.png" alt="">
+ <div class="shade" style="background:radial-gradient(ellipse at 50% 45%,transparent 35%,#02050bcc 100%)"></div>
+ <div class="atrium-title"><h1 class="serif">PEGASUS</h1><p>HEADQUARTERS</p></div>
+ ${holoButton('executive','19%','27%','SIMON · EXECUTIVE OFFICE','Strategy · leadership · approvals','#e8c27a')}
+ ${holoButton('crm','81%','27%','PEGASUS CRM','Live metrics · AI workforce leaderboard','#7ddcf3')}
+ ${holoButton('war-room','12%','63%','WAR ROOM','Mission execution','#ff9a5c')}
+ ${holoButton('lobby','88%','63%','CLIENTS','Client portals · concierge','#f0d7a8')}
+ ${holoButton('floor','50%','84%','EMPLOYEE FLOOR','Walk the hall · AI team offices','#9ff0c2')}`;
+ s.querySelectorAll('[data-go]').forEach(b=>b.onclick=travel(b.dataset.go));
+ const globe=s.querySelector('.holo-globe');if(globe)startGlobe(globe,()=>current==='hq');
+ return s;
+}
+
+/* ===== Employee floor — the corridor walk ===== */
+function door(a){return `<button class="door${a.exec?' exec':''}" type="button" data-room="${a.id}" style="--c:${a.c}" aria-label="Enter ${a.name}'s office">${orb(a)}<span><strong>${a.name.toUpperCase()}</strong><span>${a.role}</span></span><i class="live${a.office?'':' next'}" title="${a.office?'Office ready':'Office video coming'}"></i></button>`}
+function rosterItem(a){return `<button class="r-item" type="button" data-room="${a.id}" style="--c:${a.c}" aria-label="Enter ${a.name}'s office">${orb(a)}<span class="r-txt"><b>${a.name}</b><small>${a.role}</small></span><i class="r-dot" aria-hidden="true">Online</i></button>`}
+function buildFloor(){
+ const s=document.createElement('section');s.id='s-floor';s.setAttribute('aria-label','Employee Floor');
+ const half=Math.ceil(FLOOR.length/2),left=FLOOR.slice(0,half),right=FLOOR.slice(half);
+ s.innerHTML=`<div class="stage" aria-hidden="true"><img src="assets/floor-still.jpg" alt="">
+  <span class="fx fx-sign"></span><span class="fx fx-window"></span><span class="fx fx-holo"></span><span class="fx fx-ring"></span>
+  <span class="fx-sky" aria-hidden="true"><i class="c1"></i><i class="c2"></i></span>
+  <svg class="fx led" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+   <g class="led-base"><line x1="0" y1="95.8" x2="36" y2="68.6"/><line x1="100" y1="97.3" x2="62" y2="70.3"/></g>
+   <g class="led-flow"><line pathLength="100" x1="0" y1="95.8" x2="36" y2="68.6"/><line pathLength="100" x1="100" y1="97.3" x2="62" y2="70.3"/></g>
+  </svg>
+  ${[[2,59],[8,59],[92,59],[97,59],[18,58],[79,58]].map(([x,y],i)=>`<span class="fx screen" style="left:${x}%;top:${y}%;animation-delay:${i*-.7}s"></span>`).join('')}
+  <span class="motes">${Array.from({length:22},(_,i)=>`<i style="left:${(i*37)%100}%;animation-delay:${-(i*1.3)%14}s;animation-duration:${11+(i%5)*2}s"></i>`).join('')}</span>
+ </div>
+ <div class="shade" style="background:linear-gradient(90deg,#02050b80,transparent 30%,transparent 70%,#02050b80),linear-gradient(0deg,#02050bb0,transparent 26%)"></div>
+ <aside class="roster" aria-label="AI team directory"><div class="roster-head"><b>AI TEAM HUB</b><span>${FLOOR.length} agents online · tap to enter</span><span class="hub-calls" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><a href="http://127.0.0.1:4189/one-on-one" target="_blank" rel="noopener" style="color:#e5c17b;border:1px solid #887550;border-radius:999px;padding:6px 12px;font-size:12px;text-decoration:none">☎ Simon &amp; Marie one-on-one</a><a href="http://127.0.0.1:4189/war-room" target="_blank" rel="noopener" style="color:#e5c17b;border:1px solid #887550;border-radius:999px;padding:6px 12px;font-size:12px;text-decoration:none">⚑ War Room</a></span></div><div class="roster-list">
+  <div class="r-sep">EXECUTIVE</div>${FLOOR.filter(a=>a.exec).map(rosterItem).join('')}
+  <div class="r-sep">LEADERSHIP & REVIEW</div>${FLOOR.filter(a=>['marie','gatekeeper'].includes(a.id)).map(rosterItem).join('')}
+  <div class="r-sep">SPECIALISTS</div>${FLOOR.filter(a=>!a.exec&&!['marie','gatekeeper'].includes(a.id)).map(rosterItem).join('')}
+ </div></aside><div class="floor-hint">CHOOSE AN AGENT TO STEP INTO THEIR OFFICE</div>`;
+ s.querySelectorAll('[data-room]').forEach(b=>b.onclick=travel('room/'+b.dataset.room));
+ // The hallway clip loops on its own; doors fade in once the camera move lands.
+ s.onArrive=()=>{setTimeout(()=>s.classList.add('arrived'),reduced?0:500);setTimeout(loadVoices,1200)};
+ return s;
+}
+
+/* ===== Agent office ===== */
+function buildRoom(a){
+ const s=document.createElement('section');s.className='room';s.style.setProperty('--c',a.c);s.setAttribute('aria-label',`${a.name}'s office`);
+ const idx=FLOOR.indexOf(a),prev=FLOOR[(idx-1+FLOOR.length)%FLOOR.length],next=FLOOR[(idx+1)%FLOOR.length];
+ // Offices are sharp stills: AI video slowly morphs the robot and the screens, so motion comes from light instead.
+ const [hx,hy]=HEAD[a.id]||[50,40];
+ const [mx,my]=BODY[a.id]||[50,60],clip=k=>CLIPS[a.id]?.[k]?`<video class="clip clip-${k}" muted loop playsinline preload="auto" src="assets/${a.id}-${k}.mp4" aria-hidden="true"></video>`:'';
+ const visual=a.office?`<div class="stage" style="--hx:${hx}%;--hy:${hy}%;--mx:${mx}%;--my:${my}%"><img class="still" src="assets/${a.id}-still.jpg?v=2" alt="${a.name} at the desk">${clip('listen')}${clip('talk')}<span class="shine"></span><span class="eye"></span></div><div class="aura"></div>`
+  :`<div class="gen"><img src="assets/floor-still.jpg" alt=""><span class="orb big" style="--c:${a.c}">${initials(a.name)}</span></div>`;
+ const chain=a.id==='simon'?['founder','simon','marie','gatekeeper']:a.id==='marie'?['simon','marie','team','gatekeeper']:a.id==='gatekeeper'?['simon','marie','gatekeeper','founder']:a.id==='sofia'?['founder','sofia','simon','gatekeeper']:['simon','marie',a.id,'gatekeeper'];
+ const chainHtml=chain.map(id=>id==='founder'?'<button type="button" disabled>Founder</button>':id==='team'?'<button type="button" data-room="floor">Specialists</button>':`<button type="button" class="${id===a.id?'me':''}" data-room="${id}">${byId[id].name}</button>`).join('<i>›</i>');
+ const tabs={
+  overview:`<h3>ACTIVE MISSIONS</h3><ul>${(a.missions||['Office being built']).map(m=>`<li><span>${m}</span><em>●</em></li>`).join('')}</ul>
+   <h3>FOCUS</h3><ul>${(a.duties||[a.dept]).slice(0,3).map(d=>`<li><span>${d}</span><em>✓</em></li>`).join('')}</ul>`,
+  duties:`<h3>RESPONSIBILITIES</h3><ul>${(a.duties||[a.dept]).map(d=>`<li><span>${d}</span><em>✓</em></li>`).join('')}</ul>`,
+  handoffs:`<h3>HANDOFF CHAIN</h3><div class="chain">${chainHtml}</div><p class="status-line">Click a name to walk straight to that office.</p>`,
+  states:`<h3>OFFICE STATES · PREVIEW</h3><div class="state">${['listening','working','approval_wait','completed'].map(st=>`<button type="button" data-state="${st}">${st.replace('_',' ')}</button>`).join('')}</div><p class="status-line" data-status>${a.name} is at the desk. Preview only — no live task has been sent.</p>`};
+ s.innerHTML=`${visual}<div class="shade"></div>
+ <nav class="rail" aria-label="${a.name} office sections">${[['overview','Overview'],['duties','Responsibilities'],['handoffs','Handoffs'],['states','Office states']].map(([k,l],i)=>`<button type="button" data-tab="${k}" class="${i?'':'on'}">${l}</button>`).join('')}</nav>
+ <aside class="hud"><span class="eyebrow">${a.exec?'EXECUTIVE SUITE':a.next?'NEXT WING':'EMPLOYEE FLOOR'} · ${a.dept.toUpperCase()}</span><h2 class="serif">${a.name.toUpperCase()}</h2><span class="role">${a.role}</span>${a.quote?`<blockquote class="serif">“${a.quote}”</blockquote>`:''}<div data-body>${tabs.overview}</div></aside>
+ <div class="room-name"><b class="serif">${a.name.toUpperCase()}</b><span>${a.role.toUpperCase()}</span></div>
+ <div class="convo">
+  <p class="caption" aria-live="polite"></p>
+  <div class="suggest">${suggestions(a).map(q=>`<button type="button">${q}</button>`).join('')}</div>
+  <form class="composer"><span class="vorb" aria-hidden="true"></span><input type="text" autocomplete="off" placeholder="Talk to ${a.name}…" aria-label="Message ${a.name}">${a.id==='simon'?'<a class="phone-link" href="http://127.0.0.1:4189/simon-call" target="_blank" rel="noopener" aria-label="Call Simon on the phone" style="display:inline-flex;align-items:center;justify-content:center;height:36px;padding:0 14px;border-radius:999px;border:1px solid #e8c27a;background:#e8c27a;color:#05090f;font-size:13px;font-weight:600;text-decoration:none">☎ Call Simon</a>':''}<button type="button" class="mic" aria-label="Speak to ${a.name}" hidden>🎙</button><button type="button" class="voice" aria-pressed="true" aria-label="${a.name}'s voice on or off">🔊</button><button type="submit" class="send">Send</button></form>
+ </div>
+ ${a.next?'':`<button class="next-door prev" type="button" data-room="${prev.id}" aria-label="Previous office: ${prev.name}">‹</button><button class="next-door nxt" type="button" data-room="${next.id}" aria-label="Next office: ${next.name}">›</button>`}`;
+ const body=s.querySelector('[data-body]');
+ function bind(){body.querySelectorAll('[data-room]').forEach(b=>b.onclick=b.dataset.room==='floor'?travel('floor'):travel('room/'+b.dataset.room));body.querySelectorAll('[data-state]').forEach(b=>b.onclick=()=>{body.querySelector('[data-status]').textContent=`Preview state: ${b.dataset.state.replace('_',' ')}. No live task, voice, or approval was triggered.`})}
+ s.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{s.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('on',x===b));body.innerHTML=tabs[b.dataset.tab];bind()});
+ s.querySelectorAll('.next-door').forEach(b=>b.onclick=e=>go('room/'+b.dataset.room,{origin:{x:e.clientX,y:e.clientY},dir:'fwd'}));
+ bind();
+ wireConversation(s,a);
+ return s;
+}
+
+/* ===== Talk-back =====
+   Preview replies come from each agent's own office data. The presentation layer is built so a live
+   model (api/chat) can drop in later: swap reply() for a fetch and keep speak() as-is. */
+const pick=arr=>arr[Math.floor(Math.random()*arr.length)];
+function suggestions(a){return a.next?['What will this office do?']:['What are you working on?','What’s your top priority?','What’s your role?','Hand this to the team']}
+// Every agent has a fixed set of lines so each one can be pre-recorded in that agent's cloned voice
+// (assets/voice/<agent>/<key>.mp3). reply() maps a question to one of these keys.
+function agentLines(a){
+ const missions=a.missions||[],duties=a.duties||[a.dept];
+ const list=xs=>xs.length>1?xs.slice(0,-1).join(', ')+', and '+xs.at(-1):xs[0]||'';
+ // Lowercase ordinary words only, so acronyms (KMCE, CRM, SEO, A/B) survive inside a sentence.
+ const lc=t=>t.split(' ').map(w=>/^[A-Z][a-z]/.test(w)?w[0].toLowerCase()+w.slice(1):w).join(' ');
+ const handoff=a.id==='simon'?`Understood. I'll set the priority, and pass it to Marie to dispatch. Gatekeeper reviews before anything goes out.`
+  :a.id==='marie'?`On it. I'll split it across the floor, and track every handoff. Gatekeeper gets the final review.`
+  :a.id==='gatekeeper'?`Send it my way. Nothing goes out until it clears review. Anything sensitive comes back to you.`
+  :`Got it. I'll draft my part. Marie routes it, and Gatekeeper signs off before it ships.`;
+ const base={
+  greet:`Welcome to my office. I'm ${a.name}, ${a.role}.${a.quote?' '+a.quote:''}`,
+  hello:`Hey. ${a.name} here. What can I do for you?`,
+  role:`I'm ${a.name}, ${a.role}. I own ${list(duties.slice(0,4).map(lc))}.`,
+  work:missions.length?`Right now I'm moving ${list(missions)}. ${missions[0]} is my top priority.`:`I'm focused on ${lc(duties[0])}.`,
+  priority:missions.length?`${missions[0]}. That's the one I'm pushing hardest. It feeds straight into ${lc(duties[0])}.`:`${duties[0]}.`,
+  numbers:`My live numbers come straight from KMCE once this office is connected, so I won't guess at them. Right now, my focus is ${missions[0]||lc(duties[0])}.`,
+  handoff,
+  other:`Good question. Once I'm connected to the live CRM, I'll answer that with real records. For now, this office is a preview.`,
+ };
+ return {...base,...(SOUL[a.id]||{})};
+}
+// Each agent's own voice: personality-specific versions of the shared lines. Anything not listed here
+// falls back to the generic line above. Keep lines short, with full stops, so they read at a calm pace.
+const SOUL={
+ simon:{hello:`Good evening. Simon here. How may I be of service?`,
+  handoff:`Consider it handled. I'll set the priority, Marie will dispatch it, and Gatekeeper sees it before anything leaves the building.`,
+  numbers:`I don't deal in guesses. Once KMCE is connected, you'll have the real figures on my desk. Until then, my attention is on the KMCE Launch.`,
+  other:`An excellent question. I'd rather answer it with live data than with speculation. Give me the connection to KMCE, and I'll give you the full picture.`},
+ marie:{hello:`Hey, Marie here. What are we moving today?`,
+  handoff:`On it. I'll break it into pieces, put the right people on each one, and track every handoff. Gatekeeper gets the final look.`,
+  numbers:`I keep everything on a board, but the live counts come from KMCE once we're connected. For now, I'm focused on team handoffs.`,
+  other:`Good one. I'll need live access to the CRM to answer that properly. Until then, I'll keep the floor running smooth.`},
+ iris:{hello:`Iris here. What do you want to know about the market?`,
+  handoff:`I'll pull the intelligence together and brief Simon. If anything looks like a threat or an opening, you'll hear it from me first.`,
+  numbers:`I only report what I can verify. Live market figures come in once KMCE is connected. Right now, I'm mapping our competitors.`,
+  other:`Interesting. I'd want real sources before I answer that. Once I'm connected, I'll bring you the evidence, not a guess.`},
+ mark:{hello:`Mark here. Let's talk brand. What's on your mind?`,
+  handoff:`Love it. I'll shape the message and the positioning, hand it to Cammy to build the campaign, and Gatekeeper signs off before it goes public.`,
+  numbers:`A brand is more than numbers, but I'll have them for you. Once KMCE is connected, you'll see exactly how the brand is landing.`,
+  other:`Great question. I'll give you a sharp answer once I can see the live data. Until then, I'm focused on the KMCE brand refresh.`},
+ cammy:{hello:`Hi! Cammy here. Got a campaign idea for me?`,
+  handoff:`Oh, I love this. I'll turn it into a campaign plan, line up the content with Evan and Tube, and Gatekeeper checks it before launch.`,
+  numbers:`I can't wait to show you campaign results. They come straight from KMCE once we're connected. Right now, it's all about the Phoenix event launch.`,
+  other:`Ooh, good question. Let me get connected to the live CRM, and I'll come back with a real answer. And probably three campaign ideas.`},
+ evan:{hello:`Hey, Evan here. Need some words that land?`,
+  handoff:`Got it. I'll write the first draft and send it to Marie. Gatekeeper reads it before anyone else does.`,
+  numbers:`I'd rather tell you a true story than make up a stat. Live numbers come in once KMCE is connected. Right now, I'm writing the KMCE story series.`,
+  other:`That's a good one. I'll answer it properly once I can see the real data. Until then, I'm writing.`},
+ tube:{hello:`Tube here. Lights, camera, what are we shooting?`,
+  handoff:`Say less. I'll storyboard it, shoot it, cut it, and pass it to Lucy for distribution. Gatekeeper gets the final cut.`,
+  numbers:`Views and watch time come straight from KMCE once we're connected. Right now, I'm cutting the KMCE podcast teaser.`,
+  other:`Good question. Hook me up to the live data and I'll give you the real answer. Then I'll make a video about it.`},
+ lucy:{hello:`Hi, Lucy here. What should the world hear about next?`,
+  handoff:`Perfect. Once it's approved, I'll schedule it on every platform and make sure it reaches the right people.`,
+  numbers:`Reach and engagement come straight from KMCE once we're connected. For now, I'm focused on KMCE outreach.`,
+  other:`Great question. I'll have a real answer once I'm connected to the live CRM. Until then, I'll keep our message moving.`},
+ snake:{hello:`Snake. Talk to me. What do you want to measure?`,
+  handoff:`Send it over. I'll set up the tracking, so we know exactly what worked and why. Then I report back to Simon.`,
+  numbers:`I never estimate when I can measure. The live numbers come from KMCE once we're connected. Until then, I'm building the attribution model.`,
+  other:`Good question. The answer is in the data, and I'll have the data once I'm connected. Then I'll tell you what it means.`},
+ alice:{hello:`Hello, Alice here. Shall we make the shop convert better?`,
+  handoff:`Lovely. I'll design the change, test it against what we have, and keep whichever version wins. Gatekeeper reviews it before it goes live.`,
+  numbers:`Shop revenue and conversion come straight from KMCE once we're connected. Right now, I'm focused on the checkout redesign.`,
+  other:`A very good question. I'd like to answer it with real customer data. Once I'm connected, I'll show you exactly where buyers drop off.`},
+ echo:{hello:`Echo here. Who are we following up with?`,
+  handoff:`Got it. I'll reach out, follow up, and keep the conversation warm. Booker takes it from there once they're ready to meet.`,
+  numbers:`Replies and meetings come straight from KMCE once we're connected. Right now, Doctor Tim outreach is my top priority.`,
+  other:`Good question. Let me get connected to the live CRM, and I'll tell you exactly where every lead stands.`},
+ booker:{hello:`Booker here. Whose calendar are we working with?`,
+  handoff:`Leave it with me. I'll find the time, send the invite, and remind everyone, so nobody misses it.`,
+  numbers:`I'll have the real booking numbers once KMCE is connected. Until then, I'm holding the Phoenix event slots.`,
+  other:`Fair question. Once I'm connected, I'll answer it straight from the calendar. No guessing.`},
+ scout:{hello:`Scout here. Who are we hunting for?`,
+  handoff:`On it. I'll find the leads, enrich them with Claire, and hand the best ones to Atlas to qualify.`,
+  numbers:`Lead counts come straight from KMCE once we're connected. Right now, I'm out finding educators.`,
+  other:`Good question. Give me live access and I'll come back with names, not guesses.`},
+ maven:{hello:`Hi, Maven here. What story are we telling this month?`,
+  handoff:`Brilliant. I'll put it on the content calendar, brief Evan and Tube, and plan when it lands. Gatekeeper approves before it ships.`,
+  numbers:`Campaign performance comes straight from KMCE once we're connected. Right now, I'm planning the KMCE launch campaign.`,
+  other:`Ooh, good one. Let me see the live data first, and I'll give you a proper answer.`},
+ sofia:{hello:`Hi, Sofia here. Ready to grow?`,
+  handoff:`Love that. I'll weave it into our growth plan and make sure people can actually find it. Gatekeeper takes a look first.`,
+  numbers:`Traffic and followers come straight from KMCE once we're connected. Right now, I'm focused on KMCE growth.`,
+  other:`Great question. Connect me to the live data, and I'll show you exactly where our audience comes from.`},
+ gatekeeper:{hello:`Gatekeeper. What needs my review?`,
+  handoff:`Send it my way. Nothing goes out until it clears review. Anything sensitive comes straight back to you.`,
+  numbers:`I report verified figures only. Those come from KMCE once we're connected. Until then, my priority is CE compliance.`,
+  other:`A fair question. I'll answer it once I can verify the facts. Not before.`},
+ atlas:{hello:`Atlas here. Got leads for me to sort?`,
+  handoff:`Understood. I'll score every lead and send the serious ones straight to Echo. The rest go back to Scout for more research.`,
+  numbers:`Qualified lead counts come straight from KMCE once we're connected. Right now, I'm scoring educator leads.`,
+  other:`Good question. Once I'm connected, I'll tell you which leads are worth your time.`},
+ claire:{hello:`Hi, I'm Claire. Who would you like me to look into?`,
+  handoff:`Of course. I'll research them thoroughly and verify everything. You'll have a clean brief before you meet.`,
+  numbers:`I only share what I can verify. Live records come from KMCE once we're connected. Right now, I'm on partner research.`,
+  other:`That's a thoughtful question. I'll need the live records to answer it properly. I'd rather be right than quick.`},
+ flow:{hello:`Hey, Flow here. What should run on autopilot?`,
+  handoff:`Easy. I'll map the steps and automate the repetitive parts. Every handoff between agents happens on its own.`,
+  numbers:`Workflow stats come straight from KMCE once we're connected. Right now, I'm building the CRM automations.`,
+  other:`Good question. Once I'm connected, I'll wire up a workflow that answers it for you every time.`},
+ ledger:{hello:`Ledger here. What do you need on the books?`,
+  handoff:`Noted. I'll record it, reconcile it, and flag anything that doesn't add up. Simon gets the summary.`,
+  numbers:`I don't estimate money. The real figures come from KMCE once we're connected. Until then, I'm working on the monthly close.`,
+  other:`Good question. I'll answer it from the ledger, once the ledger is connected. Precision first.`},
+ midas:{hello:`Midas. Let's talk about what people will pay for.`,
+  handoff:`I like it. I'll shape it into an offer, price it, and bring it to Simon with the plan to sell it.`,
+  numbers:`Revenue comes straight from KMCE once we're connected. Right now, I'm designing the live CE events offer.`,
+  other:`Good question. Show me the live data, and I'll show you where the money is.`},
+};
+function replyKey(q){
+ const t=q.toLowerCase();
+ if(/^(hi|hey|hello|yo|good (morning|afternoon|evening))\b/.test(t))return 'hello';
+ if(/number|stat|metric|kpi|revenue|how many|how much/.test(t))return 'numbers';
+ if(/priorit|top|most important/.test(t))return 'priority';
+ if(/hand|send|approve|delegate|team|assign/.test(t))return 'handoff';
+ if(/work|mission|project|progress|focus|doing/.test(t))return 'work';
+ if(/role|who are you|what do you do|responsib|help/.test(t))return 'role';
+ return 'other';
+}
+function reply(a,q){const key=replyKey(q);return {key,text:agentLines(a)[key]}}
+const synth=window.speechSynthesis;let voices=[];
+if(synth){const load=()=>voices=synth.getVoices().filter(v=>/^en/i.test(v.lang));load();synth.addEventListener?.('voiceschanged',load)}
+const VOICE_FEMALE=/female|zira|aria|jenny|samantha|victoria|karen|moira|tessa|susan|libby|sonia|natasha|google uk english female|google us english/i;
+const FEMALE=new Set(['marie','iris','cammy','lucy','alice','sofia','claire','maven']);
+function voiceFor(a){if(!voices.length)return null;const fem=voices.filter(v=>VOICE_FEMALE.test(v.name)),male=voices.filter(v=>!VOICE_FEMALE.test(v.name));const pool=(FEMALE.has(a.id)?fem:male).length?(FEMALE.has(a.id)?fem:male):voices;let h=0;for(const ch of a.id)h=(h*31+ch.charCodeAt(0))>>>0;return pool[h%pool.length]}
+/* ===== Voices: Kokoro runs inside the browser with each agent's voice from the Pegasus voice registry =====
+   On a WebGPU-capable browser the full model runs on the graphics chip (≈330MB once, then cached; faster than real time).
+   Otherwise the compact model runs on the processor (≈90MB, slower). Until it's ready, the browser's own voice is used. */
+const KOKORO_VOICE={simon:'bm_george',marie:'af_heart',iris:'af_sarah',mark:'am_eric',cammy:'bf_emma',evan:'am_liam',tube:'am_puck',lucy:'af_bella',snake:'am_fenrir',alice:'af_sky',echo:'bf_isabella',booker:'bm_lewis',midas:'am_onyx',scout:'am_puck',claire:'af_jessica',atlas:'am_echo',sofia:'af_nova',maven:'bf_lily',gatekeeper:'bm_fable',flow:'af_river',ledger:'am_michael'};
+const VOX={tts:null,loading:null,ctx:null,src:null};
+const KOKORO_WORKER=`import {KokoroTTS} from 'https://cdn.jsdelivr.net/npm/kokoro-js@1.2.1/dist/kokoro.web.js';
+let tts;
+self.onmessage=async({data:{id,type,text,voice,speed}})=>{
+ try{
+  if(type==='load'){
+   let gpu=null;try{gpu=await navigator.gpu?.requestAdapter()}catch{}
+   tts=await KokoroTTS.from_pretrained('onnx-community/Kokoro-82M-v1.0-ONNX',gpu?{dtype:'fp32',device:'webgpu'}:{dtype:'q8',device:'wasm'});
+   postMessage({id,ok:true});
+  }else{
+   const a=await tts.generate(text,{voice,speed});
+   postMessage({id,ok:true,audio:a.audio,sampling_rate:a.sampling_rate},[a.audio.buffer]);
+  }
+ }catch(err){postMessage({id,ok:false,error:String(err)})}
+};`;
+function loadVoices(){
+ if(VOX.tts||VOX.loading||VOX.failed)return VOX.loading;
+ let worker;
+ try{worker=new Worker(URL.createObjectURL(new Blob([KOKORO_WORKER],{type:'text/javascript'})),{type:'module'})}
+ catch(err){console.warn('Voice worker unavailable, using browser voice',err);VOX.failed=true;return null}
+ const pending=new Map();let seq=0;
+ const call=msg=>new Promise((ok,fail)=>{const id=++seq;pending.set(id,{ok,fail});worker.postMessage({...msg,id})});
+ worker.onmessage=({data})=>{const p=pending.get(data.id);if(!p)return;pending.delete(data.id);data.ok?p.ok(data):p.fail(new Error(data.error))};
+ worker.onerror=e=>{VOX.failed=true;VOX.tts=null;for(const p of pending.values())p.fail(new Error(e.message||'voice worker error'));pending.clear()};
+ VOX.loading=call({type:'load'})
+  .then(()=>{VOX.tts={generate:(text,{voice,speed})=>call({type:'generate',text,voice,speed})};return VOX.tts})
+  .catch(err=>{console.warn('Kokoro voices unavailable, using browser voice',err);VOX.loading=null;VOX.failed=true});
+ return VOX.loading;
+}
+function stopVoice(){try{VOX.src?.stop()}catch{}VOX.src=null}
+// Speaks sentence by sentence (the next one is generated while the current one plays).
+// onWord(n) lights caption words in step with the audio; onAmp(v) feeds the robot's voice light from the real waveform.
+async function kokoroSay(a,text,isLive,onWord,onAmp){
+ const tts=VOX.tts,voice=KOKORO_VOICE[a.id]||'af_heart';
+ const ctx=VOX.ctx||(VOX.ctx=new AudioContext());if(ctx.state==='suspended')await ctx.resume();
+ // Short first chunk = the voice starts sooner; long sentences break at commas.
+ const sentences=(text.match(/[^.!?]+[.!?]*["”']?\s*/g)||[text]).map(t=>t.trim()).filter(Boolean)
+  .flatMap(t=>t.split(/\s+/).length>10?t.split(/(?<=,)\s+/):[t]).filter(Boolean);
+ const SPEED=0.9,gen=t=>tts.generate(t,{voice,speed:SPEED});
+ let base=0,next=gen(sentences[0]);
+ for(let i=0;i<sentences.length;i++){
+  const audio=i===0?await Promise.race([next,new Promise((_,fail)=>setTimeout(()=>fail(new Error('voice slow')),3500))]):await next;if(!isLive())return;
+  if(i+1<sentences.length)next=gen(sentences[i+1]);
+  const buf=ctx.createBuffer(1,audio.audio.length,audio.sampling_rate);buf.copyToChannel(audio.audio,0);
+  const src=ctx.createBufferSource(),an=ctx.createAnalyser();an.fftSize=512;src.buffer=buf;src.connect(an);an.connect(ctx.destination);VOX.src=src;
+  const n=sentences[i].split(/\s+/).length,data=new Uint8Array(an.fftSize);
+  await new Promise(done=>{const t0=ctx.currentTime;
+   const tick=setInterval(()=>{if(!isLive()){clearInterval(tick);stopVoice();return done()}
+    an.getByteTimeDomainData(data);let e=0;for(const v of data){const x=(v-128)/128;e+=x*x}
+    onAmp(Math.min(1,Math.sqrt(e/data.length)*5));onWord(base+Math.ceil((ctx.currentTime-t0)/buf.duration*n))},40);
+   src.onended=()=>{clearInterval(tick);done()};src.start()});
+  base+=n;
+  // Breathe between phrases: longer after a full stop, shorter after a comma.
+  if(i+1<sentences.length&&isLive()){onAmp(0);await new Promise(r=>setTimeout(r,/[.!?]["”']?$/.test(sentences[i])?420:180))}
+ }
+}
+// Recorded lines: VoxCPM2 voices cloned from each agent's approved audition, pre-rendered on the founder's laptop.
+// RECORDED lists which lines exist so the page never requests a missing file.
+const RECORDED={};
+async function recordedSay(a,key,text,isLive,onWord,onAmp){
+ const ctx=VOX.ctx||(VOX.ctx=new AudioContext());if(ctx.state==='suspended')await ctx.resume();
+ const res=await fetch(`assets/voice/${a.id}/${key}.mp3`);if(!res.ok)throw new Error('missing line');
+ const buf=await ctx.decodeAudioData(await res.arrayBuffer());if(!isLive())return;
+ const src=ctx.createBufferSource(),an=ctx.createAnalyser();an.fftSize=512;src.buffer=buf;src.connect(an);an.connect(ctx.destination);VOX.src=src;
+ // Captions advance by character position, which tracks speech closely enough for one or two sentences.
+ const words=text.split(/\s+/),ends=[];let c=0;for(const w of words){c+=w.length+1;ends.push(c)}
+ const data=new Uint8Array(an.fftSize);
+ await new Promise(done=>{const t0=ctx.currentTime;
+  const tick=setInterval(()=>{if(!isLive()){clearInterval(tick);stopVoice();return done()}
+   an.getByteTimeDomainData(data);let e=0;for(const v of data){const x=(v-128)/128;e+=x*x}
+   onAmp(Math.min(1,Math.sqrt(e/data.length)*5));
+   const at=(ctx.currentTime-t0)/buf.duration*c;onWord(ends.findIndex(x=>x>at)+1||words.length)},40);
+  src.onended=()=>{clearInterval(tick);done()};src.start()});
+}
+// Claude writes the reply (server-side, /api/hq-chat). Anything unavailable falls back to the office's scripted answer.
+async function agentReply(a,q,history){
+ try{
+  const r=await fetch('/api/hq-chat',{method:'POST',headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(25000),
+   body:JSON.stringify({agentId:a.id,message:q,history:history.slice(-8),office:{duties:a.duties,missions:a.missions,quote:a.quote}})});
+  if(r.ok){const j=await r.json();if(j.text)return {key:null,text:j.text}}
+ }catch{}
+ return reply(a,q);
+}
+function wireConversation(s,a){
+ const cap=s.querySelector('.caption'),form=s.querySelector('.composer'),input=form.querySelector('input'),voiceBtn=form.querySelector('.voice'),mic=form.querySelector('.mic'),clips={listening:s.querySelector('.clip-listen'),speaking:s.querySelector('.clip-talk')};
+ let voiceOn=true,ampT,run=0,idleT,micOn=false;
+ // idle → listening (you type or talk) → speaking (they answer) → idle. Each state crossfades its own clip over the still.
+ function setState(st){
+  s.dataset.state=st;s.classList.toggle('listening',st==='listening');s.classList.toggle('speaking',st==='speaking');
+  for(const [k,v] of Object.entries(clips)){if(!v)continue;
+   if(k===st&&!motionPaused){if(v.paused){v.currentTime=0;v.play().catch(()=>{})}}
+   else setTimeout(()=>{if(s.dataset.state!==k){v.pause();v.currentTime=0}},500)}
+ }
+ function listen(){if(s.dataset.state==='speaking')return;setState('listening');clearTimeout(idleT);if(!micOn)idleT=setTimeout(()=>{if(s.dataset.state==='listening')setState('idle')},2600)}
+ input.addEventListener('input',()=>input.value?listen():setState('idle'));
+ voiceBtn.onclick=()=>{voiceOn=!voiceOn;voiceBtn.setAttribute('aria-pressed',String(voiceOn));voiceBtn.textContent=voiceOn?'🔊':'🔇';if(!voiceOn){synth?.cancel();stopVoice()}};
+ const setAmp=v=>s.style.setProperty('--amp',v.toFixed(2));
+ function start(){clearTimeout(idleT);setState('speaking');clearInterval(ampT);ampT=setInterval(()=>setAmp(.35+Math.random()*.65),110)}
+ function stop(){clearInterval(ampT);setAmp(0);if(s.dataset.state==='speaking')setState('idle')}
+ const history=[];
+ async function ask(q){
+  const id=++run;synth?.cancel();stopVoice();clearTimeout(idleT);
+  cap.innerHTML=`<span class="you">You: ${q.replace(/</g,'&lt;')}</span><span class="w on thinking">…</span>`;
+  setState('listening');s.classList.add('thinking');
+  const {key,text}=await agentReply(a,q,history);
+  s.classList.remove('thinking');if(id!==run)return;
+  history.push({role:'user',text:q},{role:'assistant',text});
+  speak(text,q,key);
+ }
+ function speak(text,asked,key){
+  const id=++run;synth?.cancel();stopVoice();
+  const words=text.split(/\s+/);
+  cap.innerHTML=(asked?`<span class="you">You: ${asked.replace(/</g,'&lt;')}</span>`:'')+words.map(w=>`<span class="w">${w.replace(/</g,'&lt;')}</span> `).join('');
+  const spans=[...cap.querySelectorAll('.w')];let lit=0;const light=n=>{for(;lit<Math.min(n,spans.length);lit++)spans[lit].classList.add('on')};
+  start();
+  if(voiceOn&&key&&RECORDED[a.id]?.includes(key)){
+   clearInterval(ampT);
+   recordedSay(a,key,text,()=>id===run,light,setAmp).then(()=>{if(id!==run)return;light(spans.length);stop()}).catch(()=>{if(id===run&&lit===0){ampT=setInterval(()=>setAmp(.35+Math.random()*.65),110);browserSpeak()}else if(id===run){light(spans.length);stop()}});
+   return;
+  }
+  if(voiceOn&&VOX.tts){
+   clearInterval(ampT);
+   kokoroSay(a,text,()=>id===run,light,setAmp).then(()=>{if(id!==run)return;light(spans.length);stop()})
+    .catch(()=>{if(id===run&&lit===0){ampT=setInterval(()=>setAmp(.35+Math.random()*.65),110);browserSpeak()}else if(id===run){light(spans.length);stop()}});
+   return;
+  }
+  browserSpeak();
+  function browserSpeak(){
+  // Captions always run on a timer; when the browser can speak, word boundaries keep them in sync with the voice.
+  const voiced=voiceOn&&synth;let synced=false;const pace=voiced?330:240;let i=0;const tick=setInterval(()=>{if(id!==run)return clearInterval(tick);i++;if(!synced)light(i);if(i>=spans.length&&!(voiceOn&&synth&&synth.speaking)){clearInterval(tick);stop()}},pace);
+  if(voiced){const u=new SpeechSynthesisUtterance(text);const v=voiceFor(a);if(v)u.voice=v;u.rate=1.02;u.pitch=FEMALE.has(a.id)?1.05:.92;
+   let chars=0;const offsets=words.map(w=>{const o=chars;chars+=w.length+1;return o});
+   u.onboundary=e=>{if(id!==run)return;synced=true;const n=offsets.findIndex(o=>o>e.charIndex);light(n<0?spans.length:n);setAmp(1)};
+   u.onend=u.onerror=()=>{if(id!==run)return;clearInterval(tick);light(spans.length);stop()};
+   synth.speak(u)}
+  }
+ }
+ form.onsubmit=e=>{e.preventDefault();const q=input.value.trim();if(!q)return;input.value='';ask(q)};
+ s.querySelectorAll('.suggest button').forEach(b=>b.onclick=()=>ask(b.textContent));
+ const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(SR){mic.hidden=false;mic.onclick=()=>{const r=new SR();r.lang='en-US';r.interimResults=true;mic.classList.add('live');synth?.cancel();run++;micOn=true;listen();
+  r.onresult=e=>{input.value=[...e.results].map(x=>x[0].transcript).join('');if(e.results[e.results.length-1].isFinal){const q=input.value.trim();input.value='';if(q)ask(q)}};
+  r.onend=r.onerror=()=>{mic.classList.remove('live');micOn=false;if(s.dataset.state==='listening')setState('idle')};r.start()}}
+ s.onArrive=()=>{cap.innerHTML='';if(voiceOn)loadVoices();setTimeout(()=>{if(current===s.dataset.key)speak(agentLines(a).greet,null,'greet')},1500)};
+ s.onLeave=()=>{run++;synth?.cancel();stopVoice();s.classList.remove('thinking');clearTimeout(idleT);stop();setState('idle')};
+ setState('idle');
+}
+
+/* ===== Real KMCE data (assets/data/kmce-snapshot.json, refreshed from the KMCE database on deploy) ===== */
+let KMCE=null;
+const kmceData=()=>KMCE||(KMCE=fetch('assets/data/kmce-snapshot.json',{cache:'no-cache'}).then(r=>r.json()));
+const money=n=>'$'+Math.round(n).toLocaleString('en-US');
+const num=n=>Math.round(n).toLocaleString('en-US');
+const fmtDay=d=>new Date(d+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'});
+// Numbers count up when the screen opens.
+function countUp(root){root.querySelectorAll('[data-count]').forEach(el=>{const to=+el.dataset.count,f=el.dataset.fmt==='money'?money:num;
+ if(reduced){el.textContent=f(to);return}const t0=performance.now(),dur=1300;
+ (function step(t){const p=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-p,3);el.textContent=f(to*e);if(p<1)requestAnimationFrame(step)})(t0)})}
+function sparkline(vals){const w=120,h=34,max=Math.max(...vals,1),pts=vals.map((v,i)=>[i/(vals.length-1)*w,h-3-(v/max)*(h-8)]);
+ const d=pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
+ return `<svg class="spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true"><path class="area" d="${d} L${w} ${h} L0 ${h} Z"/><path class="line" pathLength="300" d="${d}"/></svg>`}
+// Leaderboard score: real logged work from KMCE. Shown on screen so it's never a mystery number.
+const SCORE_RULE='Score = completed jobs ×3 + huddle tasks + assigned tasks ×2 + reports filed + leads found ×2';
+const scoreOf=m=>m?m.jobsDone*3+m.huddleTasks+m.tasks*2+m.huddles+m.meetingReports+m.leads*2:0;
+function barChart(el,days,key,label){
+ const W=560,H=190,pad={l:30,r:8,t:10,b:24},max=Math.max(...days.map(d=>d[key]),1),step=Math.pow(10,Math.floor(Math.log10(max))),top=Math.ceil(max/step)*step||1;
+ const bw=(W-pad.l-pad.r)/days.length,ys=[0,top/2,top];
+ const y=v=>pad.t+(H-pad.t-pad.b)*(1-v/top);
+ el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${label} per day"><g class="grid">${ys.map(v=>`<line x1="${pad.l}" x2="${W-pad.r}" y1="${y(v)}" y2="${y(v)}"/><text x="${pad.l-6}" y="${y(v)+3}" text-anchor="end">${num(v)}</text>`).join('')}</g>
+  ${days.map((d,i)=>{const x=pad.l+i*bw+bw*.22,w=bw*.56,h=y(0)-y(d[key]);return `<rect class="bar" x="${x}" y="${y(0)}" width="${w}" height="0" rx="4" data-h="${h}" data-y="${y(d[key])}"/><rect class="hit" x="${pad.l+i*bw}" y="${pad.t}" width="${bw}" height="${H-pad.t-pad.b}" data-i="${i}"/>`}).join('')}
+  <g class="xl">${days.map((d,i)=>`<text x="${pad.l+i*bw+bw/2}" y="${H-6}" text-anchor="middle">${fmtDay(d.day)}</text>`).join('')}</g></svg><div class="tip"></div>`;
+ const tip=el.querySelector('.tip');
+ el.querySelectorAll('rect.bar').forEach((b,i)=>{const go=()=>{b.setAttribute('y',b.dataset.y);b.setAttribute('height',b.dataset.h)};
+  if(reduced)go();else{b.style.transition=`y .9s ${i*60}ms cubic-bezier(.2,.75,.2,1),height .9s ${i*60}ms cubic-bezier(.2,.75,.2,1)`;requestAnimationFrame(()=>requestAnimationFrame(go))}});
+ el.querySelectorAll('rect.hit').forEach(h=>{const d=days[h.dataset.i];
+  h.onmouseenter=()=>{const r=el.getBoundingClientRect(),b=h.getBoundingClientRect();tip.innerHTML=`${fmtDay(d.day)} · <b>${num(d[key])}</b> ${label.toLowerCase()}`;tip.style.left=(b.left-r.left+b.width/2)+'px';const sc=el.querySelector('svg').getBoundingClientRect().height/H;tip.style.top=(Math.min(+el.querySelectorAll('rect.bar')[h.dataset.i].dataset.y,H-pad.b-14)*sc)+'px';tip.style.opacity=1};
+  h.onmouseleave=()=>tip.style.opacity=0});
+}
+const dashSide=(active)=>`<aside class="dash-side"><div class="dash-logo"><span class="emb"><video data-play muted loop playsinline preload="auto" src="assets/pegasus-centerpiece.mp4" aria-hidden="true"></video></span><span><b>PEGASUS</b><span>COMMAND CRM</span></span></div>
+ ${[['dash','◈','Dashboard','crm'],['team','✦','AI Workforce','floor'],['client','⌂','Clients','lobby'],['approvals','✓','Approvals','crm'],['war','⚑','War Room','war-room'],['exec','♛','Executive Office','room/simon']].map(([k,i,l,go])=>`<button class="dash-nav${k===active?' on':''}" type="button" data-go="${go}"><i>${i}</i>${l}</button>`).join('')}
+ <div class="foot">Live data from the KMCE database. Agents' figures are their real logged work.</div></aside>`;
+
+/* ===== CRM dashboard ===== */
+function buildCRM(){
+ const s=document.createElement('section');s.className='dash';s.setAttribute('aria-label','Pegasus CRM dashboard');
+ s.innerHTML=`${dashSide('dash')}<div class="dash-main"><p class="sample">Loading live data…</p></div>`;
+ s.querySelectorAll('.dash-side [data-go]').forEach(b=>b.onclick=travel(b.dataset.go));
+ kmceData().then(D=>{
+  const k=D.kpis,F=D.finance,days=D.daily,asOf=new Date(D.asOf);
+  const ranked=FLOOR.map(a=>({a,m:D.agents[a.id],score:scoreOf(D.agents[a.id])})).sort((x,y)=>y.score-x.score);
+  const active=ranked.filter(r=>r.score>0),idle=ranked.filter(r=>!r.score),top=active[0]?.score||1;
+  const medals=['#ffd27a','#d9e2ec','#e0a06a'];
+  const client=D.clients[0];
+  s.querySelector('.dash-main').innerHTML=`
+  <div class="dash-head"><div><h2>PEGASUS CRM</h2><p>Your AI workforce, your pipeline, your clients. Real numbers from KMCE.</p></div>
+   <span class="live">LIVE DATA · AS OF ${asOf.toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}</span></div>
+  <div class="kgrid">
+   <div class="card" style="--i:0"><div class="k-lab">Collected</div><div class="k-val" data-count="${F.collected}" data-fmt="money">$0</div><div class="k-sub">of ${money(F.contracted)} contracted · <b style="color:#ffd27a">${money(F.outstanding)} due</b></div>${sparkline([0,0,3,3,6,6,9])}</div>
+   <div class="card" style="--i:1"><div class="k-lab">Huddle reports filed</div><div class="k-val" data-count="${k.huddleReports}">0</div><div class="k-sub">by the AI team · last ${days.length} days</div>${sparkline(days.map(d=>d.huddles))}</div>
+   <div class="card" style="--i:2"><div class="k-lab">Jobs completed</div><div class="k-val" data-count="${k.jobsCompleted}">0</div><div class="k-sub"><b>${k.jobsFailed} failed</b> · ${num(k.workerRuns)} worker runs</div>${sparkline(days.map(d=>d.jobs))}</div>
+   <div class="card" style="--i:3"><div class="k-lab">Agent tasks</div><div class="k-val" data-count="${k.tasksQueued+k.tasksAwaitingApproval}">0</div><div class="k-sub">${k.tasksAwaitingApproval} awaiting your approval</div>${sparkline(days.map(d=>d.tasks))}</div>
+   <div class="card" style="--i:4"><div class="k-lab">Leads discovered</div><div class="k-val" data-count="${k.leadsDiscovered}">0</div><div class="k-sub">found by Scout</div>${sparkline(days.map(d=>d.leads))}</div>
+   <div class="card" style="--i:5"><div class="k-lab">Provider directory</div><div class="k-val" data-count="${k.providers}">0</div><div class="k-sub">${num(k.offices)} offices mapped</div>${sparkline([1,2,3,4,5,6,7])}</div>
+  </div>
+  <div class="drow">
+   <div class="card" style="--i:6"><h3>AI WORKFORCE LEADERBOARD <small>ranked by logged work</small></h3>
+    ${active.map((r,i)=>`<button class="lb-row${i<3?' top':''}" type="button" data-room="${r.a.id}" style="--medal:${medals[i]||'transparent'}"><span class="lb-rank">${i+1}</span>${orb(r.a)}<span class="lb-name"><b>${r.a.name}</b><span>${r.m.jobsDone?r.m.jobsDone+' jobs · ':''}${r.m.huddleTasks?r.m.huddleTasks+' huddle tasks · ':''}${r.m.tasks?r.m.tasks+' tasks · ':''}${r.m.leads?r.m.leads+' leads · ':''}${r.m.huddles+r.m.meetingReports} reports</span></span><span class="lb-bar"><i data-w="${(r.score/top*100).toFixed(1)}"></i></span><span class="lb-score">${r.score}</span></button>`).join('')}
+    ${idle.length?`<div class="lb-note">No logged work in KMCE yet:</div><div class="lb-idle">${idle.map(r=>`<button type="button" data-room="${r.a.id}">${r.a.name}</button>`).join('')}</div>`:''}
+    <div class="lb-note">${SCORE_RULE}.</div>
+   </div>
+   <div style="display:grid;gap:16px;align-content:start">
+    <div class="card" style="--i:7"><h3>DAILY ACTIVITY</h3><div class="seg" role="tablist">${[['runs','Worker runs'],['jobs','Jobs done'],['huddles','Huddle reports'],['tasks','New tasks']].map(([key,l],i)=>`<button type="button" class="${i?'':'on'}" data-key="${key}" data-label="${l}">${l}</button>`).join('')}</div><div class="chart"></div></div>
+    <div class="card" style="--i:8"><h3>MONEY <small>all clients</small></h3><div class="rev-hero" data-count="${F.collected}" data-fmt="money">$0</div><div class="rev-hero"><small>COLLECTED OF ${money(F.contracted)} CONTRACTED</small></div>
+     <div class="rev-row"><span>Collected</span><b>${money(F.collected)}</b><span class="lb-bar"><i data-w="${(F.collected/F.contracted*100).toFixed(1)}"></i></span></div>
+     <div class="rev-row muted"><span>Outstanding</span><b>${money(F.outstanding)}</b><span class="lb-bar"><i data-w="${(F.outstanding/F.contracted*100).toFixed(1)}"></i></span></div>
+     <div class="stat-line" style="margin-top:12px"><span>Next payment · ${fmtDay(F.nextDue.date)}</span><b>${money(F.nextDue.amount)} <em class="chip wait">◷ Due</em></b></div>
+     <div class="stat-line"><span>Recurring from ${fmtDay(F.recurring.starts)}</span><b>${money(F.recurring.amount)}/mo</b></div>
+     <div class="k-lab" style="margin-top:12px">How it was paid</div>
+     ${F.byMethod.map(m=>`<div class="stat-line"><span>${m.label}</span><b>${money(m.amount)}</b></div>`).join('')}</div>
+   </div>
+  </div>
+  <div class="drow three">
+   <div class="card" style="--i:9"><h3>AWAITING YOUR APPROVAL <small>${client.workstreams.length} workstreams</small></h3>
+    ${client.workstreams.map(w=>`<button class="appr" type="button" data-room="${w.lead}">${orb(byId[w.lead])}<span>${w.name}<small>${byId[w.lead].name} leads · ${client.short}</small></span><em class="chip wait">◷ Approval</em></button>`).join('')}</div>
+   <div class="card" style="--i:10"><h3>CLIENTS</h3><button class="client-card" type="button" data-go="client/${client.id}"><span class="orb" style="--c:#dfba80">TA</span><span><b>${client.name}</b><span>${client.credentials} · ${client.track}</span><span>${client.campaign.name}</span></span></button>
+    <div class="stat-line" style="margin-top:10px"><span>Collected</span><b>${money(client.payments.recorded)} of ${money(client.payments.contracted)}</b></div><div class="stat-line"><span>Outstanding</span><b>${money(client.payments.outstanding)} · due ${fmtDay(D.finance.nextDue.date)}</b></div><div class="stat-line"><span>Next event</span><b>${client.event.city}, ${client.event.state} · ${client.event.ceHours} CE hrs</b></div></div>
+   <div class="card" style="--i:11"><h3>AUTONOMY ENGINE</h3>
+    <div class="stat-line"><span>Worker runs</span><b>${num(k.workerRuns)}</b></div><div class="stat-line"><span>Jobs completed</span><b>${num(k.jobsCompleted)}</b></div><div class="stat-line"><span>Failed jobs</span><b>${k.jobsFailed}</b></div><div class="stat-line"><span>Huddle reports filed</span><b>${num(k.huddleReports)}</b></div><div class="stat-line"><span>Campaign milestones</span><b>${k.milestonesOpen} open · ${k.milestonesPaused} paused</b></div><div class="stat-line"><span>Active clients</span><b>${k.activeClients}</b></div></div>
+  </div>
+  <p class="src">Source: ${D.source}. Snapshot ${asOf.toLocaleString()}. ${D.excluded||''} Figures update each time the HQ is deployed.</p>`;
+  const main=s.querySelector('.dash-main'),chart=main.querySelector('.chart');
+  main.querySelectorAll('[data-room]').forEach(b=>b.onclick=travel('room/'+b.dataset.room));
+  main.querySelectorAll('[data-go]').forEach(b=>b.onclick=travel(b.dataset.go));
+  main.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{main.querySelectorAll('.seg button').forEach(x=>x.classList.toggle('on',x===b));barChart(chart,days,b.dataset.key,b.dataset.label)});
+  s.playIn=()=>{s.classList.remove('in');void s.offsetWidth;s.classList.add('in');countUp(main);barChart(chart,days,'runs','Worker runs');
+   requestAnimationFrame(()=>main.querySelectorAll('.lb-bar i').forEach(i=>i.style.width=i.dataset.w+'%'))};
+  if(current==='crm')s.playIn();
+ });
+ s.onArrive=()=>s.playIn?.();
+ return s;
+}
+
+/* ===== War room — mission flow ===== */
+function buildWarRoom(){
+ const s=document.createElement('section');s.className='dash';s.setAttribute('aria-label','War Room');
+ s.innerHTML=`${dashSide('war')}<div class="dash-main"><p class="sample">Loading missions…</p></div>`;
+ s.querySelectorAll('.dash-side [data-go]').forEach(b=>b.onclick=travel(b.dataset.go));
+ kmceData().then(D=>{
+  const k=D.kpis,c=D.clients[0],iso=new Date().toISOString().slice(0,10),asOf=new Date(D.asOf);
+  const start=new Date(c.campaign.start+'T00:00:00'),end=new Date(c.campaign.end+'T00:00:00');
+  const total=Math.round((end-start)/864e5)+1,day=Math.min(total,Math.max(0,Math.floor((Date.now()-start)/864e5)+1));
+  const next=c.milestones.filter(m=>m.due>=iso).slice(0,4);
+  const founder=(lab,sub)=>`<div class="wf-step founder"><span class="orb" style="--c:#dfba80">◆</span><b>${lab}</b><small>${sub}</small></div>`;
+  const agentStep=(id,sub)=>`<button class="wf-step" type="button" data-room="${id}" style="--c:${byId[id].c}">${orb(byId[id])}<b>${byId[id].name}</b><small>${sub}</small></button>`;
+  const crew=['iris','mark','alice','echo','snake'];
+  s.querySelector('.dash-main').innerHTML=`
+  <div class="dash-head"><div><h2>WAR ROOM</h2><p>Mission execution. Every mission, every owner, every gate.</p></div>
+   <span class="live">LIVE DATA · AS OF ${asOf.toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}</span></div>
+  <div class="card wf" style="--i:0"><h3>CHAIN OF COMMAND <small>how every mission moves</small></h3>
+   <div class="wf-row">${founder('You','set the mission')}<i class="wf-arrow"></i>${agentStep('simon','strategy & priority')}<i class="wf-arrow"></i>${agentStep('marie','dispatch & operations')}<i class="wf-arrow"></i>
+    <button class="wf-step" type="button" data-go="floor" style="--c:#7ddcf3"><span class="wf-crew">${crew.map(id=>orb(byId[id])).join('')}</span><b>Specialists</b><small>the employee floor</small></button><i class="wf-arrow"></i>
+    ${agentStep('gatekeeper','review & compliance')}<i class="wf-arrow"></i>${founder('You','final decision')}</div></div>
+  <div class="kgrid" style="margin-top:16px">
+   <div class="card" style="--i:1"><div class="k-lab">Active missions</div><div class="k-val" data-count="${D.clients.length}">0</div><div class="k-sub">${c.campaign.name}</div></div>
+   <div class="card" style="--i:2"><div class="k-lab">Mission day</div><div class="k-val"><span data-count="${day}">0</span><small style="font-size:14px;color:var(--mute)"> / ${total}</small></div><div class="k-sub">${fmtDay(c.campaign.start)} – ${fmtDay(c.campaign.end)}</div></div>
+   <div class="card" style="--i:3"><div class="k-lab">Awaiting your approval</div><div class="k-val" data-count="${k.tasksAwaitingApproval}">0</div><div class="k-sub">workstreams ready to launch</div></div>
+   <div class="card" style="--i:4"><div class="k-lab">Tasks queued</div><div class="k-val" data-count="${k.tasksQueued}">0</div><div class="k-sub">across the floor</div></div>
+   <div class="card" style="--i:5"><div class="k-lab">Jobs completed</div><div class="k-val" data-count="${k.jobsCompleted}">0</div><div class="k-sub"><b>${k.jobsFailed} failed</b></div></div>
+   <div class="card" style="--i:6"><div class="k-lab">Milestones</div><div class="k-val" data-count="${k.milestonesOpen}">0</div><div class="k-sub">open · ${k.milestonesPaused} paused</div></div>
+  </div>
+  <div class="drow">
+   <div class="card" style="--i:7"><h3>MISSION: ${c.short.toUpperCase()} · ${c.campaign.name.toUpperCase()} <small>${c.workstreams.length} workstreams</small></h3>
+    <div class="mprog"><span style="--p:${(day/total*100).toFixed(1)}%"></span></div>
+    ${c.workstreams.map(w=>`<div class="ws"><button class="ws-lead" type="button" data-room="${w.lead}">${orb(byId[w.lead])}</button><span class="ws-txt"><b>${w.name}</b><small>${byId[w.lead].name} leads${w.support.length?' · with '+w.support.map(x=>byId[x].name).join(', '):''}</small></span><span class="ws-team">${w.support.map(x=>`<button type="button" data-room="${x}" title="${byId[x].name}">${orb(byId[x])}</button>`).join('')}</span><em class="chip wait">◷ Awaiting approval</em></div>`).join('')}
+   </div>
+   <div style="display:grid;gap:16px;align-content:start">
+    <div class="card" style="--i:8"><h3>NEXT GATES</h3><ol class="tl">${next.map((m,i)=>`<li class="${i?'':'today'}"><span class="d">${fmtDay(m.due)}</span><span class="dot"></span><span>${m.label}</span>${m.status==='Paused'?'<em class="chip pause">❚❚ Paused</em>':''}</li>`).join('')}</ol></div>
+    <div class="card" style="--i:9"><h3>AUTONOMY ENGINE</h3><div class="stat-line"><span>Worker runs</span><b>${num(k.workerRuns)}</b></div><div class="stat-line"><span>Jobs completed</span><b>${num(k.jobsCompleted)}</b></div><div class="stat-line"><span>Failed</span><b>${k.jobsFailed}</b></div><div class="stat-line"><span>Huddle reports</span><b>${num(k.huddleReports)}</b></div></div>
+   </div>
+  </div>
+  <p class="src">Source: ${D.source}. Snapshot ${asOf.toLocaleString()}.</p>`;
+  const main=s.querySelector('.dash-main');
+  main.querySelectorAll('[data-room]').forEach(b=>b.onclick=travel('room/'+b.dataset.room));
+  main.querySelectorAll('[data-go]').forEach(b=>b.onclick=travel(b.dataset.go));
+  s.playIn=()=>{s.classList.remove('in');void s.offsetWidth;s.classList.add('in');countUp(main)};
+  if(current==='war-room')s.playIn();
+ });
+ s.onArrive=()=>s.playIn?.();
+ return s;
+}
+
+/* ===== Clients: searchable list; each name opens that client's portal ===== */
+function clientInitials(n){return n.replace(/^Dr\.?\s+/i,'').split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase()}
+function buildClientList(){
+ const s=document.createElement('section');s.className='dash';s.setAttribute('aria-label','Clients');
+ s.innerHTML=`${dashSide('client')}<div class="dash-main"><p class="sample">Loading clients…</p></div>`;
+ s.querySelectorAll('.dash-side [data-go]').forEach(b=>b.onclick=travel(b.dataset.go));
+ kmceData().then(D=>{
+  const today=Date.now();
+  const rows=D.clients.map(c=>{const st=new Date(c.campaign.start+'T00:00:00'),en=new Date(c.campaign.end+'T00:00:00'),total=Math.round((en-st)/864e5)+1,day=Math.min(total,Math.max(0,Math.floor((today-st)/864e5)+1));return {c,day,total}});
+  s.querySelector('.dash-main').innerHTML=`
+  <div class="dash-head"><div><h2>CLIENTS</h2><p>Every client, one click from their portal.</p></div><span class="live">${D.clients.length} ACTIVE ${D.clients.length===1?'CLIENT':'CLIENTS'}</span></div>
+  <div class="card" style="--i:0">
+   <div class="cl-tools"><input class="cl-search" type="search" placeholder="Search clients by name, specialty, or program…" aria-label="Search clients"><span class="cl-count"></span></div>
+   <div class="cl-table" role="table">
+    <div class="cl-row cl-headrow" role="row"><span>Client</span><span>Program</span><span>Progress</span><span>Payments</span><span>Status</span><span></span></div>
+    ${rows.map(({c,day,total})=>`<a class="cl-row" role="row" href="#/client/${c.id}" data-go="client/${c.id}" data-search="${(c.name+' '+c.credentials+' '+c.track+' '+c.campaign.name+' '+c.title).toLowerCase().replace(/"/g,'')}">
+     <span class="cl-who"><span class="orb" style="--c:#dfba80">${clientInitials(c.name)}</span><span><b>${c.name}</b><small>${c.credentials} · ${c.track}</small></span></span>
+     <span class="cl-prog-name">${c.campaign.name}</span>
+     <span class="cl-prog"><span class="mprog"><span style="--p:${(day/total*100).toFixed(1)}%"></span></span><small>Day ${day} of ${total}</small></span>
+     <span class="cl-pay"><b>${money(c.payments.recorded)}</b><small>${c.payments.outstanding?money(c.payments.outstanding)+' outstanding':'paid in full'}</small></span>
+     <span><em class="chip ok">✓ ${c.status}</em></span>
+     <span class="cl-open">Open portal →</span></a>`).join('')}
+    <p class="cl-empty" hidden>No clients match that search.</p>
+   </div>
+   <p class="lb-note">New clients appear here automatically as they're added in KMCE.</p>
+  </div>`;
+  const main=s.querySelector('.dash-main'),search=main.querySelector('.cl-search'),count=main.querySelector('.cl-count'),items=[...main.querySelectorAll('a.cl-row')];
+  const filter=()=>{const q=search.value.trim().toLowerCase();let n=0;items.forEach(r=>{const hit=!q||r.dataset.search.includes(q);r.hidden=!hit;n+=hit});count.textContent=`${n} of ${items.length}`;main.querySelector('.cl-empty').hidden=n>0};
+  search.addEventListener('input',filter);filter();
+  items.forEach(a=>a.onclick=e=>{e.preventDefault();travel(a.dataset.go)(e)});
+  s.playIn=()=>{s.classList.remove('in');void s.offsetWidth;s.classList.add('in')};
+  if(current==='lobby')s.playIn();
+ });
+ s.onArrive=()=>s.playIn?.();
+ return s;
+}
+
+/* ===== Client portal ===== */
+function buildClientPortal(id){
+ const s=document.createElement('section');s.className='dash portal';s.setAttribute('aria-label','Client portal');
+ s.innerHTML=`<div class="dash-main"><p class="sample">Loading client…</p></div>`;
+ kmceData().then(D=>{
+  const c=D.clients.find(x=>x.id===id);
+  if(!c){s.querySelector('.dash-main').innerHTML='<p class="sample">That client is not in KMCE yet.</p>';return}
+  const today=new Date(),start=new Date(c.campaign.start+'T00:00:00'),end=new Date(c.campaign.end+'T00:00:00');
+  const total=Math.round((end-start)/864e5)+1,day=Math.min(total,Math.max(0,Math.floor((today-start)/864e5)+1)),R=56,C=2*Math.PI*R;
+  const iso=today.toISOString().slice(0,10);
+  s.querySelector('.dash-main').innerHTML=`
+  <div class="p-tabs"><button type="button" data-go="lobby">← All clients</button><button class="on" type="button">● ${c.name}</button></div>
+  <div class="card p-hero" style="--i:0"><div><div class="k-lab">CLIENT PORTAL · WELCOME BACK</div><h2>${c.name}</h2><div class="cred">${c.credentials}</div><p>${c.title}. ${c.track} track · <em class="chip ok">✓ ${c.status}</em></p></div>
+   <div class="ring" aria-label="Day ${day} of ${total}"><svg viewBox="0 0 132 132"><defs><linearGradient id="ringGold" x1="0" x2="1"><stop offset="0" stop-color="#9b7a45"/><stop offset="1" stop-color="#ffd998"/></linearGradient></defs><circle class="track" cx="66" cy="66" r="${R}"/><circle class="fill" cx="66" cy="66" r="${R}" stroke-dasharray="${C}" stroke-dashoffset="${C}" data-off="${C*(1-day/total)}"/></svg><div><span><b>${day}</b>OF ${total} DAYS</span></div></div></div>
+  <div class="drow three">
+   <div class="card" style="--i:1"><h3>YOUR CAMPAIGN</h3><div class="stat-line"><span>${c.campaign.name}</span></div><div class="stat-line"><span>Window</span><b>${fmtDay(c.campaign.start)} – ${fmtDay(c.campaign.end)}</b></div><div class="stat-line"><span>Status</span><em class="chip wait">◷ ${c.campaign.status} · awaiting approval</em></div><div class="stat-line"><span>Workstreams</span><b>${c.workstreams.length}</b></div></div>
+   <div class="card" style="--i:2"><h3>PAYMENTS</h3><div class="rev-hero" data-count="${c.payments.recorded}" data-fmt="money">$0</div><div class="rev-hero"><small>PAID OF ${money(c.payments.contracted)} · ${money(c.payments.outstanding)} REMAINING</small></div>
+    ${c.agreements.map(a=>`<div class="agr"><div class="agr-head"><span>${a.title}</span><em class="chip ${a.paid>=a.total?'ok':'wait'}">${a.paid>=a.total?'✓ ':'◷ '}${a.status}</em></div>
+     <div class="rev-row"><span>${money(Math.min(a.paid,a.total))} of ${money(a.total)} paid</span><b>${money(Math.max(0,a.total-a.paid))} left</b><span class="lb-bar"><i data-w="${Math.min(100,a.paid/a.total*100).toFixed(1)}"></i></span></div>
+     ${a.schedule.length?`<ul class="sched">${a.schedule.map(x=>`<li><span>${fmtDay(x.due)}</span><span>${x.label}</span><b>${money(x.amount)}</b>${x.paid?'<em class="chip ok">✓ Paid</em>':'<em class="chip wait">◷ Due</em>'}</li>`).join('')}</ul>`:''}
+     <small class="agr-note">${a.note}</small></div>`).join('')}</div>
+   <div class="card" style="--i:3"><h3>UPCOMING EVENT</h3><div class="stat-line"><span><b style="color:var(--gold-hi)">${c.event.title}</b></span></div><div class="stat-line"><span>Where</span><b>${c.event.city}, ${c.event.state}</b></div><div class="stat-line"><span>Format</span><b>${c.event.type} · ${c.event.ceHours} CE hours</b></div><div class="stat-line"><span>Tuition</span><b>${money(c.event.tuition)}</b></div><div class="stat-line"><span>Status</span><em class="chip pause">${c.event.status}</em></div></div>
+  </div>
+  <div class="drow">
+   <div class="card" style="--i:4"><h3>YOUR PEGASUS TEAM <small>tap an agent to visit their office</small></h3>
+    ${c.workstreams.map(w=>`<button class="appr" type="button" data-room="${w.lead}">${orb(byId[w.lead])}<span>${w.name}<small>${byId[w.lead].name} leads${w.support.length?' · with '+w.support.map(x=>byId[x].name).join(', '):''}</small></span><em class="chip wait">◷ Pending</em></button>`).join('')}</div>
+   <div class="card" style="--i:5"><h3>TIMELINE</h3><ol class="tl">
+    ${c.milestones.map(m=>{const past=m.due<iso,open=past&&m.status==='Open'&&!/start/i.test(m.label);return `<li class="${past?'past':''}"><span class="d">${fmtDay(m.due)}</span><span class="dot"></span><span>${m.label}</span>${m.status==='Paused'?'<em class="chip pause">❚❚ Paused</em>':open?'<em class="chip wait">◷ Open</em>':''}</li>`}).join('')}
+    </ol></div>
+  </div>
+  <div class="card" style="--i:6;margin-top:16px"><h3>CONCIERGE</h3><div class="concierge">${[['Book a meeting','with Booker','booker'],['Campaign update','from Marie','marie'],['Performance report','from Snake','snake'],['Landing page','with Alice','alice'],['Podcast & speaking','with Echo','echo'],['Ask the Executive','Simon','simon']].map(([t,d,id])=>`<button type="button" data-room="${id}"><strong>${t}</strong><span>${d}</span></button>`).join('')}</div></div>
+  <p class="src">Client record from the KMCE database. Snapshot ${new Date(D.asOf).toLocaleString()}.</p>`;
+  const main=s.querySelector('.dash-main');
+  main.querySelectorAll('[data-room]').forEach(b=>b.onclick=travel('room/'+b.dataset.room));
+  s.playIn=()=>{s.classList.remove('in');void s.offsetWidth;s.classList.add('in');countUp(main);requestAnimationFrame(()=>main.querySelectorAll('.lb-bar i').forEach(i=>i.style.width=i.dataset.w+'%'));const f=main.querySelector('.ring .fill');requestAnimationFrame(()=>requestAnimationFrame(()=>f.style.strokeDashoffset=f.dataset.off))};
+  main.querySelectorAll('[data-go]').forEach(b=>b.onclick=travel(b.dataset.go));
+  if(current===s.dataset.key)s.playIn();
+ });
+ s.onArrive=()=>s.playIn?.();
+ return s;
+}
+
+/* ===== Intro + motion control ===== */
+const intro=document.querySelector('#intro'),introVideo=document.querySelector('#intro-video');
+function enterHQ(){intro.classList.add('done');introVideo.pause();const start=location.hash.replace(/^#\//,'');go(sceneInfo(start)?start:'hq',{dir:'fwd'})}
+document.querySelector('#enter').onclick=enterHQ;
+if(reduced||location.hash.length>2){enterHQ()}else{introVideo.play().catch(()=>{});document.querySelector('#enter').focus()}
+const motionBtn=document.querySelector('#motion');
+motionBtn.onclick=()=>{motionPaused=!motionPaused;document.body.classList.toggle('paused',motionPaused);motionBtn.textContent=motionPaused?'Resume motion':'Pause motion';motionBtn.setAttribute('aria-pressed',String(motionPaused));const el=cache[current];if(!el)return;if(motionPaused){sleep(el);el.pauseLoop&&el.pauseLoop()}else arrive(el)};
+</script>
+</body></html>

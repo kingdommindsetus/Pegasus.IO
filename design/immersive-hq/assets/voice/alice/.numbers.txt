@@ -1,0 +1,1 @@
+Shop revenue and conversion come straight from KMCE once we're connected. Right now, I'm focused on the checkout redesign.
